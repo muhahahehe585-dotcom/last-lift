@@ -1,0 +1,53 @@
+.menu-screen {
+  min-height: 100vh;
+  display: grid;
+  place-items: center;
+  padding: 24px;
+  background:
+    linear-gradient(rgba(0, 0, 0, 0.35), rgba(0, 0, 0, 0.72)),
+    repeating-linear-gradient(90deg, #171817 0 42px, #20231f 42px 46px);
+}
+
+.menu-panel {
+  width: min(520px, 100%);
+  display: grid;
+  gap: 18px;
+  padding: 28px;
+  border: 2px solid #596057;
+  border-radius: 8px;
+  background: #ece8dc;
+  color: #171817;
+  box-shadow: 0 30px 90px rgba(0, 0, 0, 0.45);
+}
+
+.menu-panel h1 {
+  font-size: 56px;
+}
+
+.menu-actions,
+.menu-copy {
+  display: grid;
+  gap: 12px;
+}
+
+.menu-copy p {
+  margin: 0;
+  color: #363a35;
+  line-height: 1.45;
+}
+
+.shop-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 14px;
+  border: 2px solid #596057;
+  border-radius: 8px;
+  background: #d9d4c5;
+}
+
+.shop-item strong {
+  display: block;
+  margin-bottom: 4px;
+}

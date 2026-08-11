@@ -2,11 +2,12 @@ import { Link } from 'wouter';
 
 export function NotFoundPage() {
   return (
-    <main className="container">
-      <section className="hello">
-        <h1>Такой страницы пока нет</h1>
+    <main className="not-found">
+      <section>
+        <p className="eyebrow">Last Lift</p>
+        <h1>Page not found</h1>
         <p>
-          <Link href="/">Вернуться на главную</Link>
+          <Link href="/">Back to the game</Link>
         </p>
       </section>
     </main>
