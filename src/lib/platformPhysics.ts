@@ -118,7 +118,9 @@ export function updatePlatformGame(state: PlatformGameState, input: InputState, 
   const speed = state.inVent ? crawlSpeed : running ? runSpeed : moveSpeed;
   const vx = input.left ? -speed : input.right ? speed : 0;
   const canDoubleJump = !state.inVent && state.doubleJumpUnlocked && !state.player.grounded && !state.player.doubleJumpUsed;
-  const wantsJump = !state.inVent && input.jumpPressed && (state.player.grounded || canDoubleJump);
+  const wantsGroundJump = !state.inVent && input.jumpPressed && state.player.grounded;
+  const wantsDoubleJump = input.doubleJumpPressed && canDoubleJump;
+  const wantsJump = wantsGroundJump || wantsDoubleJump;
   const jump = wantsJump ? -jumpPower : state.player.vy;
   const isSlamming = state.player.isSlamming || (!wantsJump && !state.player.grounded && input.slamPressed);
   const slam = isSlamming ? slamSpeed : jump;
@@ -129,7 +131,7 @@ export function updatePlatformGame(state: PlatformGameState, input: InputState, 
     stamina,
     running,
     isSlamming,
-    doubleJumpUsed: canDoubleJump && wantsJump ? true : state.player.doubleJumpUsed,
+    doubleJumpUsed: wantsDoubleJump ? true : state.player.doubleJumpUsed,
     facing: vx < 0 ? -1 : vx > 0 ? 1 : state.player.facing,
   };
   player.x = Math.max(0, Math.min(worldWidth - player.width, player.x + player.vx * dt));

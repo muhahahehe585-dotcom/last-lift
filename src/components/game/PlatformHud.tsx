@@ -13,6 +13,7 @@ function formatTime(seconds: number) {
 
 export function PlatformHud({ state, onRestart }: PlatformHudProps) {
   const timer = state.bossTimeLeft > 0 ? formatTime(state.bossTimeLeft) : `${state.floorTimeLeft}s`;
+  const bullets = state.hasGun ? (state.unlimitedGun ? 'Unlimited' : state.shots) : 'None';
 
   return (
     <aside className="platform-hud">
@@ -21,11 +22,29 @@ export function PlatformHud({ state, onRestart }: PlatformHudProps) {
         <h1>Floor {state.floor}/100</h1>
       </div>
 
-      <div className="health-shell" aria-label="Health">
-        <div className="health-fill" style={{ width: `${state.player.hp}%` }} />
-      </div>
-      <div className="stamina-shell" aria-label="Stamina">
-        <div className="stamina-fill" style={{ width: `${state.player.stamina}%` }} />
+      <div className="combat-status-card">
+        <div className="meter-row">
+          <span>Health</span>
+          <strong>{Math.round(state.player.hp)}%</strong>
+        </div>
+        <div className="health-shell" aria-label="Health">
+          <div className="health-fill" style={{ width: `${state.player.hp}%` }} />
+        </div>
+        <div className="meter-row">
+          <span>Stamina</span>
+          <strong>{Math.round(state.player.stamina)}%</strong>
+        </div>
+        <div className="stamina-shell" aria-label="Stamina">
+          <div className="stamina-fill" style={{ width: `${state.player.stamina}%` }} />
+        </div>
+        <div className="resource-row">
+          <span>Flashlights</span>
+          <strong>{state.flashlights}</strong>
+        </div>
+        <div className="resource-row">
+          <span>Bullets</span>
+          <strong>{bullets}</strong>
+        </div>
       </div>
 
       <div className="platform-stats">
@@ -34,11 +53,8 @@ export function PlatformHud({ state, onRestart }: PlatformHudProps) {
         <span>Double jump {state.doubleJumpUnlocked ? 'owned' : 'locked'}</span>
         <span>Stones {state.infinityStones}/6</span>
         <span>Gauntlet {state.gauntletOwned ? 'owned' : 'locked'}</span>
-        <span>Flashlights {state.flashlights}</span>
-        <span>Gun {state.hasGun ? (state.unlimitedGun ? 'unlimited' : `${state.shots} shots`) : 'none'}</span>
         <span>Mode {state.mode}</span>
         <span>Move {state.player.running ? 'running' : 'walking'}</span>
-        <span>Stamina {Math.round(state.player.stamina)}%</span>
         <span>Enemies {state.enemies.length}</span>
         <span>Timer {timer}</span>
       </div>
@@ -49,7 +65,7 @@ export function PlatformHud({ state, onRestart }: PlatformHudProps) {
         <p>A/D or arrows: walk</p>
         <p>Shift: toggle run</p>
         <p>W/Up/Space: jump</p>
-        <p>Shop upgrade: Space or I double jumps</p>
+        <p>Shop upgrade: press I in air to double jump</p>
         <p>J: hit nearby enemies</p>
         <p>Double Space in air: slam</p>
         <p>E near door: enter room</p>

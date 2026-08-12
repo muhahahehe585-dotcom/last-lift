@@ -1,10 +1,11 @@
-import { doubleJumpCost, infinityGauntletCost } from '../../lib/progress';
+import { doubleJumpCost, endingLabels, infinityGauntletCost, type SavedEnding } from '../../lib/progress';
 
 type GameMenuProps = {
   view: 'menu' | 'credits' | 'help' | 'shop';
   onView: (view: 'menu' | 'credits' | 'help' | 'shop') => void;
   onPlay: () => void;
   coins: number;
+  endings: SavedEnding[];
   doubleJumpUnlocked: boolean;
   infinityGauntletUnlocked: boolean;
   onBuyDoubleJump: () => void;
@@ -16,6 +17,7 @@ export function GameMenu({
   onView,
   onPlay,
   coins,
+  endings,
   doubleJumpUnlocked,
   infinityGauntletUnlocked,
   onBuyDoubleJump,
@@ -28,6 +30,7 @@ export function GameMenu({
         <h1>Last Lift</h1>
         {view === 'menu' && (
           <div className="menu-actions">
+            <p className="save-summary">Coins {coins} · Endings {endings.length}/6</p>
             <button type="button" onClick={onPlay}>Play</button>
             <button type="button" onClick={() => onView('shop')}>Shop</button>
             <button type="button" onClick={() => onView('help')}>How to Play</button>
@@ -37,10 +40,11 @@ export function GameMenu({
         {view === 'shop' && (
           <div className="menu-copy">
             <p>Coins: {coins}</p>
+            <p>Endings: {formatEndings(endings)}</p>
             <div className="shop-item">
               <div>
                 <strong>Double Jump</strong>
-                <p>Jump again in the air with Space or I.</p>
+                <p>Jump with Space, then press I in the air.</p>
               </div>
               <button type="button" disabled={doubleJumpUnlocked || coins < doubleJumpCost} onClick={onBuyDoubleJump}>
                 {doubleJumpUnlocked ? 'Owned' : `${doubleJumpCost} coins`}
@@ -75,4 +79,9 @@ export function GameMenu({
       </section>
     </main>
   );
+}
+
+function formatEndings(endings: SavedEnding[]) {
+  if (endings.length === 0) return 'none yet';
+  return endings.map((ending) => endingLabels[ending]).join(', ');
 }

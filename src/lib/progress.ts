@@ -1,6 +1,20 @@
+import type { EndingKind } from './platformTypes';
+
 const coinsKey = 'last-lift-coins';
 const doubleJumpKey = 'last-lift-double-jump';
 const infinityGauntletKey = 'last-lift-infinity-gauntlet';
+const endingsKey = 'last-lift-endings';
+
+export type SavedEnding = Exclude<EndingKind, null>;
+
+export const endingLabels: Record<SavedEnding, string> = {
+  ruler: 'Ruler',
+  'half-universe': 'Half Universe',
+  sunset: 'Sunset',
+  superhero: 'Superhero',
+  'last-stand': 'Last Stand',
+  escape: 'Escape',
+};
 
 export const doubleJumpCost = 3;
 export const infinityGauntletCost = 100;
@@ -48,4 +62,30 @@ export function buyInfinityGauntlet() {
   setCoins(getCoins() - infinityGauntletCost);
   storage()?.setItem(infinityGauntletKey, 'yes');
   return true;
+}
+
+export function getSavedEndings() {
+  const saved = storage()?.getItem(endingsKey);
+  if (!saved) return [];
+
+  try {
+    const parsed: unknown = JSON.parse(saved);
+    if (!Array.isArray(parsed)) return [];
+    return parsed.filter(isSavedEnding);
+  } catch {
+    return [];
+  }
+}
+
+export function saveEnding(ending: EndingKind) {
+  if (!ending) return getSavedEndings();
+  const endings = getSavedEndings();
+  if (endings.includes(ending)) return endings;
+  const next = [...endings, ending];
+  storage()?.setItem(endingsKey, JSON.stringify(next));
+  return next;
+}
+
+function isSavedEnding(value: unknown): value is SavedEnding {
+  return typeof value === 'string' && value in endingLabels;
 }

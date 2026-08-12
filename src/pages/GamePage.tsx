@@ -5,7 +5,7 @@ import { PlatformHud } from '../components/game/PlatformHud';
 import { createLevel, initialPlatformState } from '../lib/platformLevel';
 import { triggerMeteorThrow, updatePlatformGame } from '../lib/platformPhysics';
 import { tickGameTimers } from '../lib/platformTimers';
-import { buyDoubleJump, buyInfinityGauntlet, getCoins, hasDoubleJump, hasInfinityGauntlet } from '../lib/progress';
+import { buyDoubleJump, buyInfinityGauntlet, getCoins, getSavedEndings, hasDoubleJump, hasInfinityGauntlet, saveEnding } from '../lib/progress';
 import type { InputState, PlatformGameState } from '../lib/platformTypes';
 
 const emptyInput: InputState = {
@@ -13,6 +13,7 @@ const emptyInput: InputState = {
   right: false,
   jump: false,
   jumpPressed: false,
+  doubleJumpPressed: false,
   down: false,
   slamPressed: false,
   hitPressed: false,
@@ -29,12 +30,22 @@ const emptyInput: InputState = {
 
 export function GamePage() {
   const [screen, setScreen] = useState<'menu' | 'credits' | 'help' | 'shop' | 'game'>('menu');
-  const [progress, setProgress] = useState(() => ({ coins: getCoins(), doubleJump: hasDoubleJump(), gauntlet: hasInfinityGauntlet() }));
+  const [progress, setProgress] = useState(() => ({
+    coins: getCoins(),
+    doubleJump: hasDoubleJump(),
+    gauntlet: hasInfinityGauntlet(),
+    endings: getSavedEndings(),
+  }));
   const [state, setState] = useState<PlatformGameState>(initialPlatformState);
   const inputRef = useRef<InputState>({ ...emptyInput });
   const lastJumpRef = useRef(0);
   const spaceDownRef = useRef(false);
-  const refreshProgress = () => setProgress({ coins: getCoins(), doubleJump: hasDoubleJump(), gauntlet: hasInfinityGauntlet() });
+  const refreshProgress = () => setProgress({
+    coins: getCoins(),
+    doubleJump: hasDoubleJump(),
+    gauntlet: hasInfinityGauntlet(),
+    endings: getSavedEndings(),
+  });
 
   useEffect(() => {
     if (screen !== 'game') return;
@@ -45,7 +56,8 @@ export function GamePage() {
       if (['ArrowLeft', 'a', 'A'].includes(event.key)) inputRef.current.left = pressed;
       if (['ArrowRight', 'd', 'D'].includes(event.key)) inputRef.current.right = pressed;
       if (['ArrowUp', 'w', 'W'].includes(event.key) || event.code === 'Space') inputRef.current.jump = pressed;
-      if (pressed && ['ArrowUp', 'w', 'W', 'i', 'I'].includes(event.key)) inputRef.current.jumpPressed = true;
+      if (pressed && ['ArrowUp', 'w', 'W'].includes(event.key)) inputRef.current.jumpPressed = true;
+      if (pressed && ['i', 'I'].includes(event.key)) inputRef.current.doubleJumpPressed = true;
       if (['ArrowDown', 's', 'S'].includes(event.key)) inputRef.current.down = pressed;
       if (event.code === 'Space' && !pressed) spaceDownRef.current = false;
       if (pressed && event.code === 'Space' && !spaceDownRef.current) {
@@ -87,6 +99,7 @@ export function GamePage() {
       setState((current) => updatePlatformGame(current, input, dt));
       inputRef.current.slamPressed = false;
       inputRef.current.jumpPressed = false;
+      inputRef.current.doubleJumpPressed = false;
       inputRef.current.hitPressed = false;
       inputRef.current.interactPressed = false;
       inputRef.current.leavePressed = false;
@@ -108,12 +121,18 @@ export function GamePage() {
     return () => window.clearInterval(timer);
   }, [screen]);
 
+  useEffect(() => {
+    if (state.status !== 'won' || !state.ending) return;
+    setProgress((current) => ({ ...current, endings: saveEnding(state.ending) }));
+  }, [state.status, state.ending]);
+
   if (screen !== 'game') {
     return (
       <GameMenu
         view={screen}
         onView={setScreen}
         coins={progress.coins}
+        endings={progress.endings}
         doubleJumpUnlocked={progress.doubleJump}
         infinityGauntletUnlocked={progress.gauntlet}
         onBuyDoubleJump={() => {

@@ -105,6 +105,7 @@ export type InputState = {
   right: boolean;
   jump: boolean;
   jumpPressed: boolean;
+  doubleJumpPressed: boolean;
   down: boolean;
   slamPressed: boolean;
   hitPressed: boolean;

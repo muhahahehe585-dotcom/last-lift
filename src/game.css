@@ -49,6 +49,7 @@ h1 {
   height: 18px;
   overflow: hidden;
   border: 2px solid #171817;
+  border-radius: 6px;
   background: #d8d2c2;
 }
 
@@ -70,6 +71,31 @@ h1 {
   display: grid;
   grid-template-columns: 1fr;
   gap: 8px;
+}
+
+.combat-status-card {
+  display: grid;
+  gap: 8px;
+  padding: 12px;
+  border: 1px solid #d5cfbf;
+  border-radius: 8px;
+  background: #fffdf7;
+}
+
+.meter-row,
+.resource-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  color: #363a35;
+  font-size: 14px;
+  font-weight: 900;
+}
+
+.resource-row {
+  padding-top: 4px;
+  border-top: 1px solid #e4dece;
 }
 
 .platform-stats span,
