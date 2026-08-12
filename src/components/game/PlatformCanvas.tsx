@@ -3,7 +3,7 @@ import { viewWidth, worldHeight } from '../../lib/platformLevel';
 import type { ItemKind, PlatformGameState } from '../../lib/platformTypes';
 import { cameraXFor, drawDarkness, drawDoorPrompt, drawHotel } from './platformArt';
 import { drawDeathAnimation } from './deathArt';
-import { drawHalfUniverseEnding, drawLastStandEnding, drawRulerEnding, drawSunsetEnding, drawSuperheroEnding } from './endingArt';
+import { drawEscapeEnding, drawHalfUniverseEnding, drawLastStandEnding, drawRulerEnding, drawSunsetEnding, drawSuperheroEnding } from './endingArt';
 import { drawMeteorShower, drawMeteorThrow } from './meteorArt';
 import { drawEnemy, drawItem, drawPlayer } from './spriteArt';
 
@@ -84,6 +84,10 @@ export function PlatformCanvas({ state, onAim, onMeteorClick }: PlatformCanvasPr
     }
     if (state.status === 'won' && state.ending === 'last-stand') {
       drawLastStandEnding(ctx);
+      return;
+    }
+    if (state.status === 'won' && state.ending === 'escape') {
+      drawEscapeEnding(ctx);
       return;
     }
     ctx.save();

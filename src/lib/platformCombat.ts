@@ -74,6 +74,7 @@ function updateVentMonster(state: PlatformGameState, enemy: Enemy, dt: number) {
 }
 
 function updateBoss(state: PlatformGameState, enemy: Enemy, dt: number) {
+  if (Math.abs(state.player.vx) < 5) return { ...enemy, y: floorY - enemy.height, vx: 0 };
   const bossCenter = enemy.x + enemy.width / 2;
   const playerCenter = state.player.x + state.player.width / 2;
   const direction = playerCenter < bossCenter ? -1 : 1;

@@ -137,6 +137,7 @@ function meteoritesFor(floor: number): Item[] {
 export function createLevel(floor: number, hp = 100, carry: LevelCarry = {}): PlatformGameState {
   const bossFloor = floor === finalFloor;
   const mode = modeFor(floor);
+  const hasNest = floor === 13 || mode === 'vent';
   const baseEnemyCount = Math.min(5, 2 + Math.floor(floor / 25));
   const enemyCount = bossFloor ? 1 : mode === 'supply' ? 0 : mode === 'drone-swarm' ? 6 : baseEnemyCount;
 
@@ -169,7 +170,7 @@ export function createLevel(floor: number, hp = 100, carry: LevelCarry = {}): Pl
     holes: bossFloor || mode === 'supply' || mode === 'lava' ? [] : mode === 'collapse' ? [...holesFor(floor), ...holesFor(floor + 1)] : holesFor(floor),
     boxes: mode === 'lava' ? boxesFor(floor) : [],
     ventHole: mode === 'vent' ? { x: 520, y: 70, width: 92, height: 38 } : null,
-    nest: mode === 'vent' ? { x: 2130, y: floorY - 92, width: 120, height: 92 } : null,
+    nest: hasNest ? { x: 2130, y: floorY - 92, width: 120, height: 92 } : null,
     nestHp: 5,
     inVent: false,
     ventSpawnTimer: 60,

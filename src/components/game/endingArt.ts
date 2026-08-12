@@ -119,6 +119,31 @@ export function drawSuperheroEnding(ctx: CanvasRenderingContext2D) {
   ctx.fillText('He swings across the city as its new protector.', 360, 126);
 }
 
+export function drawEscapeEnding(ctx: CanvasRenderingContext2D) {
+  px(ctx, '#101210', 0, 0, viewWidth, worldHeight);
+  const sky = ctx.createLinearGradient(0, 0, 0, worldHeight);
+  sky.addColorStop(0, '#171817');
+  sky.addColorStop(0.55, '#24334a');
+  sky.addColorStop(1, '#111311');
+  ctx.fillStyle = sky;
+  ctx.fillRect(0, 0, viewWidth, worldHeight);
+  for (let x = 35; x < viewWidth; x += 120) {
+    px(ctx, x % 240 ? '#202329' : '#111923', x, 320 + (x % 3) * 24, 74, 260);
+    px(ctx, '#f2dc5d', x + 18, 360 + (x % 4) * 22, 10, 8);
+    px(ctx, '#f2dc5d', x + 48, 430 + (x % 5) * 12, 10, 8);
+  }
+  px(ctx, '#2b302c', 0, 472, viewWidth, 168);
+  for (let x = 0; x < viewWidth; x += 86) px(ctx, '#3c4542', x + 10, 506, 58, 7);
+  drawDefeatedBoss(ctx, 438, 340);
+  drawSwordHero(ctx, 570, 254);
+  ctx.fillStyle = '#f2dc5d';
+  ctx.font = '42px monospace';
+  ctx.fillText('LAST LIFT ESCAPED', 360, 92);
+  ctx.fillStyle = '#cfc7b3';
+  ctx.font = '20px monospace';
+  ctx.fillText('The boss is down. The survivor stands above him.', 330, 128);
+}
+
 function drawSwingHero(ctx: CanvasRenderingContext2D, x: number, y: number) {
   px(ctx, '#b83f35', x + 26, y, 28, 28);
   px(ctx, '#f4f8ff', x + 34, y + 10, 6, 5);
@@ -128,6 +153,43 @@ function drawSwingHero(ctx: CanvasRenderingContext2D, x: number, y: number) {
   px(ctx, '#b83f35', x - 24, y + 44, 46, 12);
   px(ctx, '#202329', x + 22, y + 78, 18, 58);
   px(ctx, '#202329', x + 52, y + 74, 18, 58);
+}
+
+function drawDefeatedBoss(ctx: CanvasRenderingContext2D, x: number, y: number) {
+  px(ctx, '#202329', x + 45, y + 86, 250, 78);
+  px(ctx, '#5b6368', x + 96, y + 38, 132, 58);
+  px(ctx, '#1a1515', x + 112, y + 12, 106, 34);
+  px(ctx, '#111311', x + 122, y + 58, 18, 10);
+  px(ctx, '#111311', x + 184, y + 58, 18, 10);
+  px(ctx, '#b83f35', x + 145, y + 78, 58, 8);
+  px(ctx, '#7c8781', x, y + 112, 92, 28);
+  px(ctx, '#7c8781', x + 270, y + 104, 92, 28);
+  px(ctx, '#3c4542', x + 86, y + 156, 54, 34);
+  px(ctx, '#3c4542', x + 202, y + 156, 54, 34);
+  px(ctx, '#c49b55', x + 326, y + 96, 42, 30);
+  px(ctx, '#4aa3ff', x + 334, y + 104, 8, 8);
+  px(ctx, '#b83f35', x + 350, y + 103, 8, 8);
+  px(ctx, '#5e8f86', x + 342, y + 116, 8, 8);
+}
+
+function drawSwordHero(ctx: CanvasRenderingContext2D, x: number, y: number) {
+  px(ctx, '#2a1812', x + 8, y - 4, 38, 14);
+  px(ctx, '#3b2118', x + 2, y + 6, 12, 16);
+  px(ctx, '#f1c08b', x + 13, y + 14, 28, 28);
+  px(ctx, '#111311', x + 34, y + 26, 5, 5);
+  px(ctx, '#7d3b34', x + 24, y + 36, 10, 3);
+  px(ctx, '#1b2632', x + 6, y + 46, 46, 20);
+  px(ctx, '#365f88', x + 6, y + 66, 46, 36);
+  px(ctx, '#cfc7b3', x + 18, y + 69, 9, 24);
+  px(ctx, '#f1c08b', x - 12, y + 52, 18, 42);
+  px(ctx, '#f1c08b', x + 50, y + 48, 18, 42);
+  px(ctx, '#202329', x + 10, y + 102, 14, 48);
+  px(ctx, '#202329', x + 38, y + 102, 14, 48);
+  px(ctx, '#111311', x + 2, y + 146, 26, 10);
+  px(ctx, '#111311', x + 34, y + 146, 26, 10);
+  px(ctx, '#89939a', x + 58, y - 62, 8, 132);
+  px(ctx, '#cfc7b3', x + 54, y + 28, 18, 8);
+  px(ctx, '#6f543b', x + 58, y + 36, 10, 28);
 }
 
 function drawGunHero(ctx: CanvasRenderingContext2D, x: number, y: number) {
