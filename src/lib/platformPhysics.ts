@@ -262,6 +262,18 @@ function useInfinityGauntlet(state: PlatformGameState) {
 function updateGauntletSnap(state: PlatformGameState, dt: number): PlatformGameState {
   const timer = state.gauntletSnapTimer + dt;
   if (timer < 2.2) return { ...state, gauntletSnapTimer: timer };
+  const snapKillsBoss = Math.random() < 0.5;
+  if (!snapKillsBoss) {
+    return {
+      ...state,
+      gauntletSnapTimer: timer,
+      player: { ...state.player, hp: 0 },
+      status: 'lost' as const,
+      deathCause: 'boss' as const,
+      message: 'The gauntlet backfires. The snap erased you.',
+    };
+  }
+
   return {
     ...state,
     gauntletSnapTimer: timer,
