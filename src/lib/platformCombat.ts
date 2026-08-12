@@ -1,5 +1,6 @@
 import { floorY } from './platformLevel';
 import { overlaps } from './platformGeometry';
+import { damageNest } from './platformNest';
 import type { DeathCause, Enemy, PlatformGameState } from './platformTypes';
 
 const slamRadius = 110;
@@ -18,6 +19,9 @@ export function hitPlayer(state: PlatformGameState, damage: number, message: str
 }
 
 export function normalHit(state: PlatformGameState) {
+  const nestHit = hitNest(state);
+  if (nestHit) return nestHit;
+
   const playerCenter = state.player.x + state.player.width / 2;
   let landed = false;
   const enemies = state.enemies
@@ -34,6 +38,17 @@ export function normalHit(state: PlatformGameState) {
     })
     .filter((enemy) => enemy.hp > 0);
   return landed ? { ...state, enemies, message: 'Hit landed.' } : { ...state, message: 'Hit missed. Get closer or face the enemy.' };
+}
+
+function hitNest(state: PlatformGameState) {
+  if (!state.nest) return null;
+  const playerCenter = state.player.x + state.player.width / 2;
+  const nestCenter = state.nest.x + state.nest.width / 2;
+  const inFront = state.player.facing === 1 ? nestCenter > playerCenter : nestCenter < playerCenter;
+  const close = Math.abs(nestCenter - playerCenter) < hitRange + 25 && Math.abs(state.nest.y - state.player.y) < 150;
+  const touching = overlaps({ ...state.player, width: state.player.width + 28 }, state.nest);
+  if (!((inFront && close) || touching)) return null;
+  return damageNest(state);
 }
 
 export function slamEnemies(state: PlatformGameState) {

@@ -92,9 +92,11 @@ export type PlatformGameState = {
 };
 
 export type DuelState = {
+  phase: 'choice' | 'duel';
   active: boolean;
   focus: number;
   playerMarks: number;
+  shotMarks: Rect[];
   guardMarks: number;
   crosshairX: number;
   crosshairY: number;

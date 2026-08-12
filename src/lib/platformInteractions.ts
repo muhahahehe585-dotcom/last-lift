@@ -1,4 +1,5 @@
 import { overlaps } from './platformGeometry';
+import { damageNest } from './platformNest';
 import type { InputState, ItemKind, PlatformGameState } from './platformTypes';
 
 function grantLoot(state: PlatformGameState, loot: ItemKind) {
@@ -96,7 +97,7 @@ function shootEnemy(state: PlatformGameState) {
 
   const shots = state.unlimitedGun ? state.shots : state.shots - 1;
   const nest = state.inVent && state.nest && state.player.facing === 1 && bulletEnd >= state.nest.x ? state.nest : null;
-  if (!target && nest) return damageNest(state, shots, trail);
+  if (!target && nest) return damageNest(state, { shots, bulletTrail: trail });
   if (!target) return { ...state, shots, bulletTrail: trail, message: 'Shot missed.' };
   const damage = target.kind === 'boss' ? 3 : target.kind === 'vent-monster' ? 4 : 999;
   const enemies = state.enemies
@@ -109,19 +110,6 @@ function shootEnemy(state: PlatformGameState) {
     bulletTrail: trail,
     enemies,
     message: target.kind === 'boss' ? 'Boss hit by the shot.' : `${target.kind} destroyed by the shot.`,
-  };
-}
-
-function damageNest(state: PlatformGameState, shots: number, bulletTrail: PlatformGameState['bulletTrail']) {
-  const nestHp = Math.max(0, state.nestHp - 1);
-  return {
-    ...state,
-    shots,
-    bulletTrail,
-    nestHp,
-    status: nestHp <= 0 ? 'won' : state.status,
-    ending: nestHp <= 0 ? 'sunset' : state.ending,
-    message: nestHp <= 0 ? 'Vent ending found. You saved the whole world.' : `Nest hit. ${nestHp} shots left.`,
   };
 }
 

@@ -6,6 +6,7 @@ import { createLevel, initialPlatformState } from '../lib/platformLevel';
 import { triggerMeteorThrow, updatePlatformGame } from '../lib/platformPhysics';
 import { tickGameTimers } from '../lib/platformTimers';
 import { buyDoubleJump, buyInfinityGauntlet, getCoins, getSavedEndings, hasDoubleJump, hasInfinityGauntlet, saveEnding } from '../lib/progress';
+import { chooseTrainBullet, chooseTrainDuel, chooseTrainHealth } from '../lib/trainDuel';
 import type { InputState, PlatformGameState } from '../lib/platformTypes';
 
 const emptyInput: InputState = {
@@ -148,6 +149,11 @@ export function GamePage() {
           setState(createLevel(1));
           setScreen('game');
         }}
+        onTrainDuel={() => {
+          refreshProgress();
+          setState(createLevel(11));
+          setScreen('game');
+        }}
       />
     );
   }
@@ -162,6 +168,9 @@ export function GamePage() {
           inputRef.current.aimY = y;
         }}
         onMeteorClick={(x, y) => setState((current) => triggerMeteorThrow(current, x, y))}
+        onTrainBullet={() => setState(chooseTrainBullet)}
+        onTrainHealth={() => setState(chooseTrainHealth)}
+        onTrainDuel={() => setState(chooseTrainDuel)}
       />
     </main>
   );

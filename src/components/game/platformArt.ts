@@ -1,6 +1,7 @@
 import { finalFloor, floorY, viewWidth, worldHeight, worldWidth } from '../../lib/platformLevel';
 import type { HotelRoom, PlatformGameState } from '../../lib/platformTypes';
 import { drawRoof } from './roofArt';
+import { drawTrainFloor } from './trainFloorArt';
 import { drawVentWorld } from './ventArt';
 
 function px(ctx: CanvasRenderingContext2D, color: string, x: number, y: number, w: number, h: number) {
@@ -30,7 +31,7 @@ export function drawHotel(ctx: CanvasRenderingContext2D, state: PlatformGameStat
   drawRooms(ctx, state.rooms);
   if (state.floor === 1) drawTurnBackDoor(ctx);
   drawWoodFloor(ctx, state);
-  if (state.mode === 'train') drawTrain(ctx);
+  if (state.mode === 'train') drawTrainFloor(ctx);
   if (state.mode === 'vent') drawVentRoute(ctx, state);
   if (state.mode === 'flood') drawFlood(ctx);
   if (state.mode === 'lava') drawLava(ctx);
@@ -77,17 +78,6 @@ function drawVentLadder(ctx: CanvasRenderingContext2D, x: number) {
   for (let y = 126; y < floorY - 16; y += 34) {
     px(ctx, '#9a744c', x, y, 38, 8);
   }
-}
-
-function drawTrain(ctx: CanvasRenderingContext2D) {
-  px(ctx, '#202329', 0, floorY - 150, worldWidth, 150);
-  for (let x = 0; x < worldWidth; x += 260) {
-    px(ctx, '#3c4542', x + 10, floorY - 132, 220, 110);
-    px(ctx, '#101210', x + 42, floorY - 104, 54, 42);
-    px(ctx, '#101210', x + 122, floorY - 104, 54, 42);
-    px(ctx, '#89939a', x + 225, floorY - 82, 14, 58);
-  }
-  px(ctx, '#7c8781', worldWidth - 260, floorY - 152, 230, 130);
 }
 
 function drawFlood(ctx: CanvasRenderingContext2D) {

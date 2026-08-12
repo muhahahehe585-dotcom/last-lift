@@ -6,11 +6,15 @@ import { drawDeathAnimation } from './deathArt';
 import { drawEscapeEnding, drawHalfUniverseEnding, drawLastStandEnding, drawRulerEnding, drawSunsetEnding, drawSuperheroEnding } from './endingArt';
 import { drawMeteorShower, drawMeteorThrow } from './meteorArt';
 import { drawEnemy, drawItem, drawPlayer } from './spriteArt';
+import { drawTrainDuelOverlay } from './trainDuelArt';
 
 type PlatformCanvasProps = {
   state: PlatformGameState;
   onAim: (x: number, y: number) => void;
   onMeteorClick: (x: number, y: number) => void;
+  onTrainBullet: () => void;
+  onTrainHealth: () => void;
+  onTrainDuel: () => void;
 };
 
 function drawRoomInterior(ctx: CanvasRenderingContext2D, state: PlatformGameState) {
@@ -55,7 +59,7 @@ function drawRoomLoot(ctx: CanvasRenderingContext2D, loot: ItemKind | 'empty', s
   ctx.fillText(loot.toUpperCase(), 510, 435);
 }
 
-export function PlatformCanvas({ state, onAim, onMeteorClick }: PlatformCanvasProps) {
+export function PlatformCanvas({ state, onAim, onMeteorClick, onTrainBullet, onTrainHealth, onTrainDuel }: PlatformCanvasProps) {
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
 
   useEffect(() => {
@@ -106,7 +110,7 @@ export function PlatformCanvas({ state, onAim, onMeteorClick }: PlatformCanvasPr
     drawDoorPrompt(ctx, state, cameraX);
     drawRoomInterior(ctx, state);
     drawBossCountdown(ctx, state);
-    drawDuel(ctx, state);
+    drawTrainDuelOverlay(ctx, state);
   }, [state]);
 
   const aimWithPointer = (event: React.PointerEvent<HTMLCanvasElement>) => {
@@ -130,15 +134,26 @@ export function PlatformCanvas({ state, onAim, onMeteorClick }: PlatformCanvasPr
     };
   };
 
+  const showTrainChoice = state.duel?.phase === 'choice';
+
   return (
-    <canvas
-      className="platform-canvas"
-      ref={canvasRef}
-      width={viewWidth}
-      height={worldHeight}
-      onPointerMove={aimWithPointer}
-      onPointerDown={clickMeteor}
-    />
+    <div className="platform-stage">
+      <canvas
+        className="platform-canvas"
+        ref={canvasRef}
+        width={viewWidth}
+        height={worldHeight}
+        onPointerMove={aimWithPointer}
+        onPointerDown={clickMeteor}
+      />
+      {showTrainChoice && (
+        <div className="train-choice-buttons">
+          <button type="button" onClick={onTrainBullet}>Spend Bullet</button>
+          <button type="button" onClick={onTrainHealth}>Sacrifice Health</button>
+          <button type="button" onClick={onTrainDuel}>Duel</button>
+        </div>
+      )}
+    </div>
   );
 }
 
@@ -174,29 +189,6 @@ function drawPlayerSnap(ctx: CanvasRenderingContext2D, state: PlatformGameState)
     ctx.fillStyle = `rgba(255, 244, 180, ${(t - 0.78) / 0.22})`;
     ctx.fillRect(p.x - 220, p.y - 170, 520, 360);
   }
-}
-
-function drawDuel(ctx: CanvasRenderingContext2D, state: PlatformGameState) {
-  const duel = state.duel;
-  if (!duel?.active) return;
-  ctx.fillStyle = 'rgba(0, 0, 0, 0.78)';
-  ctx.fillRect(0, 0, viewWidth, worldHeight);
-  ctx.fillStyle = '#2b302c';
-  ctx.fillRect(575, 190, 160, 250);
-  ctx.fillStyle = '#4aa3ff';
-  ctx.fillRect(620, 225, 70, 18);
-  ctx.fillStyle = '#cfc7b3';
-  ctx.font = '18px monospace';
-  ctx.fillText(`Focus ${Math.round(duel.focus)} | You ${duel.playerMarks} Guard ${Math.floor(duel.guardMarks)}`, 360, 95);
-  ctx.fillText('Mash Space. Aim with movement. Press F to mark.', 330, 125);
-  ctx.strokeStyle = '#f2dc5d';
-  ctx.lineWidth = 3;
-  ctx.beginPath();
-  ctx.moveTo(duel.crosshairX - 18, duel.crosshairY);
-  ctx.lineTo(duel.crosshairX + 18, duel.crosshairY);
-  ctx.moveTo(duel.crosshairX, duel.crosshairY - 18);
-  ctx.lineTo(duel.crosshairX, duel.crosshairY + 18);
-  ctx.stroke();
 }
 
 function drawBossCountdown(ctx: CanvasRenderingContext2D, state: PlatformGameState) {

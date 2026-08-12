@@ -73,7 +73,8 @@ export function PlatformHud({ state, onRestart }: PlatformHudProps) {
         <p>E inside room: open drawer, O: leave</p>
         <p>Q: blind bots, F: shoot guard</p>
         <p>Boss: G uses full gauntlet</p>
-        <p>Train duel: Space focus, mouse/trackpad aim, F mark</p>
+        <p>Train guard: F bullet, J health, E duel</p>
+        <p>Duel: Space focus, mouse/trackpad aim, F mark</p>
       </div>
 
       <button type="button" onClick={onRestart}>Restart</button>

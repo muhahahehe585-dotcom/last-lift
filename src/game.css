@@ -20,6 +20,36 @@
   box-shadow: 0 24px 90px rgba(0, 0, 0, 0.36);
 }
 
+.platform-stage {
+  position: relative;
+}
+
+.platform-stage .platform-canvas {
+  display: block;
+}
+
+.train-choice-buttons {
+  position: absolute;
+  left: 50%;
+  top: 26%;
+  width: min(560px, calc(100% - 32px));
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+  transform: translateX(-50%);
+}
+
+.train-choice-buttons button {
+  min-height: 44px;
+  padding: 10px 12px;
+  border: 2px solid #f2dc5d;
+  border-radius: 8px;
+  background: #111311;
+  color: #f2dc5d;
+  font-size: 14px;
+  font-weight: 900;
+}
+
 .platform-hud {
   display: grid;
   gap: 16px;
@@ -164,5 +194,10 @@ h1 {
 
   .platform-hud {
     order: 2;
+  }
+
+  .train-choice-buttons {
+    grid-template-columns: 1fr;
+    top: 20%;
   }
 }

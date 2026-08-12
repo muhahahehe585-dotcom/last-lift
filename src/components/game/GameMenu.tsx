@@ -4,6 +4,7 @@ type GameMenuProps = {
   view: 'menu' | 'credits' | 'help' | 'shop';
   onView: (view: 'menu' | 'credits' | 'help' | 'shop') => void;
   onPlay: () => void;
+  onTrainDuel: () => void;
   coins: number;
   endings: SavedEnding[];
   doubleJumpUnlocked: boolean;
@@ -16,6 +17,7 @@ export function GameMenu({
   view,
   onView,
   onPlay,
+  onTrainDuel,
   coins,
   endings,
   doubleJumpUnlocked,
@@ -32,6 +34,7 @@ export function GameMenu({
           <div className="menu-actions">
             <p className="save-summary">Coins {coins} · Endings {endings.length}/6</p>
             <button type="button" onClick={onPlay}>Play</button>
+            <button type="button" onClick={onTrainDuel}>Train Duel</button>
             <button type="button" onClick={() => onView('shop')}>Shop</button>
             <button type="button" onClick={() => onView('help')}>How to Play</button>
             <button type="button" onClick={() => onView('credits')}>Credits</button>

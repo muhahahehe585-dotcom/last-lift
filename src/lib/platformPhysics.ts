@@ -16,14 +16,24 @@ const staminaRecover = 9;
 const jumpPower = 680;
 const slamSpeed = 1050;
 const liftX = worldWidth - 120;
+const trainGuardX = worldWidth - 380;
 
 function tryLift(state: PlatformGameState) {
   const atLift = state.player.x + state.player.width > liftX;
   if (!atLift || state.floor === finalFloor) return state;
-  if (state.mode === 'train') return startTrainDuel(state);
   if (state.mode !== 'flood' && state.batteries < state.batteriesNeeded) return { ...state, message: 'The lift still needs more batteries.' };
   awardFloorCoin();
   return createLevel(state.floor + 1, state.player.hp, getCarry(state));
+}
+
+function tryTrainGuard(state: PlatformGameState) {
+  if (state.mode !== 'train') return state;
+  const atGuard = state.player.x + state.player.width > trainGuardX;
+  if (!atGuard) return state;
+  return startTrainDuel({
+    ...state,
+    player: { ...state.player, x: trainGuardX - state.player.width - 12, vx: 0 },
+  });
 }
 
 function tryVentNest(state: PlatformGameState) {
@@ -101,7 +111,7 @@ export function updatePlatformGame(state: PlatformGameState, input: InputState, 
   if (state.status !== 'playing') return state;
   if (state.meteorThrowTimer > 0) return updateMeteorThrow(state, dt);
   if (state.gauntletSnapTimer > 0) return updateGauntletSnap(state, dt);
-  if (state.duel?.active) return updateTrainDuel(state, input, dt);
+  if (state.duel) return updateTrainDuel(state, input, dt);
   if (input.shortcutPressed && state.floor === finalFloor && Math.abs(state.player.vx) < 5) {
     return { ...state, bossTimeLeft: Math.min(state.bossTimeLeft, 10), message: 'Gauntlet test shortcut: 10 seconds left.' };
   }
@@ -214,6 +224,7 @@ export function updatePlatformGame(state: PlatformGameState, input: InputState, 
     next = hitPlayer(next, touchingEnemy.kind === 'boss' ? 35 : 18, `${touchingEnemy.kind} hit you.`, cause);
   }
   next = tryVentNest(next);
+  next = tryTrainGuard(next);
   next = tryLift(next);
 
   return next;
