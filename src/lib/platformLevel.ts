@@ -103,6 +103,17 @@ function floodItemsFor(floor: number): Item[] {
   }));
 }
 
+function lavaItemsFor(floor: number, boxes: ReturnType<typeof boxesFor>): Item[] {
+  return boxes.slice(0, 4).map((box, index) => ({
+    id: `lava-battery-${floor}-${index}`,
+    kind: 'battery',
+    x: box.x + box.width / 2 - 13,
+    y: box.y - 34,
+    width: 26,
+    height: 34,
+  }));
+}
+
 function roomLoot(floor: number, index: number): ItemKind | 'empty' {
   const value = (floor * 11 + index * 7) % 20;
   if (value === 0) return 'gun';
@@ -137,7 +148,7 @@ function meteoritesFor(floor: number): Item[] {
 export function createLevel(floor: number, hp = 100, carry: LevelCarry = {}): PlatformGameState {
   const bossFloor = floor === finalFloor;
   const mode = modeFor(floor);
-  const hasNest = floor === 13 || mode === 'vent';
+  const boxes = mode === 'lava' ? boxesFor(floor) : [];
   const baseEnemyCount = Math.min(5, 2 + Math.floor(floor / 25));
   const enemyCount = bossFloor ? 1 : mode === 'supply' ? 0 : mode === 'drone-swarm' ? 6 : baseEnemyCount;
 
@@ -165,12 +176,12 @@ export function createLevel(floor: number, hp = 100, carry: LevelCarry = {}): Pl
       doubleJumpUsed: false,
     },
     enemies: mode === 'vent' ? [ventMonsterFor(floor)] : mode === 'flood' ? [seaMonsterFor(floor)] : Array.from({ length: enemyCount }, (_, index) => enemyFor(floor, index)),
-    items: bossFloor ? [] : mode === 'flood' ? floodItemsFor(floor) : mode === 'supply' ? [...itemsFor(floor), ...itemsFor(floor + 1)] : itemsFor(floor),
+    items: bossFloor ? [] : mode === 'flood' ? floodItemsFor(floor) : mode === 'lava' ? lavaItemsFor(floor, boxes) : mode === 'supply' ? [...itemsFor(floor), ...itemsFor(floor + 1)] : itemsFor(floor),
     rooms: bossFloor || mode === 'flood' ? [] : roomsFor(floor),
     holes: bossFloor || mode === 'supply' || mode === 'lava' ? [] : mode === 'collapse' ? [...holesFor(floor), ...holesFor(floor + 1)] : holesFor(floor),
-    boxes: mode === 'lava' ? boxesFor(floor) : [],
+    boxes,
     ventHole: mode === 'vent' ? { x: 520, y: 70, width: 92, height: 38 } : null,
-    nest: hasNest ? { x: 2130, y: floorY - 92, width: 120, height: 92 } : null,
+    nest: mode === 'vent' ? { x: 2130, y: floorY - 92, width: 120, height: 92 } : null,
     nestHp: 5,
     inVent: false,
     ventSpawnTimer: 60,

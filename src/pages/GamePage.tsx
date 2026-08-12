@@ -31,6 +31,7 @@ const emptyInput: InputState = {
 
 export function GamePage() {
   const [screen, setScreen] = useState<'menu' | 'credits' | 'help' | 'shop' | 'game'>('menu');
+  const [trainTestMode, setTrainTestMode] = useState(false);
   const [progress, setProgress] = useState(() => ({
     coins: getCoins(),
     doubleJump: hasDoubleJump(),
@@ -39,6 +40,7 @@ export function GamePage() {
   }));
   const [state, setState] = useState<PlatformGameState>(initialPlatformState);
   const inputRef = useRef<InputState>({ ...emptyInput });
+  const trainTestModeRef = useRef(false);
   const lastJumpRef = useRef(0);
   const spaceDownRef = useRef(false);
   const refreshProgress = () => setProgress({
@@ -47,6 +49,23 @@ export function GamePage() {
     gauntlet: hasInfinityGauntlet(),
     endings: getSavedEndings(),
   });
+
+  const finishTrainChoice = (choice: (current: PlatformGameState) => PlatformGameState) => {
+    setState((current) => {
+      const next = choice(current);
+      if (trainTestModeRef.current && current.duel && (next.floor !== 11 || next.status !== 'playing')) {
+        trainTestModeRef.current = false;
+        setTrainTestMode(false);
+        setScreen('menu');
+        return createLevel(11);
+      }
+      return next;
+    });
+  };
+
+  useEffect(() => {
+    trainTestModeRef.current = trainTestMode;
+  }, [trainTestMode]);
 
   useEffect(() => {
     if (screen !== 'game') return;
@@ -97,7 +116,16 @@ export function GamePage() {
       const dt = Math.min(0.03, (time - last) / 1000);
       last = time;
       const input = { ...inputRef.current };
-      setState((current) => updatePlatformGame(current, input, dt));
+      setState((current) => {
+        const next = updatePlatformGame(current, input, dt);
+        if (trainTestModeRef.current && current.duel && (next.floor !== 11 || next.status !== 'playing')) {
+          trainTestModeRef.current = false;
+          setTrainTestMode(false);
+          setScreen('menu');
+          return createLevel(11);
+        }
+        return next;
+      });
       inputRef.current.slamPressed = false;
       inputRef.current.jumpPressed = false;
       inputRef.current.doubleJumpPressed = false;
@@ -127,6 +155,14 @@ export function GamePage() {
     setProgress((current) => ({ ...current, endings: saveEnding(state.ending) }));
   }, [state.status, state.ending]);
 
+  useEffect(() => {
+    if (!trainTestMode || screen !== 'game') return;
+    if (state.floor === 11 && state.status === 'playing') return;
+    refreshProgress();
+    setTrainTestMode(false);
+    setScreen('menu');
+  }, [screen, state.floor, state.status, trainTestMode]);
+
   if (screen !== 'game') {
     return (
       <GameMenu
@@ -146,11 +182,13 @@ export function GamePage() {
         }}
         onPlay={() => {
           refreshProgress();
+          setTrainTestMode(false);
           setState(createLevel(1));
           setScreen('game');
         }}
         onTrainDuel={() => {
           refreshProgress();
+          setTrainTestMode(true);
           setState(createLevel(11));
           setScreen('game');
         }}
@@ -160,7 +198,7 @@ export function GamePage() {
 
   return (
     <main className="platform-shell">
-      <PlatformHud state={state} onRestart={() => setState(createLevel(1))} />
+      <PlatformHud state={state} onRestart={() => setState(createLevel(trainTestMode ? 11 : 1))} />
       <PlatformCanvas
         state={state}
         onAim={(x, y) => {
@@ -168,8 +206,8 @@ export function GamePage() {
           inputRef.current.aimY = y;
         }}
         onMeteorClick={(x, y) => setState((current) => triggerMeteorThrow(current, x, y))}
-        onTrainBullet={() => setState(chooseTrainBullet)}
-        onTrainHealth={() => setState(chooseTrainHealth)}
+        onTrainBullet={() => finishTrainChoice(chooseTrainBullet)}
+        onTrainHealth={() => finishTrainChoice(chooseTrainHealth)}
         onTrainDuel={() => setState(chooseTrainDuel)}
       />
     </main>
