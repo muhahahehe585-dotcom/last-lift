@@ -166,7 +166,7 @@ export function createLevel(floor: number, hp = 100, carry: LevelCarry = {}): Pl
     enemies: mode === 'vent' ? [ventMonsterFor(floor)] : mode === 'flood' ? [seaMonsterFor(floor)] : Array.from({ length: enemyCount }, (_, index) => enemyFor(floor, index)),
     items: bossFloor ? [] : mode === 'flood' ? floodItemsFor(floor) : mode === 'supply' ? [...itemsFor(floor), ...itemsFor(floor + 1)] : itemsFor(floor),
     rooms: bossFloor || mode === 'flood' ? [] : roomsFor(floor),
-    holes: bossFloor || mode === 'supply' ? [] : mode === 'collapse' ? [...holesFor(floor), ...holesFor(floor + 1)] : holesFor(floor),
+    holes: bossFloor || mode === 'supply' || mode === 'lava' ? [] : mode === 'collapse' ? [...holesFor(floor), ...holesFor(floor + 1)] : holesFor(floor),
     boxes: mode === 'lava' ? boxesFor(floor) : [],
     ventHole: mode === 'vent' ? { x: 520, y: 70, width: 92, height: 38 } : null,
     nest: mode === 'vent' ? { x: 2130, y: floorY - 92, width: 120, height: 92 } : null,
