@@ -36,7 +36,7 @@ export function GameMenu({
         <h1>Last Lift</h1>
         {view === 'menu' && (
           <div className="menu-actions">
-            <p className="save-summary">Coins {coins} · Endings {endings.length}/6</p>
+            <p className="save-summary">Coins {coins} · Endings {endings.length}/7</p>
             <button type="button" onClick={onPlay}>Play</button>
             <button type="button" onClick={onTrainDuel}>Train Duel</button>
             <button type="button" onClick={() => onView('shop')}>Shop</button>

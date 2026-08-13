@@ -1,4 +1,4 @@
-import { floorY, worldHeight, worldWidth } from '../../lib/platformLevel';
+import { bossEscapeDoor, floorY, worldHeight, worldWidth } from '../../lib/platformLevel';
 import type { PlatformGameState } from '../../lib/platformTypes';
 
 function px(ctx: CanvasRenderingContext2D, color: string, x: number, y: number, w: number, h: number) {
@@ -30,7 +30,18 @@ export function drawRoof(ctx: CanvasRenderingContext2D, state: PlatformGameState
   px(ctx, '#272b2e', 210, floorY - 118, 130, 72);
   px(ctx, '#151817', 244, floorY - 160, 62, 42);
   px(ctx, '#7c8781', 272, floorY - 250, 8, 90);
+  drawBossEscapeDoor(ctx, state);
   px(ctx, 'rgba(242, 220, 93, 0.18)', 1890, 190, 300, 230);
 
   if (state.bossTimeLeft < 60) px(ctx, 'rgba(184, 63, 53, 0.18)', 0, 0, worldWidth, worldHeight);
+}
+
+function drawBossEscapeDoor(ctx: CanvasRenderingContext2D, state: PlatformGameState) {
+  px(ctx, '#080908', bossEscapeDoor.x - 10, bossEscapeDoor.y - 12, bossEscapeDoor.width + 20, bossEscapeDoor.height + 12);
+  px(ctx, state.bossDodged ? '#6f543b' : '#2b302c', bossEscapeDoor.x, bossEscapeDoor.y, bossEscapeDoor.width, bossEscapeDoor.height);
+  px(ctx, state.bossDodged ? '#2a211a' : '#151817', bossEscapeDoor.x + 9, bossEscapeDoor.y + 16, bossEscapeDoor.width - 18, bossEscapeDoor.height - 22);
+  px(ctx, state.bossDodged ? '#f2dc5d' : '#596057', bossEscapeDoor.x + bossEscapeDoor.width - 16, bossEscapeDoor.y + 72, 6, 6);
+  ctx.fillStyle = state.bossDodged ? '#f2dc5d' : '#89939a';
+  ctx.font = '16px monospace';
+  ctx.fillText('EXIT', bossEscapeDoor.x - 1, bossEscapeDoor.y - 22);
 }

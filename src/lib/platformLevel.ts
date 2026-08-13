@@ -8,6 +8,7 @@ export const viewWidth = 1200;
 export const worldHeight = 640;
 export const floorY = 520;
 export const finalFloor = 100;
+export const bossEscapeDoor = { x: worldWidth - 82, y: floorY - 138, width: 58, height: 138 };
 
 type LevelCarry = {
   flashlights?: number;
@@ -209,6 +210,7 @@ export function createLevel(floor: number, hp = 100, carry: LevelCarry = {}): Pl
     bossTimeLeft: bossFloor ? 600 : 0,
     gauntletSnapTimer: 0,
     meteorThrowTimer: 0,
+    bossDodged: false,
     message: modeMessage(floor, mode, bossFloor),
     deathCause: null,
     deathTimer: 0,

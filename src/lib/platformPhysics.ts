@@ -1,4 +1,4 @@
-import { createLevel, finalFloor, floorY, worldWidth } from './platformLevel';
+import { bossEscapeDoor, createLevel, finalFloor, floorY, worldWidth } from './platformLevel';
 import { overlaps } from './platformGeometry';
 import { hitPlayer, normalHit, slamEnemies, updateEnemies } from './platformCombat';
 import { applyEventDamage } from './platformHazards';
@@ -26,6 +26,19 @@ function tryLift(state: PlatformGameState) {
   if (state.mode !== 'flood' && state.batteries < state.batteriesNeeded) return { ...state, message: 'The lift still needs more batteries.' };
   awardFloorCoin();
   return createLevel(state.floor + 1, state.player.hp, getCarry(state));
+}
+
+function tryBossRunAwayDoor(state: PlatformGameState) {
+  if (state.floor !== finalFloor || !state.bossDodged) return state;
+  const playerCenter = state.player.x + state.player.width / 2;
+  const doorCenter = bossEscapeDoor.x + bossEscapeDoor.width / 2;
+  if (Math.abs(playerCenter - doorCenter) > 95) return state;
+  return {
+    ...state,
+    status: 'won' as const,
+    ending: 'ran-away' as const,
+    message: 'RAN AWAY.',
+  };
 }
 
 function tryTrainGuard(state: PlatformGameState) {
@@ -120,6 +133,10 @@ export function updatePlatformGame(state: PlatformGameState, input: InputState, 
     return { ...state, bossTimeLeft: Math.min(state.bossTimeLeft, 10), message: 'Gauntlet test shortcut: 10 seconds left.' };
   }
   if (input.gauntletPressed) return useInfinityGauntlet(state);
+  if (input.interactPressed) {
+    const runaway = tryBossRunAwayDoor(state);
+    if (runaway !== state) return runaway;
+  }
   const actionState = handleActionInputs(state, input, dt);
   if (actionState !== state || state.currentRoom) return actionState;
   if (input.hitPressed) return normalHit(state);
@@ -232,6 +249,7 @@ export function updatePlatformGame(state: PlatformGameState, input: InputState, 
   }
   next = tryVentNest(next);
   next = tryTrainGuard(next);
+  if (input.interactPressed) next = tryBossRunAwayDoor(next);
   next = tryLift(next);
 
   return next;
@@ -257,7 +275,8 @@ function tryDodge(state: PlatformGameState, input: InputState) {
       dodgeCooldown: 0.65,
       dodgePulse: 0.28,
     },
-    message: 'Slid behind the enemy.',
+    bossDodged: state.bossDodged || enemy.kind === 'boss',
+    message: enemy.kind === 'boss' ? 'You slid under the boss. The far roof door is open.' : 'Slid behind the enemy.',
   };
 }
 

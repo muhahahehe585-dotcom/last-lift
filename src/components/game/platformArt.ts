@@ -1,4 +1,4 @@
-import { finalFloor, floorY, viewWidth, worldHeight, worldWidth } from '../../lib/platformLevel';
+import { bossEscapeDoor, finalFloor, floorY, viewWidth, worldHeight, worldWidth } from '../../lib/platformLevel';
 import type { HotelRoom, PlatformGameState } from '../../lib/platformTypes';
 import { drawRoof } from './roofArt';
 import { drawTrainFloor } from './trainFloorArt';
@@ -145,6 +145,14 @@ export function drawDarkness(ctx: CanvasRenderingContext2D, state: PlatformGameS
 
 export function drawDoorPrompt(ctx: CanvasRenderingContext2D, state: PlatformGameState, cameraX: number) {
   const playerCenter = state.player.x + state.player.width / 2;
+  const escapeDoorCenter = bossEscapeDoor.x + bossEscapeDoor.width / 2;
+  if (state.floor === finalFloor && state.bossDodged && Math.abs(playerCenter - escapeDoorCenter) < 95) {
+    px(ctx, '#f2dc5d', bossEscapeDoor.x + 17 - cameraX, bossEscapeDoor.y - 42, 24, 24);
+    ctx.fillStyle = '#111311';
+    ctx.font = '18px monospace';
+    ctx.fillText('E', bossEscapeDoor.x + 23 - cameraX, bossEscapeDoor.y - 24);
+    return;
+  }
   const room = state.rooms.find((item) => !item.opened && Math.abs(playerCenter - (item.x + item.width / 2)) < 180);
   if (state.ventHole && Math.abs(playerCenter - (state.ventHole.x + state.ventHole.width / 2)) < 95 && !state.currentRoom) {
     px(ctx, '#f2dc5d', state.ventHole.x + 34 - cameraX, state.ventHole.y - 34, 24, 24);
