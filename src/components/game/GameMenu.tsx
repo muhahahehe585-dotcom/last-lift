@@ -93,7 +93,7 @@ export function GameMenu({
         {view === 'credits' && (
           <div className="menu-copy">
             <p>Created by the Last Lift team.</p>
-            <p>Design, code, and chaos: you + Codex.</p>
+            <p>Design, code, and chaos: ansar + codex.</p>
             <button type="button" onClick={() => onView('menu')}>Back</button>
           </div>
         )}
