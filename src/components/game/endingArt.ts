@@ -145,28 +145,24 @@ export function drawEscapeEnding(ctx: CanvasRenderingContext2D) {
 }
 
 export function drawRanAwayEnding(ctx: CanvasRenderingContext2D) {
-  px(ctx, '#0a0b0a', 0, 0, viewWidth, worldHeight);
-  const sky = ctx.createLinearGradient(0, 0, 0, worldHeight);
-  sky.addColorStop(0, '#14151a');
-  sky.addColorStop(0.45, '#2d3335');
-  sky.addColorStop(1, '#101210');
-  ctx.fillStyle = sky;
-  ctx.fillRect(0, 0, viewWidth, worldHeight);
-  for (let x = 20; x < viewWidth; x += 115) {
-    px(ctx, x % 230 ? '#1b1d1c' : '#202329', x, 330 + (x % 4) * 18, 76, 250);
-    px(ctx, '#b83f35', x + 20, 375 + (x % 5) * 18, 12, 8);
-    px(ctx, '#f2dc5d', x + 52, 438 + (x % 3) * 20, 10, 8);
-  }
-  px(ctx, '#252928', 0, 470, viewWidth, 170);
+  px(ctx, '#080908', 0, 0, viewWidth, worldHeight);
+  px(ctx, '#242820', 120, 145, 960, 405);
+  px(ctx, '#151611', 150, 178, 900, 330);
+  px(ctx, '#30352b', 150, 476, 900, 32);
+  for (let x = 185; x < 1000; x += 160) drawSupplyShelf(ctx, x, 230);
+  px(ctx, '#5e8f86', 920, 340, 80, 92);
+  px(ctx, '#c49b55', 918, 324, 84, 18);
+  px(ctx, '#b83f35', 950, 365, 18, 18);
+  px(ctx, '#f2dc5d', 160, 185, 820, 8);
+  px(ctx, 'rgba(242, 220, 93, 0.18)', 260, 190, 540, 250);
   px(ctx, 'rgba(184, 63, 53, 0.2)', 0, 0, viewWidth, worldHeight);
-  drawSurroundedHero(ctx, 560, 350);
-  drawThreatBot(ctx, 360, 360, 1.2);
-  drawThreatBot(ctx, 760, 356, 1.2);
-  drawThreatBot(ctx, 455, 405, 1);
-  drawThreatBot(ctx, 690, 408, 1);
-  drawThreatDrone(ctx, 485, 248);
-  drawThreatDrone(ctx, 670, 232);
-  drawThreatDrone(ctx, 805, 278);
+  drawCorneredHero(ctx, 240, 350);
+  drawThreatBot(ctx, 470, 355, 1.25);
+  drawThreatBot(ctx, 640, 365, 1.1);
+  drawThreatBot(ctx, 790, 348, 1.25);
+  drawThreatDrone(ctx, 520, 245);
+  drawThreatDrone(ctx, 690, 230);
+  drawThreatDrone(ctx, 850, 260);
   ctx.fillStyle = '#f2dc5d';
   ctx.font = '46px monospace';
   ctx.fillText('RAN AWAY', 475, 90);
@@ -176,12 +172,25 @@ export function drawRanAwayEnding(ctx: CanvasRenderingContext2D) {
   ctx.fillText('The world collapsed because he was scared.', 375, 158);
 }
 
-function drawSurroundedHero(ctx: CanvasRenderingContext2D, x: number, y: number) {
+function drawSupplyShelf(ctx: CanvasRenderingContext2D, x: number, y: number) {
+  px(ctx, '#6f543b', x, y, 90, 18);
+  px(ctx, '#6f543b', x, y + 62, 90, 18);
+  px(ctx, '#596057', x + 8, y - 28, 24, 28);
+  px(ctx, '#f2dc5d', x + 44, y - 20, 20, 20);
+  px(ctx, '#cfc7b3', x + 12, y + 34, 28, 20);
+  px(ctx, '#b83f35', x + 56, y + 28, 22, 28);
+}
+
+function drawCorneredHero(ctx: CanvasRenderingContext2D, x: number, y: number) {
+  px(ctx, '#30352b', x - 54, y - 72, 22, 210);
+  px(ctx, '#30352b', x - 54, y + 118, 210, 22);
   px(ctx, '#2a1812', x + 10, y - 10, 38, 14);
   px(ctx, '#f1c08b', x + 13, y + 4, 34, 34);
-  px(ctx, '#111311', x + 20, y + 16, 5, 5);
-  px(ctx, '#111311', x + 37, y + 16, 5, 5);
-  px(ctx, '#b83f35', x + 23, y + 28, 17, 4);
+  px(ctx, '#f4f8ff', x + 19, y + 14, 7, 7);
+  px(ctx, '#f4f8ff', x + 36, y + 14, 7, 7);
+  px(ctx, '#111311', x + 25, y + 26, 5, 5);
+  px(ctx, '#111311', x + 25, y + 30, 18, 4);
+  px(ctx, '#111311', x + 25, y + 34, 5, 5);
   px(ctx, '#f1c08b', x + 48, y + 35, 18, 36);
   px(ctx, '#f1c08b', x - 9, y + 38, 18, 34);
   px(ctx, '#365f88', x + 6, y + 42, 48, 62);
