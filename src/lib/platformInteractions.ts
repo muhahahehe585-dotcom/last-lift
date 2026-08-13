@@ -94,7 +94,7 @@ function shootEnemy(state: PlatformGameState, input: InputState) {
   const bulletRange = 520;
   const bulletY = state.player.y + 28;
   const bulletStart = state.player.x + state.player.width / 2;
-  const facing = input.aimX === null ? state.player.facing : input.aimX >= bulletStart ? 1 : -1;
+  const facing = input.aimX === null ? (state.inVent ? 1 : state.player.facing) : input.aimX >= bulletStart ? 1 : -1;
   const bulletEnd = bulletStart + facing * bulletRange;
   const trail = {
     x: bulletStart,

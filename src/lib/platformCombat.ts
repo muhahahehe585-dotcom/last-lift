@@ -85,7 +85,7 @@ export function updateEnemies(state: PlatformGameState, dt: number, blinded: boo
 function updateVentMonster(state: PlatformGameState, enemy: Enemy, dt: number) {
   const nextX = enemy.x - Math.abs(enemy.vx) * dt;
   const minX = state.player.x + state.player.width + 26;
-  return { ...enemy, x: Math.max(minX, nextX), y: floorY - 82, vx: -Math.abs(enemy.vx) };
+  return { ...enemy, x: Math.max(minX, nextX), y: floorY - 102, height: 52, vx: -Math.abs(enemy.vx) };
 }
 
 function updateBoss(state: PlatformGameState, enemy: Enemy, dt: number) {

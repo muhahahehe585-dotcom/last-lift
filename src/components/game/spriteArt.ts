@@ -95,12 +95,24 @@ function drawSeaMonster(ctx: CanvasRenderingContext2D, enemy: Enemy) {
 }
 
 function drawVentMonster(ctx: CanvasRenderingContext2D, enemy: Enemy) {
-  px(ctx, '#2b1d17', enemy.x, enemy.y + 22, enemy.width, 40);
-  px(ctx, '#5c2b28', enemy.x + 18, enemy.y, 42, 38);
-  px(ctx, '#f2dc5d', enemy.x + 42, enemy.y + 12, 7, 7);
-  px(ctx, '#071012', enemy.x + 55, enemy.y + 24, 18, 6);
-  px(ctx, '#2b1d17', enemy.x + 8, enemy.y + 62, 12, 20);
-  px(ctx, '#2b1d17', enemy.x + 48, enemy.y + 62, 12, 20);
+  px(ctx, '#dfe6df', enemy.x + 8, enemy.y + 18, enemy.width - 12, 26);
+  px(ctx, '#f4f8ff', enemy.x + 18, enemy.y, 42, 30);
+  px(ctx, '#0a0b0a', enemy.x + 26, enemy.y + 9, 8, 10);
+  px(ctx, '#0a0b0a', enemy.x + 46, enemy.y + 9, 8, 10);
+  px(ctx, '#f4f8ff', enemy.x + 29, enemy.y + 12, 3, 3);
+  px(ctx, '#f4f8ff', enemy.x + 49, enemy.y + 12, 3, 3);
+  px(ctx, '#111311', enemy.x + 34, enemy.y + 23, 30, 8);
+  px(ctx, '#f4f8ff', enemy.x + 38, enemy.y + 23, 5, 10);
+  px(ctx, '#f4f8ff', enemy.x + 50, enemy.y + 23, 5, 10);
+  px(ctx, '#f4f8ff', enemy.x + 61, enemy.y + 23, 5, 10);
+  px(ctx, '#cdd6d0', enemy.x - 2, enemy.y + 28, 20, 8);
+  px(ctx, '#cdd6d0', enemy.x + 62, enemy.y + 26, 22, 8);
+  px(ctx, '#f4f8ff', enemy.x - 8, enemy.y + 34, 18, 7);
+  px(ctx, '#f4f8ff', enemy.x + 72, enemy.y + 32, 18, 7);
+  px(ctx, '#b83f35', enemy.x - 11, enemy.y + 38, 14, 4);
+  px(ctx, '#b83f35', enemy.x + 83, enemy.y + 36, 14, 4);
+  px(ctx, '#dfe6df', enemy.x + 16, enemy.y + 44, 12, 11);
+  px(ctx, '#dfe6df', enemy.x + 50, enemy.y + 44, 12, 11);
 }
 
 export function drawItem(ctx: CanvasRenderingContext2D, item: Item) {
