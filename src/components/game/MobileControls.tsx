@@ -9,7 +9,7 @@ type MobileControlsProps = {
   hasGun: boolean;
   selectedInventory: InventoryItem;
   onHold: (control: HoldControl, pressed: boolean) => void;
-  onTap: (control: 'run' | 'doubleJump' | 'slam' | 'hit' | 'interact' | 'leave' | 'gauntlet') => void;
+  onTap: (control: 'run' | 'doubleJump' | 'slam' | 'dodge' | 'hit' | 'interact' | 'leave' | 'gauntlet') => void;
   onSelectInventory: (item: InventoryItem) => void;
   onMenu: () => void;
 };
@@ -36,6 +36,7 @@ export function MobileControls({ flashlights, medkits, bullets, hasGun, selected
         <HoldButton label="Jump" onChange={(pressed) => onHold('jump', pressed)} />
         <button type="button" onClick={() => onTap('doubleJump')}>Double</button>
         <button type="button" onClick={() => onTap('slam')}>Slam</button>
+        <button type="button" onClick={() => onTap('dodge')}>Dodge</button>
         <button type="button" onClick={() => onTap('run')}>Run</button>
         <button type="button" onClick={() => onTap('hit')}>Hit</button>
         <button type="button" onClick={() => onTap('interact')}>Use</button>

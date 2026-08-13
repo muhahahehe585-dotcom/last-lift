@@ -17,6 +17,8 @@ const jumpPower = 680;
 const slamSpeed = 1050;
 const liftX = worldWidth - 120;
 const trainGuardX = worldWidth - 380;
+export const dodgeRadius = 150;
+const dodgeDistance = 150;
 
 function tryLift(state: PlatformGameState) {
   const atLift = state.player.x + state.player.width > liftX;
@@ -68,6 +70,7 @@ function getCarry(state: PlatformGameState) {
     unlimitedGun: state.unlimitedGun,
     infinityStones: state.infinityStones,
     stamina: state.player.stamina,
+    armorCount: state.armorCount,
   };
 }
 
@@ -155,6 +158,8 @@ export function updatePlatformGame(state: PlatformGameState, input: InputState, 
   }
   player.slamCooldown = Math.max(0, player.slamCooldown - dt);
   player.slamPulse = Math.max(0, player.slamPulse - dt);
+  player.dodgeCooldown = Math.max(0, player.dodgeCooldown - dt);
+  player.dodgePulse = Math.max(0, player.dodgePulse - dt);
   player.hurtCooldown = Math.max(0, player.hurtCooldown - dt);
 
   const wasAirSlamming = player.isSlamming;
@@ -202,6 +207,7 @@ export function updatePlatformGame(state: PlatformGameState, input: InputState, 
     botBlindTime: Math.max(0, state.botBlindTime - dt),
     enemies: updateEnemies({ ...state, player }, dt, blinded),
   });
+  next = tryDodge(next, input);
   next = updateVentSpawns(next, dt);
   next = applyEventDamage(next, dt);
   if (next.status !== 'playing') return next;
@@ -222,13 +228,51 @@ export function updatePlatformGame(state: PlatformGameState, input: InputState, 
   if (touchingEnemy) {
     if (touchingEnemy.kind === 'boss' && Math.abs(next.player.vx) < 5) return next;
     const cause = touchingEnemy.kind === 'drone' ? 'drone' : touchingEnemy.kind === 'bot-guard' ? 'guard' : touchingEnemy.kind === 'boss' ? 'boss' : 'bot';
-    next = hitPlayer(next, touchingEnemy.kind === 'boss' ? 35 : 18, `${touchingEnemy.kind} hit you.`, cause);
+    next = hitPlayer(next, damageForEnemyTouch(next, touchingEnemy.kind), `${touchingEnemy.kind} hit you.`, cause);
   }
   next = tryVentNest(next);
   next = tryTrainGuard(next);
   next = tryLift(next);
 
   return next;
+}
+
+function tryDodge(state: PlatformGameState, input: InputState) {
+  if (!input.dodgePressed || state.player.dodgeCooldown > 0) return state;
+  const enemy = state.enemies.find((item) => distanceBetweenCenters(state.player, item) <= dodgeRadius);
+  if (!enemy) return state;
+  const playerCenter = state.player.x + state.player.width / 2;
+  const enemyCenter = enemy.x + enemy.width / 2;
+  const direction: -1 | 1 = playerCenter < enemyCenter ? -1 : 1;
+  const x = Math.max(0, Math.min(worldWidth - state.player.width, state.player.x + direction * dodgeDistance));
+  return {
+    ...state,
+    player: {
+      ...state.player,
+      x,
+      vx: direction * moveSpeed,
+      facing: direction,
+      hurtCooldown: 0.45,
+      dodgeCooldown: 0.65,
+      dodgePulse: 0.28,
+    },
+    message: 'Dodged.',
+  };
+}
+
+function distanceBetweenCenters(a: { x: number; y: number; width: number; height: number }, b: { x: number; y: number; width: number; height: number }) {
+  const ax = a.x + a.width / 2;
+  const ay = a.y + a.height / 2;
+  const bx = b.x + b.width / 2;
+  const by = b.y + b.height / 2;
+  return Math.hypot(ax - bx, ay - by);
+}
+
+function damageForEnemyTouch(state: PlatformGameState, kind: string) {
+  if (kind === 'boss') return 35;
+  if (state.floor < 5) return kind === 'bot-guard' ? 7 : 5;
+  if (state.floor < 15) return kind === 'bot-guard' ? 10 : 8;
+  return kind === 'bot-guard' ? 14 : 12;
 }
 
 function updateMeteorites(state: PlatformGameState, dt: number) {

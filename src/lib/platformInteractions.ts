@@ -78,12 +78,13 @@ function useFlashlight(state: PlatformGameState) {
 }
 
 function useMedkit(state: PlatformGameState) {
+  const maxHealth = state.player.hp > 100 ? 180 : 100;
   if (state.medkits < 1) return { ...state, message: 'No medkits left.' };
-  if (state.player.hp >= 100) return { ...state, message: 'Health is already full.' };
+  if (state.player.hp >= maxHealth) return { ...state, message: 'Health is already full.' };
   return {
     ...state,
     medkits: state.medkits - 1,
-    player: { ...state.player, hp: Math.min(100, state.player.hp + 25) },
+    player: { ...state.player, hp: Math.min(maxHealth, state.player.hp + 25) },
     message: 'Medkit used.',
   };
 }

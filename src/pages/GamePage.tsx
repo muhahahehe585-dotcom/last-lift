@@ -7,7 +7,7 @@ import type { InventoryItem } from '../components/game/actionHitboxArt';
 import { createLevel, initialPlatformState } from '../lib/platformLevel';
 import { triggerMeteorThrow, updatePlatformGame } from '../lib/platformPhysics';
 import { tickGameTimers } from '../lib/platformTimers';
-import { buyDoubleJump, buyInfinityGauntlet, getCoins, getSavedEndings, hasDoubleJump, hasInfinityGauntlet, loadProgress, saveEnding } from '../lib/progress';
+import { buyArmor, buyDoubleJump, buyInfinityGauntlet, consumeArmor, getArmor, getCoins, getSavedEndings, hasDoubleJump, hasInfinityGauntlet, loadProgress, saveEnding } from '../lib/progress';
 import { chooseTrainBullet, chooseTrainDuel, chooseTrainHealth } from '../lib/trainDuel';
 import type { InputState, PlatformGameState } from '../lib/platformTypes';
 
@@ -19,6 +19,7 @@ const emptyInput: InputState = {
   doubleJumpPressed: false,
   down: false,
   slamPressed: false,
+  dodgePressed: false,
   hitPressed: false,
   interactPressed: false,
   leavePressed: false,
@@ -33,7 +34,7 @@ const emptyInput: InputState = {
 };
 
 type HoldControl = 'left' | 'right' | 'jump' | 'down';
-type TapControl = 'run' | 'doubleJump' | 'slam' | 'hit' | 'interact' | 'leave' | 'flashlight' | 'shoot' | 'gauntlet';
+type TapControl = 'run' | 'doubleJump' | 'slam' | 'dodge' | 'hit' | 'interact' | 'leave' | 'flashlight' | 'shoot' | 'gauntlet';
 
 export function GamePage() {
   const [screen, setScreen] = useState<'menu' | 'credits' | 'help' | 'shop' | 'game'>('menu');
@@ -43,6 +44,7 @@ export function GamePage() {
     coins: getCoins(),
     doubleJump: hasDoubleJump(),
     gauntlet: hasInfinityGauntlet(),
+    armor: getArmor(),
     endings: getSavedEndings(),
   }));
   const [state, setState] = useState<PlatformGameState>(initialPlatformState);
@@ -54,6 +56,7 @@ export function GamePage() {
     coins: getCoins(),
     doubleJump: hasDoubleJump(),
     gauntlet: hasInfinityGauntlet(),
+    armor: getArmor(),
     endings: getSavedEndings(),
   });
 
@@ -79,6 +82,7 @@ export function GamePage() {
     if (control === 'run') inputRef.current.runPressed = true;
     if (control === 'doubleJump') inputRef.current.doubleJumpPressed = true;
     if (control === 'slam') inputRef.current.slamPressed = true;
+    if (control === 'dodge') inputRef.current.dodgePressed = true;
     if (control === 'hit') inputRef.current.hitPressed = true;
     if (control === 'interact') inputRef.current.interactPressed = true;
     if (control === 'leave') inputRef.current.leavePressed = true;
@@ -90,6 +94,12 @@ export function GamePage() {
     setTrainTestMode(false);
     setSelectedInventory(null);
     setScreen('menu');
+  };
+
+  const startArmoredRun = () => {
+    const hasArmor = consumeArmor();
+    refreshProgress();
+    return createLevel(1, hasArmor ? 180 : 100, { armorCount: getArmor() });
   };
 
   const selectInventory = (item: InventoryItem) => {
@@ -114,6 +124,7 @@ export function GamePage() {
       setState((current) => ({
         ...current,
         coins: getCoins(),
+        armorCount: getArmor(),
         doubleJumpUnlocked: hasDoubleJump(),
         gauntletOwned: hasInfinityGauntlet(),
       }));
@@ -131,6 +142,7 @@ export function GamePage() {
       if (['ArrowRight', 'd', 'D'].includes(event.key)) inputRef.current.right = pressed;
       if (['ArrowUp', 'w', 'W'].includes(event.key) || event.code === 'Space') inputRef.current.jump = pressed;
       if (pressed && ['ArrowUp', 'w', 'W'].includes(event.key)) inputRef.current.jumpPressed = true;
+      if (pressed && ['w', 'W'].includes(event.key)) inputRef.current.dodgePressed = true;
       if (pressed && ['i', 'I'].includes(event.key)) inputRef.current.doubleJumpPressed = true;
       if (['ArrowDown', 's', 'S'].includes(event.key)) inputRef.current.down = pressed;
       if (event.code === 'Space' && !pressed) spaceDownRef.current = false;
@@ -181,6 +193,7 @@ export function GamePage() {
         return next;
       });
       inputRef.current.slamPressed = false;
+      inputRef.current.dodgePressed = false;
       inputRef.current.jumpPressed = false;
       inputRef.current.doubleJumpPressed = false;
       inputRef.current.hitPressed = false;
@@ -227,6 +240,7 @@ export function GamePage() {
         endings={progress.endings}
         doubleJumpUnlocked={progress.doubleJump}
         infinityGauntletUnlocked={progress.gauntlet}
+        armorCount={progress.armor}
         onBuyDoubleJump={() => {
           buyDoubleJump();
           refreshProgress();
@@ -235,10 +249,13 @@ export function GamePage() {
           buyInfinityGauntlet();
           refreshProgress();
         }}
-        onPlay={() => {
+        onBuyArmor={() => {
+          buyArmor();
           refreshProgress();
+        }}
+        onPlay={() => {
           setTrainTestMode(false);
-          setState(createLevel(1));
+          setState(startArmoredRun());
           setScreen('game');
         }}
         onTrainDuel={() => {

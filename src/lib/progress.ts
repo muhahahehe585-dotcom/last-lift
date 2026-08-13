@@ -5,11 +5,13 @@ const coinsKey = 'last-lift-coins';
 const doubleJumpKey = 'last-lift-double-jump';
 const infinityGauntletKey = 'last-lift-infinity-gauntlet';
 const endingsKey = 'last-lift-endings';
+const armorKey = 'last-lift-armor';
 
 type ProgressState = {
   coins: number;
   doubleJump: boolean;
   gauntlet: boolean;
+  armor: number;
   endings: SavedEnding[];
 };
 
@@ -26,6 +28,7 @@ export const endingLabels: Record<SavedEnding, string> = {
 
 export const doubleJumpCost = 3;
 export const infinityGauntletCost = 100;
+export const armorCost = 5;
 
 let progressCache: ProgressState = readLocalProgress();
 
@@ -71,6 +74,22 @@ export function buyInfinityGauntlet() {
   return true;
 }
 
+export function getArmor() {
+  return progressCache.armor;
+}
+
+export function buyArmor() {
+  if (getCoins() < armorCost) return false;
+  updateProgress({ coins: getCoins() - armorCost, armor: getArmor() + 1 });
+  return true;
+}
+
+export function consumeArmor() {
+  if (getArmor() < 1) return false;
+  updateProgress({ armor: getArmor() - 1 });
+  return true;
+}
+
 export function getSavedEndings() {
   return progressCache.endings;
 }
@@ -99,7 +118,7 @@ export async function loadProgress() {
 
   const { data } = await supabase
     .from('game_progress')
-    .select('coins,double_jump_unlocked,infinity_gauntlet_unlocked,endings')
+    .select('coins,double_jump_unlocked,infinity_gauntlet_unlocked,armor_count,endings')
     .eq('user_id', auth.user.id)
     .maybeSingle();
 
@@ -108,9 +127,10 @@ export async function loadProgress() {
         coins: data.coins,
         doubleJump: data.double_jump_unlocked,
         gauntlet: data.infinity_gauntlet_unlocked,
+        armor: data.armor_count,
         endings: data.endings.filter(isSavedEnding),
       }
-    : { coins: 0, doubleJump: false, gauntlet: false, endings: [] };
+    : { coins: 0, doubleJump: false, gauntlet: false, armor: 0, endings: [] };
 
   progressCache = mergeProgress(local, remote);
   writeLocalProgress(progressCache);
@@ -124,12 +144,18 @@ function readLocalProgress(): ProgressState {
     coins: readLocalCoins(),
     doubleJump: storage()?.getItem(doubleJumpKey) === 'yes',
     gauntlet: storage()?.getItem(infinityGauntletKey) === 'yes',
+    armor: readLocalArmor(),
     endings: readLocalEndings(saved),
   };
 }
 
 function readLocalCoins() {
   const saved = storage()?.getItem(coinsKey);
+  return saved ? Number.parseInt(saved, 10) || 0 : 0;
+}
+
+function readLocalArmor() {
+  const saved = storage()?.getItem(armorKey);
   return saved ? Number.parseInt(saved, 10) || 0 : 0;
 }
 
@@ -154,6 +180,7 @@ function writeLocalProgress(progress: ProgressState) {
   storage()?.setItem(coinsKey, String(progress.coins));
   storage()?.setItem(doubleJumpKey, progress.doubleJump ? 'yes' : 'no');
   storage()?.setItem(infinityGauntletKey, progress.gauntlet ? 'yes' : 'no');
+  storage()?.setItem(armorKey, String(progress.armor));
   storage()?.setItem(endingsKey, JSON.stringify(progress.endings));
 }
 
@@ -162,6 +189,7 @@ function mergeProgress(local: ProgressState, remote: ProgressState): ProgressSta
     coins: Math.max(local.coins, remote.coins),
     doubleJump: local.doubleJump || remote.doubleJump,
     gauntlet: local.gauntlet || remote.gauntlet,
+    armor: Math.max(local.armor, remote.armor),
     endings: Array.from(new Set([...local.endings, ...remote.endings])),
   };
 }
@@ -176,6 +204,7 @@ async function saveProgressToSupabase() {
     coins: progressCache.coins,
     double_jump_unlocked: progressCache.doubleJump,
     infinity_gauntlet_unlocked: progressCache.gauntlet,
+    armor_count: progressCache.armor,
     endings: progressCache.endings,
     updated_at: new Date().toISOString(),
   });

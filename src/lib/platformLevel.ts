@@ -1,7 +1,7 @@
 import type { Enemy, EnemyKind, HotelRoom, Item, ItemKind, PlatformGameState } from './platformTypes';
 import { batteryNeed, modeFor, modeMessage } from './floorEvents';
 import { boxesFor, holesFor } from './platformObstacles';
-import { getCoins, hasDoubleJump, hasInfinityGauntlet } from './progress';
+import { getArmor, getCoins, hasDoubleJump, hasInfinityGauntlet } from './progress';
 
 export const worldWidth = 2400;
 export const viewWidth = 1200;
@@ -17,6 +17,7 @@ type LevelCarry = {
   unlimitedGun?: boolean;
   infinityStones?: number;
   stamina?: number;
+  armorCount?: number;
 };
 
 const enemyKinds: EnemyKind[] = ['drone', 'broken-bot', 'bot-guard'];
@@ -173,6 +174,8 @@ export function createLevel(floor: number, hp = 100, carry: LevelCarry = {}): Pl
       isSlamming: false,
       slamCooldown: 0,
       slamPulse: 0,
+      dodgeCooldown: 0,
+      dodgePulse: 0,
       hurtCooldown: 0,
       doubleJumpUsed: false,
     },
@@ -210,6 +213,7 @@ export function createLevel(floor: number, hp = 100, carry: LevelCarry = {}): Pl
     deathCause: null,
     deathTimer: 0,
     coins: getCoins(),
+    armorCount: carry.armorCount ?? getArmor(),
     doubleJumpUnlocked: hasDoubleJump(),
   };
 }

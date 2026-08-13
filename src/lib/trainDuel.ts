@@ -29,7 +29,15 @@ export function updateTrainDuel(state: PlatformGameState, input: InputState, dt:
   if (playerMarks >= 4) {
     awardFloorCoin();
     return {
-      ...createLevel(state.floor + 1, state.player.hp, { flashlights: state.flashlights, medkits: state.medkits, hasGun: true, shots: 24, stamina: state.player.stamina, unlimitedGun: state.unlimitedGun }),
+      ...createLevel(state.floor + 1, state.player.hp, {
+        flashlights: state.flashlights,
+        medkits: state.medkits,
+        hasGun: true,
+        shots: 24,
+        stamina: state.player.stamina,
+        unlimitedGun: state.unlimitedGun,
+        armorCount: state.armorCount,
+      }),
       message: 'Duel won. Revolver acquired with 24 bullets.',
     };
   }
@@ -81,6 +89,7 @@ function advanceTrainFloor(state: PlatformGameState, message: string) {
       stamina: state.player.stamina,
       unlimitedGun: state.unlimitedGun,
       infinityStones: state.infinityStones,
+      armorCount: state.armorCount,
     }),
     message,
   };

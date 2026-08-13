@@ -1,4 +1,4 @@
-import { doubleJumpCost, endingLabels, infinityGauntletCost, type SavedEnding } from '../../lib/progress';
+import { armorCost, doubleJumpCost, endingLabels, infinityGauntletCost, type SavedEnding } from '../../lib/progress';
 
 type GameMenuProps = {
   view: 'menu' | 'credits' | 'help' | 'shop';
@@ -9,8 +9,10 @@ type GameMenuProps = {
   endings: SavedEnding[];
   doubleJumpUnlocked: boolean;
   infinityGauntletUnlocked: boolean;
+  armorCount: number;
   onBuyDoubleJump: () => void;
   onBuyInfinityGauntlet: () => void;
+  onBuyArmor: () => void;
 };
 
 export function GameMenu({
@@ -22,8 +24,10 @@ export function GameMenu({
   endings,
   doubleJumpUnlocked,
   infinityGauntletUnlocked,
+  armorCount,
   onBuyDoubleJump,
   onBuyInfinityGauntlet,
+  onBuyArmor,
 }: GameMenuProps) {
   return (
     <main className="menu-screen">
@@ -43,6 +47,7 @@ export function GameMenu({
         {view === 'shop' && (
           <div className="menu-copy">
             <p>Coins: {coins}</p>
+            <p>Armor: {armorCount}</p>
             <p>Endings: {formatEndings(endings)}</p>
             <div className="shop-item">
               <div>
@@ -51,6 +56,15 @@ export function GameMenu({
               </div>
               <button type="button" disabled={doubleJumpUnlocked || coins < doubleJumpCost} onClick={onBuyDoubleJump}>
                 {doubleJumpUnlocked ? 'Owned' : `${doubleJumpCost} coins`}
+              </button>
+            </div>
+            <div className="shop-item">
+              <div>
+                <strong>Armor</strong>
+                <p>Starts one run with 180 HP instead of 100 HP.</p>
+              </div>
+              <button type="button" disabled={coins < armorCost} onClick={onBuyArmor}>
+                {armorCost} coins
               </button>
             </div>
             <div className="shop-item">

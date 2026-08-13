@@ -14,6 +14,8 @@ function formatTime(seconds: number) {
 export function PlatformHud({ state, onRestart }: PlatformHudProps) {
   const timer = state.bossTimeLeft > 0 ? formatTime(state.bossTimeLeft) : `${state.floorTimeLeft}s`;
   const bullets = state.hasGun ? (state.unlimitedGun ? 'Unlimited' : state.shots) : 'None';
+  const maxHealth = state.player.hp > 100 ? 180 : 100;
+  const healthWidth = Math.min(100, (state.player.hp / maxHealth) * 100);
 
   return (
     <aside className="platform-hud">
@@ -25,10 +27,10 @@ export function PlatformHud({ state, onRestart }: PlatformHudProps) {
       <div className="combat-status-card">
         <div className="meter-row">
           <span>Health</span>
-          <strong>{Math.round(state.player.hp)}%</strong>
+          <strong>{Math.round(state.player.hp)}/{maxHealth}</strong>
         </div>
         <div className="health-shell" aria-label="Health">
-          <div className="health-fill" style={{ width: `${state.player.hp}%` }} />
+          <div className="health-fill" style={{ width: `${healthWidth}%` }} />
         </div>
         <div className="meter-row">
           <span>Stamina</span>
@@ -48,6 +50,10 @@ export function PlatformHud({ state, onRestart }: PlatformHudProps) {
         <div className="resource-row">
           <span>Bullets</span>
           <strong>{bullets}</strong>
+        </div>
+        <div className="resource-row">
+          <span>Armor</span>
+          <strong>{state.armorCount}</strong>
         </div>
       </div>
 
@@ -69,6 +75,7 @@ export function PlatformHud({ state, onRestart }: PlatformHudProps) {
         <p>A/D or arrows: walk</p>
         <p>Shift: toggle run</p>
         <p>W/Up/Space: jump</p>
+        <p>W near enemy circle: dodge</p>
         <p>Shop upgrade: press I in air to double jump</p>
         <p>J: hit nearby enemies</p>
         <p>Double Space in air: slam</p>

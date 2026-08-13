@@ -23,6 +23,8 @@ export type Player = Rect & {
   isSlamming: boolean;
   slamCooldown: number;
   slamPulse: number;
+  dodgeCooldown: number;
+  dodgePulse: number;
   hurtCooldown: number;
   doubleJumpUsed: boolean;
 };
@@ -89,6 +91,7 @@ export type PlatformGameState = {
   deathCause: DeathCause | null;
   deathTimer: number;
   coins: number;
+  armorCount: number;
   doubleJumpUnlocked: boolean;
 };
 
@@ -111,6 +114,7 @@ export type InputState = {
   doubleJumpPressed: boolean;
   down: boolean;
   slamPressed: boolean;
+  dodgePressed: boolean;
   hitPressed: boolean;
   interactPressed: boolean;
   leavePressed: boolean;
