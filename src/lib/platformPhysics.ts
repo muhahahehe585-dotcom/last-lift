@@ -126,6 +126,7 @@ function trySecretFloorOneHoles(state: PlatformGameState, player: PlatformGameSt
 export function updatePlatformGame(state: PlatformGameState, input: InputState, dt: number): PlatformGameState {
   if (state.status === 'lost') return { ...state, deathTimer: state.deathTimer + dt };
   if (state.status !== 'playing') return state;
+  if (state.rageJumpTimer > 0) return updateRageJump(state, dt);
   if (state.meteorThrowTimer > 0) return updateMeteorThrow(state, dt);
   if (state.gauntletSnapTimer > 0) return updateGauntletSnap(state, dt);
   if (state.duel) return updateTrainDuel(state, input, dt);
@@ -311,16 +312,28 @@ export function triggerMeteorThrow(state: PlatformGameState, x: number, y: numbe
   if (clickedRageFire) {
     return {
       ...state,
-      enemies: state.enemies.filter((enemy) => enemy.kind !== 'boss'),
-      status: 'won' as const,
-      ending: 'rage' as const,
-      message: 'RAGE.',
+      rageJumpTimer: 0.01,
+      player: { ...state.player, vx: 0, vy: -900, hurtCooldown: 3 },
+      message: 'Rage ignites. The roof is not far enough.',
     };
   }
   if (state.floor !== finalFloor || state.status !== 'playing' || state.meteorThrowTimer > 0) return state;
   const meteor = state.meteorites.find((item) => x >= item.x && x <= item.x + item.width && y >= item.y && y <= item.y + item.height);
   if (!meteor) return state;
   return { ...state, grabbedMeteor: meteor, meteorThrowTimer: 0.01, message: 'Mask on. Webs grabbed the meteorite.' };
+}
+
+function updateRageJump(state: PlatformGameState, dt: number): PlatformGameState {
+  const timer = state.rageJumpTimer + dt;
+  if (timer < 2.8) return { ...state, rageJumpTimer: timer };
+  return {
+    ...state,
+    rageJumpTimer: timer,
+    enemies: state.enemies.filter((enemy) => enemy.kind !== 'boss'),
+    status: 'won' as const,
+    ending: 'rage' as const,
+    message: 'RAGE.',
+  };
 }
 
 function updateMeteorThrow(state: PlatformGameState, dt: number): PlatformGameState {

@@ -115,6 +115,7 @@ export function PlatformCanvas({ state, onAim, onMeteorClick, onTrainBullet, onT
     else drawPlayer(ctx, state);
     drawActionHitboxes(ctx, state, selectedInventory);
     drawPlayerSnap(ctx, state);
+    drawRageJump(ctx, state);
     drawMeteorThrow(ctx, state);
     drawBulletTrail(ctx, state);
     ctx.restore();
@@ -171,6 +172,69 @@ export function PlatformCanvas({ state, onAim, onMeteorClick, onTrainBullet, onT
       )}
     </div>
   );
+}
+
+function drawRageJump(ctx: CanvasRenderingContext2D, state: PlatformGameState) {
+  if (state.rageJumpTimer <= 0) return;
+  const t = Math.min(1, state.rageJumpTimer / 2.8);
+  const lift = Math.sin(Math.min(1, t / 0.45) * Math.PI * 0.5) * 500;
+  const x = state.player.x + 12 + t * 760;
+  const y = state.player.y - lift + Math.max(0, t - 0.56) * 940;
+
+  ctx.fillStyle = `rgba(184, 63, 53, ${0.22 + t * 0.38})`;
+  ctx.fillRect(state.player.x - 220, state.player.y - 210, 620 + t * 780, 460);
+
+  if (t > 0.42) {
+    const roofX = state.player.x + 560;
+    const roofY = 168;
+    ctx.fillStyle = '#2b302c';
+    ctx.fillRect(roofX - 120, roofY + 250, 650, 82);
+    ctx.fillStyle = '#596057';
+    ctx.fillRect(roofX - 120, roofY + 238, 650, 14);
+    drawBurningBossHit(ctx, roofX + 190, roofY + 150, t);
+  }
+
+  drawFlamingLaunchHero(ctx, x, y, t);
+}
+
+function drawFlamingLaunchHero(ctx: CanvasRenderingContext2D, x: number, y: number, t: number) {
+  ctx.fillStyle = '#ff8a3d';
+  ctx.fillRect(x - 28, y + 22, 96, 140);
+  ctx.fillStyle = '#f2dc5d';
+  ctx.fillRect(x - 8, y - 8, 52, 126);
+  ctx.fillStyle = '#b83f35';
+  ctx.fillRect(x + 18, y + 36, 70, 118);
+  ctx.fillStyle = '#2a1812';
+  ctx.fillRect(x + 8, y - 4, 38, 14);
+  ctx.fillStyle = '#f1c08b';
+  ctx.fillRect(x + 13, y + 14, 28, 28);
+  ctx.fillStyle = '#f4f8ff';
+  ctx.fillRect(x + 22, y + 24, 6, 6);
+  ctx.fillRect(x + 37, y + 24, 6, 6);
+  ctx.fillStyle = '#365f88';
+  ctx.fillRect(x + 6, y + 46, 46, 56);
+  ctx.fillStyle = `rgba(242, 220, 93, ${0.2 + t * 0.45})`;
+  ctx.fillRect(x - 54, y - 42, 160, 240);
+}
+
+function drawBurningBossHit(ctx: CanvasRenderingContext2D, x: number, y: number, t: number) {
+  ctx.fillStyle = '#3c4542';
+  ctx.fillRect(x + 52, y + 36, 180, 70);
+  ctx.fillStyle = '#0a0b0a';
+  ctx.fillRect(x + 86, y, 120, 42);
+  ctx.fillStyle = '#111311';
+  ctx.fillRect(x + 102, y + 56, 22, 12);
+  ctx.fillRect(x + 170, y + 56, 22, 12);
+  ctx.fillStyle = '#ff8a3d';
+  ctx.fillRect(x + 18, y + 52, 60, 130);
+  ctx.fillRect(x + 206, y + 38, 70, 144);
+  ctx.fillStyle = '#f2dc5d';
+  ctx.fillRect(x + 38, y + 20, 22, 112);
+  ctx.fillRect(x + 232, y + 12, 20, 118);
+  if (t > 0.72) {
+    ctx.fillStyle = `rgba(255, 244, 180, ${(t - 0.72) / 0.28})`;
+    ctx.fillRect(x - 140, y - 92, 540, 310);
+  }
 }
 
 function drawBulletTrail(ctx: CanvasRenderingContext2D, state: PlatformGameState) {

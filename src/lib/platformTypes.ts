@@ -87,6 +87,7 @@ export type PlatformGameState = {
   bossTimeLeft: number;
   gauntletSnapTimer: number;
   meteorThrowTimer: number;
+  rageJumpTimer: number;
   bossDodged: boolean;
   message: string;
   deathCause: DeathCause | null;
