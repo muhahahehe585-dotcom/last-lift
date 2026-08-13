@@ -3,6 +3,7 @@ import type { PlatformGameState } from '../../lib/platformTypes';
 type PlatformHudProps = {
   state: PlatformGameState;
   onRestart: () => void;
+  onMenu: () => void;
 };
 
 function formatTime(seconds: number) {
@@ -11,7 +12,7 @@ function formatTime(seconds: number) {
   return `${minutes}:${leftover.toString().padStart(2, '0')}`;
 }
 
-export function PlatformHud({ state, onRestart }: PlatformHudProps) {
+export function PlatformHud({ state, onRestart, onMenu }: PlatformHudProps) {
   const timer = state.bossTimeLeft > 0 ? formatTime(state.bossTimeLeft) : `${state.floorTimeLeft}s`;
   const bullets = state.hasGun ? (state.unlimitedGun ? 'Unlimited' : state.shots) : 'None';
   const maxHealth = state.player.hp > 100 ? 180 : 100;
@@ -89,6 +90,7 @@ export function PlatformHud({ state, onRestart }: PlatformHudProps) {
       </div>
 
       <button type="button" onClick={onRestart}>Restart</button>
+      <button type="button" onClick={onMenu}>Menu (0)</button>
     </aside>
   );
 }

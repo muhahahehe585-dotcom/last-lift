@@ -90,6 +90,7 @@ export function GamePage() {
   };
 
   const returnToMenu = () => {
+    inputRef.current = { ...emptyInput };
     refreshProgress();
     setTrainTestMode(false);
     setSelectedInventory(null);
@@ -137,7 +138,12 @@ export function GamePage() {
       if (['ArrowLeft', 'ArrowRight', 'ArrowUp', 'ArrowDown', ' '].includes(event.key) || event.code === 'Space') {
         event.preventDefault();
       }
-      if (pressed && event.key === '0') returnToMenu();
+      const wantsMenu = event.key === '0' || event.code === 'Digit0' || event.code === 'Numpad0';
+      if (pressed && wantsMenu) {
+        event.preventDefault();
+        returnToMenu();
+        return;
+      }
       if (['ArrowLeft', 'a', 'A'].includes(event.key)) inputRef.current.left = pressed;
       if (['ArrowRight', 'd', 'D'].includes(event.key)) inputRef.current.right = pressed;
       if (['ArrowUp', 'w', 'W'].includes(event.key) || event.code === 'Space') inputRef.current.jump = pressed;
@@ -270,7 +276,7 @@ export function GamePage() {
 
   return (
     <main className="platform-shell">
-      <PlatformHud state={state} onRestart={() => setState(createLevel(trainTestMode ? 11 : 1))} />
+      <PlatformHud state={state} onRestart={() => setState(createLevel(trainTestMode ? 11 : 1))} onMenu={returnToMenu} />
       <PlatformCanvas
         state={state}
         onAim={(x, y) => {
