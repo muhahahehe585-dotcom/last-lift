@@ -1,4 +1,5 @@
 import { overlaps } from './platformGeometry';
+import { floorY, ventMonsterFor } from './platformLevel';
 import { damageNest } from './platformNest';
 import type { InputState, ItemKind, PlatformGameState } from './platformTypes';
 
@@ -33,6 +34,9 @@ function enterRoom(state: PlatformGameState) {
     return {
       ...state,
       inVent: true,
+      enemies: [ventMonsterFor(state.floor)],
+      nest: { x: 2130, y: floorY - 92, width: 120, height: 92 },
+      nestHp: 5,
       player: { ...state.player, x: 80, y: 416, height: 44, grounded: true },
       message: 'You crawled into the vents. No sprinting. The nest is forward.',
     };

@@ -65,11 +65,6 @@ function drawVentRoute(ctx: CanvasRenderingContext2D, state: PlatformGameState) 
     px(ctx, '#596057', state.ventHole.x + 8, state.ventHole.y + 22, state.ventHole.width - 16, 6);
     drawVentLadder(ctx, state.ventHole.x + state.ventHole.width / 2 - 18);
   }
-  if (state.nest) {
-    px(ctx, '#2b1d17', state.nest.x, state.nest.y, state.nest.width, state.nest.height);
-    px(ctx, '#5c2b28', state.nest.x + 16, state.nest.y + 18, state.nest.width - 32, state.nest.height - 36);
-    px(ctx, '#f2dc5d', state.nest.x + 48, state.nest.y + 34, 20, 16);
-  }
 }
 
 function drawVentLadder(ctx: CanvasRenderingContext2D, x: number) {

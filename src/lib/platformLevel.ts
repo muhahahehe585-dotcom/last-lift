@@ -60,7 +60,7 @@ function seaMonsterFor(floor: number): Enemy {
   };
 }
 
-function ventMonsterFor(floor: number): Enemy {
+export function ventMonsterFor(floor: number): Enemy {
   return {
     id: `vent-monster-${floor}`,
     kind: 'vent-monster',
@@ -181,13 +181,13 @@ export function createLevel(floor: number, hp = 100, carry: LevelCarry = {}): Pl
       hurtCooldown: 0,
       doubleJumpUsed: false,
     },
-    enemies: mode === 'vent' ? [ventMonsterFor(floor)] : mode === 'flood' ? [seaMonsterFor(floor)] : Array.from({ length: enemyCount }, (_, index) => enemyFor(floor, index)),
+    enemies: mode === 'vent' ? [] : mode === 'flood' ? [seaMonsterFor(floor)] : Array.from({ length: enemyCount }, (_, index) => enemyFor(floor, index)),
     items: bossFloor ? [] : mode === 'flood' ? floodItemsFor(floor) : mode === 'lava' ? lavaItemsFor(floor, boxes) : mode === 'supply' ? [...itemsFor(floor), ...itemsFor(floor + 1)] : itemsFor(floor),
     rooms: bossFloor || mode === 'flood' ? [] : roomsFor(floor),
     holes: bossFloor || mode === 'supply' || mode === 'lava' ? [] : mode === 'collapse' ? [...holesFor(floor), ...holesFor(floor + 1)] : holesFor(floor),
     boxes,
     ventHole: mode === 'vent' ? { x: 520, y: 70, width: 92, height: 38 } : null,
-    nest: mode === 'vent' ? { x: 2130, y: floorY - 92, width: 120, height: 92 } : null,
+    nest: null,
     nestHp: 5,
     inVent: false,
     ventSpawnTimer: 60,
