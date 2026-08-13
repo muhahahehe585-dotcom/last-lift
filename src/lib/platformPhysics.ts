@@ -235,6 +235,7 @@ export function updatePlatformGame(state: PlatformGameState, input: InputState, 
       bulletTrail: { x: shootingDrone.x + shootingDrone.width / 2, y: shootingDrone.y + 18, width: next.player.x - shootingDrone.x, height: 0.12 },
     };
     next = hitPlayer(next, 4, 'Drone shot you.', 'drone');
+    next = { ...next, player: { ...next.player, hurtCooldown: Math.max(next.player.hurtCooldown, 2) } };
     if (next.status !== 'playing') return next;
   }
   if (wasAirSlamming && player.grounded) next = slamEnemies(next);
