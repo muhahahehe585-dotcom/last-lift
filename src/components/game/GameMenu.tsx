@@ -4,6 +4,7 @@ type GameMenuProps = {
   view: 'menu' | 'credits' | 'help' | 'shop';
   onView: (view: 'menu' | 'credits' | 'help' | 'shop') => void;
   onPlay: () => void;
+  onTutorial: () => void;
   onTrainDuel: () => void;
   coins: number;
   endings: SavedEnding[];
@@ -19,6 +20,7 @@ export function GameMenu({
   view,
   onView,
   onPlay,
+  onTutorial,
   onTrainDuel,
   coins,
   endings,
@@ -38,6 +40,7 @@ export function GameMenu({
           <div className="menu-actions">
             <p className="save-summary">Coins {coins} · Endings {endings.length}/7</p>
             <button type="button" onClick={onPlay}>Play</button>
+            <button type="button" onClick={onTutorial}>Tutorial</button>
             <button type="button" onClick={onTrainDuel}>Train Duel</button>
             <button type="button" onClick={() => onView('shop')}>Shop</button>
             <button type="button" onClick={() => onView('help')}>How to Play</button>
@@ -83,6 +86,7 @@ export function GameMenu({
           <div className="menu-copy">
             <p>Climb 100 abandoned hotel floors. Some floors have lava, floods, blackouts, swarms, collapses, or supplies.</p>
             <p>A/D move, Shift runs, Space jumps, J hits, I double jumps when owned, E enters/searches rooms.</p>
+            <p>Tutorial mode revives you through floor 13. Normal mode does not.</p>
             <button type="button" onClick={() => onView('menu')}>Back</button>
           </div>
         )}

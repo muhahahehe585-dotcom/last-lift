@@ -7,7 +7,7 @@ import type { InventoryItem } from '../components/game/actionHitboxArt';
 import { createLevel, initialPlatformState } from '../lib/platformLevel';
 import { triggerMeteorThrow, updatePlatformGame } from '../lib/platformPhysics';
 import { tickGameTimers } from '../lib/platformTimers';
-import { buyArmor, buyDoubleJump, buyInfinityGauntlet, consumeArmor, getArmor, getCoins, getSavedEndings, hasDoubleJump, hasInfinityGauntlet, loadProgress, saveEnding } from '../lib/progress';
+import { buyArmor, buyDoubleJump, buyInfinityGauntlet, consumeArmor, getArmor, getCoins, getSavedEndings, hasDoubleJump, hasInfinityGauntlet, loadProgress, saveEnding, setCoins } from '../lib/progress';
 import { chooseTrainBullet, chooseTrainDuel, chooseTrainHealth } from '../lib/trainDuel';
 import type { InputState, PlatformGameState } from '../lib/platformTypes';
 
@@ -39,6 +39,7 @@ type TapControl = 'run' | 'doubleJump' | 'slam' | 'dodge' | 'hit' | 'interact' |
 export function GamePage() {
   const [screen, setScreen] = useState<'menu' | 'credits' | 'help' | 'shop' | 'game'>('menu');
   const [trainTestMode, setTrainTestMode] = useState(false);
+  const [tutorialMode, setTutorialMode] = useState(false);
   const [selectedInventory, setSelectedInventory] = useState<InventoryItem>(null);
   const [progress, setProgress] = useState(() => ({
     coins: getCoins(),
@@ -50,6 +51,8 @@ export function GamePage() {
   const [state, setState] = useState<PlatformGameState>(initialPlatformState);
   const inputRef = useRef<InputState>({ ...emptyInput });
   const trainTestModeRef = useRef(false);
+  const tutorialModeRef = useRef(false);
+  const tutorialCoinsRef = useRef(0);
   const lastJumpRef = useRef(0);
   const spaceDownRef = useRef(false);
   const refreshProgress = () => setProgress({
@@ -93,6 +96,7 @@ export function GamePage() {
     inputRef.current = { ...emptyInput };
     refreshProgress();
     setTrainTestMode(false);
+    setTutorialMode(false);
     setSelectedInventory(null);
     setScreen('menu');
   };
@@ -101,6 +105,38 @@ export function GamePage() {
     const hasArmor = consumeArmor();
     refreshProgress();
     return createLevel(1, hasArmor ? 180 : 100, { armorCount: getArmor() });
+  };
+
+  const startTutorial = () => {
+    refreshProgress();
+    tutorialCoinsRef.current = getCoins();
+    setTrainTestMode(false);
+    setTutorialMode(true);
+    setSelectedInventory(null);
+    setState({
+      ...createLevel(1),
+      message: 'Tutorial started. You will revive here, but the real game will not do this.',
+    });
+    setScreen('game');
+  };
+
+  const continueTutorial = (current: PlatformGameState) => {
+    if (!tutorialModeRef.current) return current;
+    if (current.coins !== tutorialCoinsRef.current) setCoins(tutorialCoinsRef.current);
+    if (current.floor > 13 || (current.floor >= 13 && current.status === 'won')) {
+      setTutorialMode(false);
+      setScreen('menu');
+      refreshProgress();
+      return {
+        ...createLevel(1),
+        message: 'Tutorial complete. Floors 1-13 are practiced. Normal mode is dangerous now.',
+      };
+    }
+    if (current.status !== 'lost') return current;
+    return {
+      ...createLevel(current.floor),
+      message: 'Revived for tutorial. In the real game, dying sends you back to the lobby.',
+    };
   };
 
   const selectInventory = (item: InventoryItem) => {
@@ -118,6 +154,10 @@ export function GamePage() {
   useEffect(() => {
     trainTestModeRef.current = trainTestMode;
   }, [trainTestMode]);
+
+  useEffect(() => {
+    tutorialModeRef.current = tutorialMode;
+  }, [tutorialMode]);
 
   useEffect(() => {
     loadProgress().then(() => {
@@ -190,6 +230,8 @@ export function GamePage() {
       const input = { ...inputRef.current };
       setState((current) => {
         const next = updatePlatformGame(current, input, dt);
+        const tutorialNext = continueTutorial(next);
+        if (tutorialNext !== next) return tutorialNext;
         if (trainTestModeRef.current && current.duel && (next.floor !== 11 || next.status !== 'playing')) {
           trainTestModeRef.current = false;
           setTrainTestMode(false);
@@ -220,7 +262,7 @@ export function GamePage() {
 
   useEffect(() => {
     if (screen !== 'game') return;
-    const timer = window.setInterval(() => setState(tickGameTimers), 1000);
+    const timer = window.setInterval(() => setState((current) => continueTutorial(tickGameTimers(current))), 1000);
     return () => window.clearInterval(timer);
   }, [screen]);
 
@@ -261,12 +303,15 @@ export function GamePage() {
         }}
         onPlay={() => {
           setTrainTestMode(false);
+          setTutorialMode(false);
           setState(startArmoredRun());
           setScreen('game');
         }}
+        onTutorial={startTutorial}
         onTrainDuel={() => {
           refreshProgress();
           setTrainTestMode(true);
+          setTutorialMode(false);
           setState(createLevel(11));
           setScreen('game');
         }}
@@ -276,7 +321,12 @@ export function GamePage() {
 
   return (
     <main className="platform-shell">
-      <PlatformHud state={state} onRestart={() => setState(createLevel(trainTestMode ? 11 : 1))} onMenu={returnToMenu} />
+      <PlatformHud
+        state={state}
+        onRestart={() => setState(createLevel(trainTestMode ? 11 : 1))}
+        onMenu={returnToMenu}
+        tutorialMode={tutorialMode}
+      />
       <PlatformCanvas
         state={state}
         onAim={(x, y) => {

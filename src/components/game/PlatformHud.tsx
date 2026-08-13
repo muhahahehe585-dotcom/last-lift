@@ -4,6 +4,7 @@ type PlatformHudProps = {
   state: PlatformGameState;
   onRestart: () => void;
   onMenu: () => void;
+  tutorialMode: boolean;
 };
 
 function formatTime(seconds: number) {
@@ -12,7 +13,7 @@ function formatTime(seconds: number) {
   return `${minutes}:${leftover.toString().padStart(2, '0')}`;
 }
 
-export function PlatformHud({ state, onRestart, onMenu }: PlatformHudProps) {
+export function PlatformHud({ state, onRestart, onMenu, tutorialMode }: PlatformHudProps) {
   const timer = state.bossTimeLeft > 0 ? formatTime(state.bossTimeLeft) : `${state.floorTimeLeft}s`;
   const bullets = state.hasGun ? (state.unlimitedGun ? 'Unlimited' : state.shots) : 'None';
   const maxHealth = state.player.hp > 100 ? 180 : 100;
@@ -71,6 +72,18 @@ export function PlatformHud({ state, onRestart, onMenu }: PlatformHudProps) {
       </div>
 
       <p className={`game-message ${state.status}`}>{state.message}</p>
+      {tutorialMode && (
+        <div className="controls-card">
+          <p>Tutorial: you revive until floor 13 is complete.</p>
+          <p>Real game warning: dying will not revive you.</p>
+          <p>A/D or arrows move. Shift toggles run.</p>
+          <p>Space jumps. Double Space slams. I double jumps.</p>
+          <p>J hits. W inside enemy circle slides behind.</p>
+          <p>E uses doors, rooms, vents, and the roof exit. O leaves rooms.</p>
+          <p>Q uses flashlight. F shoots. G snaps the gauntlet.</p>
+          <p>0 or Menu returns to the lobby.</p>
+        </div>
+      )}
 
       <div className="controls-card">
         <p>A/D or arrows: walk</p>
