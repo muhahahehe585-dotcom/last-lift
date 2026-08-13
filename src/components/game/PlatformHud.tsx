@@ -42,6 +42,10 @@ export function PlatformHud({ state, onRestart }: PlatformHudProps) {
           <strong>{state.flashlights}</strong>
         </div>
         <div className="resource-row">
+          <span>Medkits</span>
+          <strong>{state.medkits}</strong>
+        </div>
+        <div className="resource-row">
           <span>Bullets</span>
           <strong>{bullets}</strong>
         </div>

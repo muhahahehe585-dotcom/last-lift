@@ -69,6 +69,7 @@ export type PlatformGameState = {
   batteries: number;
   batteriesNeeded: number;
   flashlights: number;
+  medkits: number;
   infinityStones: number;
   gauntletOwned: boolean;
   botBlindTime: number;
@@ -114,6 +115,7 @@ export type InputState = {
   interactPressed: boolean;
   leavePressed: boolean;
   flashlightPressed: boolean;
+  medkitPressed: boolean;
   shootPressed: boolean;
   runPressed: boolean;
   shortcutPressed: boolean;

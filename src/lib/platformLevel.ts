@@ -11,6 +11,7 @@ export const finalFloor = 100;
 
 type LevelCarry = {
   flashlights?: number;
+  medkits?: number;
   hasGun?: boolean;
   shots?: number;
   unlimitedGun?: boolean;
@@ -189,6 +190,7 @@ export function createLevel(floor: number, hp = 100, carry: LevelCarry = {}): Pl
     batteries: 0,
     batteriesNeeded: mode === 'flood' ? 0 : batteryNeed(floor),
     flashlights: carry.flashlights ?? 0,
+    medkits: carry.medkits ?? 0,
     infinityStones: carry.infinityStones ?? 0,
     gauntletOwned: hasInfinityGauntlet(),
     botBlindTime: 0,

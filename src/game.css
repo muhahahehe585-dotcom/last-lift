@@ -81,6 +81,62 @@
   font-weight: 900;
 }
 
+.mobile-controls {
+  display: none;
+  gap: 12px;
+  user-select: none;
+  touch-action: none;
+}
+
+.mobile-pad,
+.mobile-actions,
+.mobile-inventory {
+  display: grid;
+  gap: 8px;
+}
+
+.mobile-inventory {
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+}
+
+.mobile-pad {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.mobile-actions {
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+}
+
+.mobile-controls button {
+  min-height: 48px;
+  padding: 8px 6px;
+  border: 2px solid #596057;
+  border-radius: 8px;
+  background: #fffdf7;
+  color: #171817;
+  font-size: 13px;
+  font-weight: 900;
+}
+
+.mobile-inventory button {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  align-items: center;
+  gap: 6px;
+  text-align: left;
+}
+
+.mobile-inventory button.selected {
+  border-color: #f2dc5d;
+  background: #111311;
+  color: #f2dc5d;
+}
+
+.mobile-menu-button {
+  justify-content: center;
+  text-align: center;
+}
+
 .platform-hud {
   display: grid;
   gap: 16px;
@@ -230,5 +286,25 @@ h1 {
   .train-choice-buttons {
     grid-template-columns: 1fr;
     top: 20%;
+  }
+
+  .mobile-controls {
+    order: 1;
+  }
+}
+
+@media (hover: none), (pointer: coarse), (max-width: 860px) {
+  .mobile-controls {
+    display: grid;
+  }
+}
+
+@media (max-width: 520px) {
+  .mobile-inventory {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .mobile-actions {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
   }
 }

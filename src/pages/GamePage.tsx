@@ -1,11 +1,13 @@
 import { useEffect, useRef, useState } from 'react';
 import { GameMenu } from '../components/game/GameMenu';
+import { MobileControls } from '../components/game/MobileControls';
 import { PlatformCanvas } from '../components/game/PlatformCanvas';
 import { PlatformHud } from '../components/game/PlatformHud';
+import type { InventoryItem } from '../components/game/actionHitboxArt';
 import { createLevel, initialPlatformState } from '../lib/platformLevel';
 import { triggerMeteorThrow, updatePlatformGame } from '../lib/platformPhysics';
 import { tickGameTimers } from '../lib/platformTimers';
-import { buyDoubleJump, buyInfinityGauntlet, getCoins, getSavedEndings, hasDoubleJump, hasInfinityGauntlet, saveEnding } from '../lib/progress';
+import { buyDoubleJump, buyInfinityGauntlet, getCoins, getSavedEndings, hasDoubleJump, hasInfinityGauntlet, loadProgress, saveEnding } from '../lib/progress';
 import { chooseTrainBullet, chooseTrainDuel, chooseTrainHealth } from '../lib/trainDuel';
 import type { InputState, PlatformGameState } from '../lib/platformTypes';
 
@@ -21,6 +23,7 @@ const emptyInput: InputState = {
   interactPressed: false,
   leavePressed: false,
   flashlightPressed: false,
+  medkitPressed: false,
   shootPressed: false,
   runPressed: false,
   shortcutPressed: false,
@@ -29,9 +32,13 @@ const emptyInput: InputState = {
   aimY: null,
 };
 
+type HoldControl = 'left' | 'right' | 'jump' | 'down';
+type TapControl = 'run' | 'doubleJump' | 'slam' | 'hit' | 'interact' | 'leave' | 'flashlight' | 'shoot' | 'gauntlet';
+
 export function GamePage() {
   const [screen, setScreen] = useState<'menu' | 'credits' | 'help' | 'shop' | 'game'>('menu');
   const [trainTestMode, setTrainTestMode] = useState(false);
+  const [selectedInventory, setSelectedInventory] = useState<InventoryItem>(null);
   const [progress, setProgress] = useState(() => ({
     coins: getCoins(),
     doubleJump: hasDoubleJump(),
@@ -63,9 +70,55 @@ export function GamePage() {
     });
   };
 
+  const setMobileHold = (control: HoldControl, pressed: boolean) => {
+    inputRef.current[control] = pressed;
+    if (control === 'jump' && pressed) inputRef.current.jumpPressed = true;
+  };
+
+  const tapMobileControl = (control: TapControl) => {
+    if (control === 'run') inputRef.current.runPressed = true;
+    if (control === 'doubleJump') inputRef.current.doubleJumpPressed = true;
+    if (control === 'slam') inputRef.current.slamPressed = true;
+    if (control === 'hit') inputRef.current.hitPressed = true;
+    if (control === 'interact') inputRef.current.interactPressed = true;
+    if (control === 'leave') inputRef.current.leavePressed = true;
+    if (control === 'gauntlet') inputRef.current.gauntletPressed = true;
+  };
+
+  const returnToMenu = () => {
+    refreshProgress();
+    setTrainTestMode(false);
+    setSelectedInventory(null);
+    setScreen('menu');
+  };
+
+  const selectInventory = (item: InventoryItem) => {
+    setSelectedInventory((current) => (current === item ? null : item));
+  };
+
+  const useSelectedInventory = (x: number, y: number) => {
+    inputRef.current.aimX = x;
+    inputRef.current.aimY = y;
+    if (selectedInventory === 'gun') inputRef.current.shootPressed = true;
+    if (selectedInventory === 'medkit') inputRef.current.medkitPressed = true;
+    if (selectedInventory === 'flashlight') inputRef.current.flashlightPressed = true;
+  };
+
   useEffect(() => {
     trainTestModeRef.current = trainTestMode;
   }, [trainTestMode]);
+
+  useEffect(() => {
+    loadProgress().then(() => {
+      refreshProgress();
+      setState((current) => ({
+        ...current,
+        coins: getCoins(),
+        doubleJumpUnlocked: hasDoubleJump(),
+        gauntletOwned: hasInfinityGauntlet(),
+      }));
+    });
+  }, []);
 
   useEffect(() => {
     if (screen !== 'game') return;
@@ -73,6 +126,7 @@ export function GamePage() {
       if (['ArrowLeft', 'ArrowRight', 'ArrowUp', 'ArrowDown', ' '].includes(event.key) || event.code === 'Space') {
         event.preventDefault();
       }
+      if (pressed && event.key === '0') returnToMenu();
       if (['ArrowLeft', 'a', 'A'].includes(event.key)) inputRef.current.left = pressed;
       if (['ArrowRight', 'd', 'D'].includes(event.key)) inputRef.current.right = pressed;
       if (['ArrowUp', 'w', 'W'].includes(event.key) || event.code === 'Space') inputRef.current.jump = pressed;
@@ -133,6 +187,7 @@ export function GamePage() {
       inputRef.current.interactPressed = false;
       inputRef.current.leavePressed = false;
       inputRef.current.flashlightPressed = false;
+      inputRef.current.medkitPressed = false;
       inputRef.current.shootPressed = false;
       inputRef.current.runPressed = false;
       inputRef.current.shortcutPressed = false;
@@ -209,6 +264,19 @@ export function GamePage() {
         onTrainBullet={() => finishTrainChoice(chooseTrainBullet)}
         onTrainHealth={() => finishTrainChoice(chooseTrainHealth)}
         onTrainDuel={() => setState(chooseTrainDuel)}
+        selectedInventory={selectedInventory}
+        onUseInventory={useSelectedInventory}
+      />
+      <MobileControls
+        flashlights={state.flashlights}
+        medkits={state.medkits}
+        bullets={state.unlimitedGun ? 'unlimited' : state.shots}
+        hasGun={state.hasGun}
+        selectedInventory={selectedInventory}
+        onHold={setMobileHold}
+        onTap={tapMobileControl}
+        onSelectInventory={selectInventory}
+        onMenu={returnToMenu}
       />
     </main>
   );

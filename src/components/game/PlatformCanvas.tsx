@@ -1,6 +1,7 @@
 import { useEffect, useRef } from 'react';
 import { viewWidth, worldHeight } from '../../lib/platformLevel';
 import type { ItemKind, PlatformGameState } from '../../lib/platformTypes';
+import { drawActionHitboxes, type InventoryItem } from './actionHitboxArt';
 import { cameraXFor, drawDarkness, drawDoorPrompt, drawHotel } from './platformArt';
 import { drawDeathAnimation } from './deathArt';
 import { drawEscapeEnding, drawHalfUniverseEnding, drawLastStandEnding, drawRulerEnding, drawSunsetEnding, drawSuperheroEnding } from './endingArt';
@@ -15,6 +16,8 @@ type PlatformCanvasProps = {
   onTrainBullet: () => void;
   onTrainHealth: () => void;
   onTrainDuel: () => void;
+  selectedInventory: InventoryItem;
+  onUseInventory: (x: number, y: number) => void;
 };
 
 function drawRoomInterior(ctx: CanvasRenderingContext2D, state: PlatformGameState) {
@@ -59,7 +62,7 @@ function drawRoomLoot(ctx: CanvasRenderingContext2D, loot: ItemKind | 'empty', s
   ctx.fillText(loot.toUpperCase(), 510, 435);
 }
 
-export function PlatformCanvas({ state, onAim, onMeteorClick, onTrainBullet, onTrainHealth, onTrainDuel }: PlatformCanvasProps) {
+export function PlatformCanvas({ state, onAim, onMeteorClick, onTrainBullet, onTrainHealth, onTrainDuel, selectedInventory, onUseInventory }: PlatformCanvasProps) {
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
 
   useEffect(() => {
@@ -102,6 +105,7 @@ export function PlatformCanvas({ state, onAim, onMeteorClick, onTrainBullet, onT
     state.enemies.forEach((enemy) => drawEnemy(ctx, enemy));
     if (state.status === 'lost') drawDeathAnimation(ctx, state);
     else drawPlayer(ctx, state);
+    drawActionHitboxes(ctx, state, selectedInventory);
     drawPlayerSnap(ctx, state);
     drawMeteorThrow(ctx, state);
     drawBulletTrail(ctx, state);
@@ -111,7 +115,7 @@ export function PlatformCanvas({ state, onAim, onMeteorClick, onTrainBullet, onT
     drawRoomInterior(ctx, state);
     drawBossCountdown(ctx, state);
     drawTrainDuelOverlay(ctx, state);
-  }, [state]);
+  }, [state, selectedInventory]);
 
   const aimWithPointer = (event: React.PointerEvent<HTMLCanvasElement>) => {
     if (!state.duel?.active) return;
@@ -123,6 +127,10 @@ export function PlatformCanvas({ state, onAim, onMeteorClick, onTrainBullet, onT
 
   const clickMeteor = (event: React.PointerEvent<HTMLCanvasElement>) => {
     const point = canvasPoint(event);
+    if (selectedInventory) {
+      onUseInventory(point.x + cameraXFor(state), point.y);
+      return;
+    }
     onMeteorClick(point.x + cameraXFor(state), point.y);
   };
 

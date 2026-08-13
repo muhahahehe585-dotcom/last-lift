@@ -13,7 +13,7 @@ function grantLoot(state: PlatformGameState, loot: ItemKind) {
   if (loot === 'flashlight') return { ...state, flashlights: state.flashlights + 1 };
   if (loot === 'gun') return { ...state, hasGun: true, shots: state.shots + 3 };
   if (loot === 'stone') return { ...state, infinityStones: Math.min(6, state.infinityStones + 1) };
-  return { ...state, player: { ...state.player, hp: Math.min(100, state.player.hp + 25) } };
+  return { ...state, medkits: state.medkits + 1 };
 }
 
 export function collectItems(state: PlatformGameState) {
@@ -77,26 +77,38 @@ function useFlashlight(state: PlatformGameState) {
   return { ...state, flashlights: state.flashlights - 1, botBlindTime: 4, message: 'Flashlight blast blinds the bots.' };
 }
 
-function shootEnemy(state: PlatformGameState) {
+function useMedkit(state: PlatformGameState) {
+  if (state.medkits < 1) return { ...state, message: 'No medkits left.' };
+  if (state.player.hp >= 100) return { ...state, message: 'Health is already full.' };
+  return {
+    ...state,
+    medkits: state.medkits - 1,
+    player: { ...state.player, hp: Math.min(100, state.player.hp + 25) },
+    message: 'Medkit used.',
+  };
+}
+
+function shootEnemy(state: PlatformGameState, input: InputState) {
   if (!state.hasGun || (!state.unlimitedGun && state.shots < 1)) return state;
   const bulletRange = 520;
   const bulletY = state.player.y + 28;
   const bulletStart = state.player.x + state.player.width / 2;
-  const bulletEnd = bulletStart + state.player.facing * bulletRange;
+  const facing = input.aimX === null ? state.player.facing : input.aimX >= bulletStart ? 1 : -1;
+  const bulletEnd = bulletStart + facing * bulletRange;
   const trail = {
     x: bulletStart,
     y: bulletY,
-    width: state.player.facing * bulletRange,
+    width: facing * bulletRange,
     height: 0.16,
   };
   const target = state.enemies
     .filter((enemy) => enemy.kind !== 'sea-monster')
     .filter((enemy) => bulletY >= enemy.y - 8 && bulletY <= enemy.y + enemy.height + 8)
-    .filter((enemy) => (state.player.facing === 1 ? enemy.x >= bulletStart && enemy.x <= bulletEnd : enemy.x + enemy.width <= bulletStart && enemy.x + enemy.width >= bulletEnd))
+    .filter((enemy) => (facing === 1 ? enemy.x >= bulletStart && enemy.x <= bulletEnd : enemy.x + enemy.width <= bulletStart && enemy.x + enemy.width >= bulletEnd))
     .sort((a, b) => Math.abs(a.x - bulletStart) - Math.abs(b.x - bulletStart))[0];
 
   const shots = state.unlimitedGun ? state.shots : state.shots - 1;
-  const nest = state.inVent && state.nest && state.player.facing === 1 && bulletEnd >= state.nest.x ? state.nest : null;
+  const nest = state.inVent && state.nest && facing === 1 && bulletEnd >= state.nest.x ? state.nest : null;
   if (!target && nest) return damageNest(state, { shots, bulletTrail: trail });
   if (!target) return { ...state, shots, bulletTrail: trail, message: 'Shot missed.' };
   const damage = target.kind === 'boss' ? 3 : target.kind === 'vent-monster' ? 4 : 999;
@@ -119,6 +131,7 @@ export function handleActionInputs(state: PlatformGameState, input: InputState, 
   if (state.currentRoom) return { ...state, botBlindTime: Math.max(0, state.botBlindTime - dt) };
   if (input.interactPressed) return enterRoom(state);
   if (input.flashlightPressed) return useFlashlight(state);
-  if (input.shootPressed) return shootEnemy(state);
+  if (input.medkitPressed) return useMedkit(state);
+  if (input.shootPressed) return shootEnemy(state, input);
   return state;
 }

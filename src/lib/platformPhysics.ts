@@ -62,6 +62,7 @@ function tryTurnedBackDoor(state: PlatformGameState, player: PlatformGameState['
 function getCarry(state: PlatformGameState) {
   return {
     flashlights: state.flashlights,
+    medkits: state.medkits,
     hasGun: state.hasGun,
     shots: state.shots,
     unlimitedGun: state.unlimitedGun,
