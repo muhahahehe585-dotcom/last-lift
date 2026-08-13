@@ -1,5 +1,5 @@
 export type GameStatus = 'playing' | 'won' | 'lost';
-export type EndingKind = 'ruler' | 'half-universe' | 'sunset' | 'superhero' | 'last-stand' | 'escape' | 'ran-away' | null;
+export type EndingKind = 'ruler' | 'half-universe' | 'sunset' | 'superhero' | 'last-stand' | 'escape' | 'ran-away' | 'rage' | null;
 export type DeathCause = 'lava' | 'flood' | 'bot' | 'guard' | 'drone' | 'fall' | 'boss' | 'duel';
 export type EnemyKind = 'drone' | 'broken-bot' | 'bot-guard' | 'boss' | 'sea-monster' | 'vent-monster';
 export type ItemKind = 'battery' | 'medkit' | 'flashlight' | 'gun' | 'stone';

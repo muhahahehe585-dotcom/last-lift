@@ -9,6 +9,7 @@ export const worldHeight = 640;
 export const floorY = 520;
 export const finalFloor = 100;
 export const bossEscapeDoor = { x: worldWidth - 82, y: floorY - 138, width: 58, height: 138 };
+export const rageFire = { x: 1160, y: floorY + 8, width: 90, height: 58 };
 
 type LevelCarry = {
   flashlights?: number;

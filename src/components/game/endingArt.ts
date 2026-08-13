@@ -172,6 +172,60 @@ export function drawRanAwayEnding(ctx: CanvasRenderingContext2D) {
   ctx.fillText('The world collapsed because he was scared.', 375, 158);
 }
 
+export function drawRageEnding(ctx: CanvasRenderingContext2D) {
+  px(ctx, '#090807', 0, 0, viewWidth, worldHeight);
+  const sky = ctx.createLinearGradient(0, 0, 0, worldHeight);
+  sky.addColorStop(0, '#2b1010');
+  sky.addColorStop(0.55, '#7d3b34');
+  sky.addColorStop(1, '#111311');
+  ctx.fillStyle = sky;
+  ctx.fillRect(0, 0, viewWidth, worldHeight);
+  for (let x = 0; x < viewWidth; x += 120) {
+    px(ctx, x % 240 ? '#202329' : '#111923', x, 315 + (x % 4) * 20, 80, 260);
+    px(ctx, '#ff8a3d', x + 20, 365 + (x % 5) * 18, 12, 10);
+  }
+  px(ctx, '#2b302c', 0, 472, viewWidth, 168);
+  for (let x = 0; x < viewWidth; x += 86) px(ctx, '#454b4d', x + 10, 506, 58, 7);
+  drawBurnedBoss(ctx, 420, 355);
+  drawRageHero(ctx, 570, 250);
+  px(ctx, 'rgba(184, 63, 53, 0.22)', 0, 0, viewWidth, worldHeight);
+  ctx.fillStyle = '#f2dc5d';
+  ctx.font = '48px monospace';
+  ctx.fillText('RAGE', 535, 90);
+  ctx.fillStyle = '#fff8dc';
+  ctx.font = '20px monospace';
+  ctx.fillText('You saved the world, but rage consumed you completely.', 300, 128);
+}
+
+function drawBurnedBoss(ctx: CanvasRenderingContext2D, x: number, y: number) {
+  px(ctx, '#151817', x + 30, y + 92, 280, 70);
+  px(ctx, '#3c4542', x + 88, y + 34, 150, 60);
+  px(ctx, '#0a0b0a', x + 108, y + 8, 112, 34);
+  px(ctx, '#b83f35', x + 130, y + 62, 72, 8);
+  px(ctx, '#ff8a3d', x + 40, y + 70, 34, 50);
+  px(ctx, '#f2dc5d', x + 52, y + 54, 14, 38);
+  px(ctx, '#ff8a3d', x + 260, y + 78, 34, 48);
+  px(ctx, '#f2dc5d', x + 272, y + 62, 14, 36);
+  px(ctx, '#111311', x + 122, y + 54, 18, 10);
+  px(ctx, '#111311', x + 188, y + 54, 18, 10);
+}
+
+function drawRageHero(ctx: CanvasRenderingContext2D, x: number, y: number) {
+  px(ctx, '#2a1812', x + 8, y - 4, 38, 14);
+  px(ctx, '#f1c08b', x + 13, y + 14, 28, 28);
+  px(ctx, '#f4f8ff', x + 22, y + 24, 6, 6);
+  px(ctx, '#f4f8ff', x + 37, y + 24, 6, 6);
+  px(ctx, '#111311', x + 25, y + 36, 18, 4);
+  px(ctx, '#365f88', x + 6, y + 46, 46, 56);
+  px(ctx, '#202329', x + 8, y + 102, 14, 48);
+  px(ctx, '#202329', x + 38, y + 102, 14, 48);
+  px(ctx, '#ff8a3d', x - 16, y + 22, 18, 92);
+  px(ctx, '#f2dc5d', x - 8, y + 2, 10, 72);
+  px(ctx, '#b83f35', x + 56, y + 18, 22, 102);
+  px(ctx, '#ff8a3d', x + 60, y - 4, 12, 78);
+  px(ctx, 'rgba(242, 220, 93, 0.35)', x - 44, y - 38, 150, 210);
+}
+
 function drawSupplyShelf(ctx: CanvasRenderingContext2D, x: number, y: number) {
   px(ctx, '#6f543b', x, y, 90, 18);
   px(ctx, '#6f543b', x, y + 62, 90, 18);

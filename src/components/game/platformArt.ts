@@ -1,4 +1,4 @@
-import { bossEscapeDoor, finalFloor, floorY, viewWidth, worldHeight, worldWidth } from '../../lib/platformLevel';
+import { bossEscapeDoor, finalFloor, floorY, rageFire, viewWidth, worldHeight, worldWidth } from '../../lib/platformLevel';
 import type { HotelRoom, PlatformGameState } from '../../lib/platformTypes';
 import { drawRoof } from './roofArt';
 import { drawTrainFloor } from './trainFloorArt';
@@ -34,7 +34,7 @@ export function drawHotel(ctx: CanvasRenderingContext2D, state: PlatformGameStat
   if (state.mode === 'train') drawTrainFloor(ctx);
   if (state.mode === 'vent') drawVentRoute(ctx, state);
   if (state.mode === 'flood') drawFlood(ctx);
-  if (state.mode === 'lava') drawLava(ctx);
+  if (state.mode === 'lava') drawLava(ctx, state);
   if (state.mode === 'lava') drawBoxes(ctx, state);
   if (state.mode === 'supply') drawSupplyLights(ctx);
   px(ctx, '#5e8f86', worldWidth - 108, floorY - 132, 70, 132);
@@ -85,9 +85,17 @@ function drawFlood(ctx: CanvasRenderingContext2D) {
   for (let x = 0; x < worldWidth; x += 80) px(ctx, '#58a6b8', x, floorY - 22 + (x % 160 ? 6 : 0), 42, 5);
 }
 
-function drawLava(ctx: CanvasRenderingContext2D) {
+function drawLava(ctx: CanvasRenderingContext2D, state: PlatformGameState) {
   px(ctx, 'rgba(184, 63, 53, 0.9)', 0, floorY + 10, worldWidth, 58);
   for (let x = 0; x < worldWidth; x += 110) px(ctx, '#f2dc5d', x + 20, floorY + 24, 48, 6);
+  if (state.floor !== 5) return;
+  px(ctx, '#f2dc5d', rageFire.x + 20, rageFire.y + 18, 44, 38);
+  px(ctx, '#ff8a3d', rageFire.x + 10, rageFire.y + 24, 70, 32);
+  px(ctx, '#b83f35', rageFire.x + 28, rageFire.y + 30, 30, 24);
+  px(ctx, 'rgba(242, 220, 93, 0.3)', rageFire.x - 18, rageFire.y - 18, rageFire.width + 36, rageFire.height + 24);
+  ctx.fillStyle = '#fff8dc';
+  ctx.font = '16px monospace';
+  ctx.fillText('RAGE', rageFire.x + 20, rageFire.y - 8);
 }
 
 function drawBoxes(ctx: CanvasRenderingContext2D, state: PlatformGameState) {

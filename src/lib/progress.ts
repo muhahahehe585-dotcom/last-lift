@@ -25,6 +25,7 @@ export const endingLabels: Record<SavedEnding, string> = {
   'last-stand': 'Last Stand',
   escape: 'Escape',
   'ran-away': 'Ran Away',
+  rage: 'Rage',
 };
 
 export const doubleJumpCost = 3;

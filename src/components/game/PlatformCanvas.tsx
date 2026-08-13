@@ -4,7 +4,7 @@ import type { ItemKind, PlatformGameState } from '../../lib/platformTypes';
 import { drawActionHitboxes, type InventoryItem } from './actionHitboxArt';
 import { cameraXFor, drawDarkness, drawDoorPrompt, drawHotel } from './platformArt';
 import { drawDeathAnimation } from './deathArt';
-import { drawEscapeEnding, drawHalfUniverseEnding, drawLastStandEnding, drawRanAwayEnding, drawRulerEnding, drawSunsetEnding, drawSuperheroEnding } from './endingArt';
+import { drawEscapeEnding, drawHalfUniverseEnding, drawLastStandEnding, drawRageEnding, drawRanAwayEnding, drawRulerEnding, drawSunsetEnding, drawSuperheroEnding } from './endingArt';
 import { drawMeteorShower, drawMeteorThrow } from './meteorArt';
 import { drawEnemy, drawItem, drawPlayer } from './spriteArt';
 import { drawTrainDuelOverlay } from './trainDuelArt';
@@ -99,6 +99,10 @@ export function PlatformCanvas({ state, onAim, onMeteorClick, onTrainBullet, onT
     }
     if (state.status === 'won' && state.ending === 'ran-away') {
       drawRanAwayEnding(ctx);
+      return;
+    }
+    if (state.status === 'won' && state.ending === 'rage') {
+      drawRageEnding(ctx);
       return;
     }
     ctx.save();

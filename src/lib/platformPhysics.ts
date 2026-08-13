@@ -1,4 +1,4 @@
-import { bossEscapeDoor, createLevel, finalFloor, floorY, worldWidth } from './platformLevel';
+import { bossEscapeDoor, createLevel, finalFloor, floorY, rageFire, worldWidth } from './platformLevel';
 import { overlaps } from './platformGeometry';
 import { hitPlayer, normalHit, slamEnemies, updateEnemies } from './platformCombat';
 import { applyEventDamage } from './platformHazards';
@@ -307,6 +307,16 @@ function updateMeteorites(state: PlatformGameState, dt: number) {
 }
 
 export function triggerMeteorThrow(state: PlatformGameState, x: number, y: number): PlatformGameState {
+  const clickedRageFire = state.floor === 5 && state.mode === 'lava' && x >= rageFire.x && x <= rageFire.x + rageFire.width && y >= rageFire.y && y <= rageFire.y + rageFire.height;
+  if (clickedRageFire) {
+    return {
+      ...state,
+      enemies: state.enemies.filter((enemy) => enemy.kind !== 'boss'),
+      status: 'won' as const,
+      ending: 'rage' as const,
+      message: 'RAGE.',
+    };
+  }
   if (state.floor !== finalFloor || state.status !== 'playing' || state.meteorThrowTimer > 0) return state;
   const meteor = state.meteorites.find((item) => x >= item.x && x <= item.x + item.width && y >= item.y && y <= item.y + item.height);
   if (!meteor) return state;
