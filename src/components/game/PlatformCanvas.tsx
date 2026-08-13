@@ -105,6 +105,10 @@ export function PlatformCanvas({ state, onAim, onMeteorClick, onTrainBullet, onT
       drawRageEnding(ctx);
       return;
     }
+    if (state.rageJumpTimer > 0) {
+      drawRageJump(ctx, state);
+      return;
+    }
     ctx.save();
     ctx.translate(-cameraX, 0);
     drawHotel(ctx, state);
@@ -115,7 +119,6 @@ export function PlatformCanvas({ state, onAim, onMeteorClick, onTrainBullet, onT
     else drawPlayer(ctx, state);
     drawActionHitboxes(ctx, state, selectedInventory);
     drawPlayerSnap(ctx, state);
-    drawRageJump(ctx, state);
     drawMeteorThrow(ctx, state);
     drawBulletTrail(ctx, state);
     ctx.restore();
@@ -177,24 +180,72 @@ export function PlatformCanvas({ state, onAim, onMeteorClick, onTrainBullet, onT
 function drawRageJump(ctx: CanvasRenderingContext2D, state: PlatformGameState) {
   if (state.rageJumpTimer <= 0) return;
   const t = Math.min(1, state.rageJumpTimer / 2.8);
-  const lift = Math.sin(Math.min(1, t / 0.45) * Math.PI * 0.5) * 500;
-  const x = state.player.x + 12 + t * 760;
-  const y = state.player.y - lift + Math.max(0, t - 0.56) * 940;
+  if (t < 0.34) return drawRageLavaLaunch(ctx, t / 0.34);
+  if (t < 0.62) return drawRageSkyJump(ctx, (t - 0.34) / 0.28);
+  drawRageRoofKill(ctx, (t - 0.62) / 0.38);
+}
 
-  ctx.fillStyle = `rgba(184, 63, 53, ${0.22 + t * 0.38})`;
-  ctx.fillRect(state.player.x - 220, state.player.y - 210, 620 + t * 780, 460);
+function drawRageLavaLaunch(ctx: CanvasRenderingContext2D, t: number) {
+  drawRageLavaScene(ctx);
+  const y = 430 - t * 240;
+  drawFlamingLaunchHero(ctx, 585, y, t);
+  ctx.fillStyle = `rgba(242, 220, 93, ${0.2 + t * 0.5})`;
+  ctx.fillRect(500 - t * 180, y + 96, 240 + t * 360, 150);
+}
 
-  if (t > 0.42) {
-    const roofX = state.player.x + 560;
-    const roofY = 168;
-    ctx.fillStyle = '#2b302c';
-    ctx.fillRect(roofX - 120, roofY + 250, 650, 82);
-    ctx.fillStyle = '#596057';
-    ctx.fillRect(roofX - 120, roofY + 238, 650, 14);
-    drawBurningBossHit(ctx, roofX + 190, roofY + 150, t);
+function drawRageSkyJump(ctx: CanvasRenderingContext2D, t: number) {
+  const sky = ctx.createLinearGradient(0, 0, 0, worldHeight);
+  sky.addColorStop(0, '#101826');
+  sky.addColorStop(0.55, '#7d3b34');
+  sky.addColorStop(1, '#111311');
+  ctx.fillStyle = sky;
+  ctx.fillRect(0, 0, viewWidth, worldHeight);
+  for (let y = 40; y < worldHeight; y += 90) {
+    ctx.fillStyle = '#ff8a3d';
+    ctx.fillRect(560 + Math.sin(t * 8 + y) * 40, y + t * 80, 60, 18);
   }
+  drawFlamingLaunchHero(ctx, 570 + t * 50, 510 - t * 520, t);
+}
 
-  drawFlamingLaunchHero(ctx, x, y, t);
+function drawRageRoofKill(ctx: CanvasRenderingContext2D, t: number) {
+  drawRageRoofScene(ctx);
+  const heroX = 365 + Math.min(1, t / 0.45) * 205;
+  const heroY = 302 + Math.sin(Math.min(1, t / 0.45) * Math.PI) * -80;
+  drawFlamingLaunchHero(ctx, heroX, heroY, t);
+  drawBossBeingKilled(ctx, 665, 322);
+  if (t > 0.72) {
+    ctx.fillStyle = `rgba(255, 244, 180, ${(t - 0.72) / 0.28})`;
+    ctx.fillRect(270, 165, 650, 350);
+  }
+}
+
+function drawRageLavaScene(ctx: CanvasRenderingContext2D) {
+  ctx.fillStyle = '#111311';
+  ctx.fillRect(0, 0, viewWidth, worldHeight);
+  ctx.fillStyle = '#262520';
+  ctx.fillRect(0, 80, viewWidth, 390);
+  ctx.fillStyle = '#b83f35';
+  ctx.fillRect(0, 500, viewWidth, 90);
+  for (let x = 0; x < viewWidth; x += 120) {
+    ctx.fillStyle = '#f2dc5d';
+    ctx.fillRect(x + 20, 520, 62, 9);
+  }
+}
+
+function drawRageRoofScene(ctx: CanvasRenderingContext2D) {
+  const sky = ctx.createLinearGradient(0, 0, 0, worldHeight);
+  sky.addColorStop(0, '#101826');
+  sky.addColorStop(0.55, '#24334a');
+  sky.addColorStop(1, '#4d5360');
+  ctx.fillStyle = sky;
+  ctx.fillRect(0, 0, viewWidth, worldHeight);
+  ctx.fillStyle = '#555b60';
+  ctx.fillRect(0, 428, viewWidth, 46);
+  ctx.fillStyle = '#2b302c';
+  ctx.fillRect(0, 474, viewWidth, 140);
+  ctx.fillStyle = '#89939a';
+  ctx.fillRect(0, 382, viewWidth, 8);
+  ctx.fillRect(0, 414, viewWidth, 8);
 }
 
 function drawFlamingLaunchHero(ctx: CanvasRenderingContext2D, x: number, y: number, t: number) {
@@ -217,7 +268,7 @@ function drawFlamingLaunchHero(ctx: CanvasRenderingContext2D, x: number, y: numb
   ctx.fillRect(x - 54, y - 42, 160, 240);
 }
 
-function drawBurningBossHit(ctx: CanvasRenderingContext2D, x: number, y: number, t: number) {
+function drawBossBeingKilled(ctx: CanvasRenderingContext2D, x: number, y: number) {
   ctx.fillStyle = '#3c4542';
   ctx.fillRect(x + 52, y + 36, 180, 70);
   ctx.fillStyle = '#0a0b0a';
@@ -231,10 +282,6 @@ function drawBurningBossHit(ctx: CanvasRenderingContext2D, x: number, y: number,
   ctx.fillStyle = '#f2dc5d';
   ctx.fillRect(x + 38, y + 20, 22, 112);
   ctx.fillRect(x + 232, y + 12, 20, 118);
-  if (t > 0.72) {
-    ctx.fillStyle = `rgba(255, 244, 180, ${(t - 0.72) / 0.28})`;
-    ctx.fillRect(x - 140, y - 92, 540, 310);
-  }
 }
 
 function drawBulletTrail(ctx: CanvasRenderingContext2D, state: PlatformGameState) {
