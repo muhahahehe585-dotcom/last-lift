@@ -81,6 +81,51 @@
   font-weight: 900;
 }
 
+.lobby-confirm {
+  position: fixed;
+  inset: 0;
+  z-index: 20;
+  display: grid;
+  place-items: center;
+  padding: 20px;
+  background: rgba(0, 0, 0, 0.56);
+}
+
+.lobby-confirm-panel {
+  width: min(420px, 100%);
+  display: grid;
+  gap: 18px;
+  padding: 22px;
+  border: 2px solid #f2dc5d;
+  border-radius: 8px;
+  background: #111311;
+  color: #fff8dc;
+  text-align: center;
+}
+
+.lobby-confirm-panel p {
+  margin: 0;
+  font-size: 18px;
+  font-weight: 900;
+  line-height: 1.3;
+}
+
+.lobby-confirm-panel div {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.lobby-confirm-panel button {
+  min-height: 46px;
+  border: 2px solid #f2dc5d;
+  border-radius: 8px;
+  background: #fffdf7;
+  color: #171817;
+  font-size: 16px;
+  font-weight: 900;
+}
+
 .mobile-controls {
   display: none;
   gap: 12px;

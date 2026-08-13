@@ -40,6 +40,7 @@ export function GamePage() {
   const [screen, setScreen] = useState<'menu' | 'credits' | 'help' | 'shop' | 'game'>('menu');
   const [trainTestMode, setTrainTestMode] = useState(false);
   const [tutorialMode, setTutorialMode] = useState(false);
+  const [confirmLobby, setConfirmLobby] = useState(false);
   const [selectedInventory, setSelectedInventory] = useState<InventoryItem>(null);
   const [progress, setProgress] = useState(() => ({
     coins: getCoins(),
@@ -94,6 +95,7 @@ export function GamePage() {
 
   const returnToMenu = () => {
     inputRef.current = { ...emptyInput };
+    setConfirmLobby(false);
     refreshProgress();
     setTrainTestMode(false);
     setTutorialMode(false);
@@ -175,13 +177,18 @@ export function GamePage() {
   useEffect(() => {
     if (screen !== 'game') return;
     const setKey = (event: KeyboardEvent, pressed: boolean) => {
+      if (confirmLobby) {
+        event.preventDefault();
+        return;
+      }
       if (['ArrowLeft', 'ArrowRight', 'ArrowUp', 'ArrowDown', ' '].includes(event.key) || event.code === 'Space') {
         event.preventDefault();
       }
       const wantsMenu = event.key === '0' || event.code === 'Digit0' || event.code === 'Numpad0';
       if (pressed && wantsMenu) {
         event.preventDefault();
-        returnToMenu();
+        inputRef.current = { ...emptyInput };
+        setConfirmLobby(true);
         return;
       }
       if (['ArrowLeft', 'a', 'A'].includes(event.key)) inputRef.current.left = pressed;
@@ -217,7 +224,7 @@ export function GamePage() {
       window.removeEventListener('keydown', onKeyDown);
       window.removeEventListener('keyup', onKeyUp);
     };
-  }, [screen]);
+  }, [confirmLobby, screen]);
 
   useEffect(() => {
     if (screen !== 'game') return;
@@ -340,6 +347,17 @@ export function GamePage() {
         selectedInventory={selectedInventory}
         onUseInventory={useSelectedInventory}
       />
+      {confirmLobby && (
+        <div className="lobby-confirm" role="dialog" aria-modal="true" aria-label="Return to lobby confirmation">
+          <div className="lobby-confirm-panel">
+            <p>are you sure you want yo go to the lobby?</p>
+            <div>
+              <button type="button" onClick={returnToMenu}>Yes</button>
+              <button type="button" onClick={() => setConfirmLobby(false)}>No</button>
+            </div>
+          </div>
+        </div>
+      )}
       <MobileControls
         flashlights={state.flashlights}
         medkits={state.medkits}
