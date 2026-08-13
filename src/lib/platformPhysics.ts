@@ -18,7 +18,7 @@ const slamSpeed = 1050;
 const liftX = worldWidth - 120;
 const trainGuardX = worldWidth - 380;
 export const dodgeRadius = 150;
-const dodgeDistance = 150;
+const dodgeGap = 18;
 
 function tryLift(state: PlatformGameState) {
   const atLift = state.player.x + state.player.width > liftX;
@@ -243,20 +243,21 @@ function tryDodge(state: PlatformGameState, input: InputState) {
   if (!enemy) return state;
   const playerCenter = state.player.x + state.player.width / 2;
   const enemyCenter = enemy.x + enemy.width / 2;
-  const direction: -1 | 1 = playerCenter < enemyCenter ? -1 : 1;
-  const x = Math.max(0, Math.min(worldWidth - state.player.width, state.player.x + direction * dodgeDistance));
+  const slideDirection: -1 | 1 = playerCenter < enemyCenter ? 1 : -1;
+  const targetX = slideDirection === 1 ? enemy.x + enemy.width + dodgeGap : enemy.x - state.player.width - dodgeGap;
+  const x = Math.max(0, Math.min(worldWidth - state.player.width, targetX));
   return {
     ...state,
     player: {
       ...state.player,
       x,
-      vx: direction * moveSpeed,
-      facing: direction,
+      vx: slideDirection * moveSpeed,
+      facing: slideDirection,
       hurtCooldown: 0.45,
       dodgeCooldown: 0.65,
       dodgePulse: 0.28,
     },
-    message: 'Dodged.',
+    message: 'Slid behind the enemy.',
   };
 }
 
