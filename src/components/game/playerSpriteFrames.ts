@@ -1,9 +1,12 @@
+import idleSheetUrl from '../../assets/player-idle-sheet.jpg';
 import jumpSheetUrl from '../../assets/player-jump-sheet.jpg';
 import spriteSheetUrl from '../../assets/player-sprite-sheet.jpg';
 
 export type FrameName =
   | 'walkRight'
   | 'walkLeft'
+  | 'idleRight'
+  | 'idleLeft'
   | 'shootRight'
   | 'shootLeft'
   | 'hitRight'
@@ -25,8 +28,12 @@ mainSheet.src = spriteSheetUrl;
 export const jumpSheet = new Image();
 jumpSheet.src = jumpSheetUrl;
 
+export const idleSheet = new Image();
+idleSheet.src = idleSheetUrl;
+
 const main = mainSheet;
 const jump = jumpSheet;
+const idle = idleSheet;
 
 export const frames: Record<FrameName, SourceFrame[]> = {
   walkRight: [
@@ -40,6 +47,18 @@ export const frames: Record<FrameName, SourceFrame[]> = {
     { sheet: main, x: 933, y: 70, width: 102, height: 174 },
     { sheet: main, x: 1077, y: 70, width: 102, height: 174 },
     { sheet: main, x: 1217, y: 70, width: 105, height: 174 },
+  ],
+  idleRight: [
+    { sheet: idle, x: 84, y: 584, width: 102, height: 154 },
+    { sheet: idle, x: 225, y: 584, width: 102, height: 154 },
+    { sheet: idle, x: 368, y: 584, width: 102, height: 154 },
+    { sheet: idle, x: 512, y: 584, width: 102, height: 154 },
+  ],
+  idleLeft: [
+    { sheet: idle, x: 794, y: 584, width: 102, height: 154 },
+    { sheet: idle, x: 936, y: 584, width: 102, height: 154 },
+    { sheet: idle, x: 1078, y: 584, width: 102, height: 154 },
+    { sheet: idle, x: 1218, y: 584, width: 102, height: 154 },
   ],
   shootRight: [
     { sheet: main, x: 84, y: 312, width: 157, height: 150 },

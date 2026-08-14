@@ -1,11 +1,11 @@
 import { floorY } from '../../lib/platformLevel';
 import type { PlatformGameState } from '../../lib/platformTypes';
-import { frames, jumpSheet, mainSheet, type FrameName, type SourceFrame } from './playerSpriteFrames';
+import { frames, idleSheet, jumpSheet, mainSheet, type FrameName, type SourceFrame } from './playerSpriteFrames';
 
 const cleanedFrames = new Map<string, HTMLCanvasElement>();
 
 export function canDrawPlayerSprite() {
-  return mainSheet.complete && mainSheet.naturalWidth > 0 && jumpSheet.complete && jumpSheet.naturalWidth > 0;
+  return mainSheet.complete && mainSheet.naturalWidth > 0 && jumpSheet.complete && jumpSheet.naturalWidth > 0 && idleSheet.complete && idleSheet.naturalWidth > 0;
 }
 
 export function drawSpritePlayer(ctx: CanvasRenderingContext2D, state: PlatformGameState) {
@@ -37,6 +37,7 @@ function frameSetFor(state: PlatformGameState): FrameName {
   if (state.player.hitPulse > 0) return `hit${direction}` as FrameName;
   if (state.player.doubleJumpPulse > 0) return 'doubleJumpLeft';
   if (!state.player.grounded) return 'jumpLeft';
+  if (Math.abs(state.player.vx) < 5) return `idle${direction}` as FrameName;
   return `walk${direction}` as FrameName;
 }
 
@@ -46,7 +47,7 @@ function frameIndexFor(state: PlatformGameState, frameSet: FrameName) {
   if (frameSet.startsWith('hit')) return pulseFrame(total, state.player.hitPulse, 0.24);
   if (frameSet === 'doubleJumpLeft') return pulseFrame(total, state.player.doubleJumpPulse, 0.34);
   if (frameSet === 'jumpLeft') return state.player.vy < -180 ? 1 : state.player.vy > 180 ? 3 : 2;
-  if (Math.abs(state.player.vx) < 5) return 1;
+  if (frameSet.startsWith('idle')) return Math.floor(performance.now() / 180) % total;
   return Math.abs(Math.floor(state.player.x / (state.player.running ? 18 : 24))) % total;
 }
 
@@ -56,6 +57,7 @@ function pulseFrame(total: number, pulse: number, duration: number) {
 
 function frameHeight(frameSet: FrameName) {
   if (frameSet.startsWith('walk')) return 86;
+  if (frameSet.startsWith('idle')) return 86;
   if (frameSet.startsWith('shoot')) return 92;
   if (frameSet.startsWith('hit')) return 98;
   return frameSet === 'doubleJumpLeft' ? 102 : 94;
