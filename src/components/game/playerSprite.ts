@@ -1,11 +1,11 @@
 import { floorY } from '../../lib/platformLevel';
 import type { PlatformGameState } from '../../lib/platformTypes';
-import { frames, idleSheet, jumpSheet, mainSheet, type FrameName, type SourceFrame } from './playerSpriteFrames';
+import { frames, type FrameName, type SourceFrame } from './playerSpriteFrames';
 
 const cleanedFrames = new Map<string, HTMLCanvasElement>();
 
 export function canDrawPlayerSprite() {
-  return mainSheet.complete && mainSheet.naturalWidth > 0 && jumpSheet.complete && jumpSheet.naturalWidth > 0 && idleSheet.complete && idleSheet.naturalWidth > 0;
+  return true;
 }
 
 export function drawSpritePlayer(ctx: CanvasRenderingContext2D, state: PlatformGameState) {
@@ -13,6 +13,7 @@ export function drawSpritePlayer(ctx: CanvasRenderingContext2D, state: PlatformG
   const p = state.player;
   const frameSet = frameSetFor(state);
   const source = frames[frameSet][frameIndexFor(state, frameSet)];
+  if (!canDrawFrame(source)) return false;
   const frame = cleanedFrame(frameSet, source);
   const height = frameHeight(frameSet);
   const width = (source.width / source.height) * height;
@@ -29,6 +30,10 @@ export function drawSpritePlayer(ctx: CanvasRenderingContext2D, state: PlatformG
   }
   ctx.drawImage(frame, x, y, width, height);
   return true;
+}
+
+function canDrawFrame(source: SourceFrame) {
+  return source.sheet.complete && source.sheet.naturalWidth > 0;
 }
 
 function frameSetFor(state: PlatformGameState): FrameName {
