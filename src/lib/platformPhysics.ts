@@ -238,7 +238,7 @@ export function updatePlatformGame(state: PlatformGameState, input: InputState, 
     const cause = touchingEnemy.kind === 'drone' ? 'drone' : touchingEnemy.kind === 'bot-guard' ? 'guard' : touchingEnemy.kind === 'boss' ? 'boss' : 'bot';
     next = startEnemyAttack(next, touchingEnemy.id);
     next = touchingEnemy.kind === 'broken-bot' && Math.abs(next.player.vx) < 5
-      ? damagePlayerPerSecond(next, damageForEnemyTouch(next, touchingEnemy.kind) * 1.3, dt, 'broken-bot is hitting you.', 'bot')
+      ? damagePlayerPerSecond(next, 5, dt, 'broken-bot is hitting you.', 'bot')
       : hitPlayer(next, damageForEnemyTouch(next, touchingEnemy.kind), `${touchingEnemy.kind} hit you.`, cause);
   }
   next = tryVentNest(next);
