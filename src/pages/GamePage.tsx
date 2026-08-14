@@ -109,6 +109,12 @@ export function GamePage() {
     return createLevel(1, hasArmor ? 180 : 100, { armorCount: getArmor() });
   };
 
+  const restartRun = () => {
+    if (trainTestMode) return createLevel(11);
+    if (tutorialMode) return createLevel(1);
+    return startArmoredRun();
+  };
+
   const startTutorial = () => {
     refreshProgress();
     tutorialCoinsRef.current = getCoins();
@@ -330,7 +336,7 @@ export function GamePage() {
     <main className="platform-shell">
       <PlatformHud
         state={state}
-        onRestart={() => setState(createLevel(trainTestMode ? 11 : 1))}
+        onRestart={() => setState(restartRun())}
         onMenu={returnToMenu}
         tutorialMode={tutorialMode}
       />
