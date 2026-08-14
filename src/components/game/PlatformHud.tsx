@@ -16,7 +16,7 @@ function formatTime(seconds: number) {
 export function PlatformHud({ state, onRestart, onMenu, tutorialMode }: PlatformHudProps) {
   const timer = state.bossTimeLeft > 0 ? formatTime(state.bossTimeLeft) : `${state.floorTimeLeft}s`;
   const bullets = state.hasGun ? (state.unlimitedGun ? 'Unlimited' : state.shots) : 'None';
-  const maxHealth = state.player.hp > 100 ? 180 : 100;
+  const maxHealth = state.player.maxHp;
   const healthWidth = Math.min(100, (state.player.hp / maxHealth) * 100);
 
   return (
@@ -80,7 +80,7 @@ export function PlatformHud({ state, onRestart, onMenu, tutorialMode }: Platform
           <p>Space jumps. Double Space slams. I double jumps.</p>
           <p>J hits. W inside enemy circle slides behind.</p>
           <p>E uses doors, rooms, vents, and the roof exit. O leaves rooms.</p>
-          <p>Q uses flashlight. F shoots. G snaps the gauntlet.</p>
+          <p>M uses medkit. Q uses flashlight. F shoots. G snaps the gauntlet.</p>
           <p>0 or Menu returns to the lobby.</p>
         </div>
       )}
@@ -96,7 +96,7 @@ export function PlatformHud({ state, onRestart, onMenu, tutorialMode }: Platform
         <p>E near door: enter room</p>
         <p>Vent floors: E under ceiling hole</p>
         <p>E inside room: open drawer, O: leave</p>
-        <p>Q: blind bots, F: shoot guard</p>
+        <p>M: use medkit, Q: blind bots, F: shoot guard</p>
         <p>Boss: G uses full gauntlet</p>
         <p>Train guard: F bullet, J health, E duel</p>
         <p>Duel: Space focus, mouse/trackpad aim, F mark</p>

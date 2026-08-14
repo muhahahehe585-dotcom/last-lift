@@ -86,13 +86,12 @@ function useFlashlight(state: PlatformGameState) {
 }
 
 function useMedkit(state: PlatformGameState) {
-  const maxHealth = state.player.hp > 100 ? 180 : 100;
   if (state.medkits < 1) return { ...state, message: 'No medkits left.' };
-  if (state.player.hp >= maxHealth) return { ...state, message: 'Health is already full.' };
+  if (state.player.hp >= state.player.maxHp) return { ...state, message: 'Health is already full.' };
   return {
     ...state,
     medkits: state.medkits - 1,
-    player: { ...state.player, hp: Math.min(maxHealth, state.player.hp + 25) },
+    player: { ...state.player, hp: Math.min(state.player.maxHp, state.player.hp + 25) },
     message: 'Medkit used.',
   };
 }
@@ -136,11 +135,11 @@ function shootEnemy(state: PlatformGameState, input: InputState) {
 
 export function handleActionInputs(state: PlatformGameState, input: InputState, dt: number) {
   if (input.leavePressed) return leaveRoom(state);
+  if (input.medkitPressed) return useMedkit(state);
   if (state.currentRoom && input.interactPressed) return searchDrawer(state);
   if (state.currentRoom) return { ...state, botBlindTime: Math.max(0, state.botBlindTime - dt) };
   if (input.interactPressed) return enterRoom(state);
   if (input.flashlightPressed) return useFlashlight(state);
-  if (input.medkitPressed) return useMedkit(state);
   if (input.shootPressed) return shootEnemy(state, input);
   return state;
 }

@@ -79,6 +79,7 @@ function getCarry(state: PlatformGameState) {
     infinityStones: state.infinityStones,
     stamina: state.player.stamina,
     armorCount: state.armorCount,
+    maxHp: state.player.maxHp,
   };
 }
 

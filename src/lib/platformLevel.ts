@@ -20,6 +20,7 @@ type LevelCarry = {
   infinityStones?: number;
   stamina?: number;
   armorCount?: number;
+  maxHp?: number;
 };
 
 const enemyKinds: EnemyKind[] = ['drone', 'broken-bot', 'bot-guard'];
@@ -169,6 +170,7 @@ export function createLevel(floor: number, hp = 100, carry: LevelCarry = {}): Pl
       vx: 0,
       vy: 0,
       hp,
+      maxHp: carry.maxHp ?? Math.max(100, hp),
       stamina: carry.stamina ?? 100,
       grounded: true,
       facing: 1,

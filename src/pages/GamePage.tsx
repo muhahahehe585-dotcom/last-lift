@@ -34,7 +34,7 @@ const emptyInput: InputState = {
 };
 
 type HoldControl = 'left' | 'right' | 'jump' | 'down';
-type TapControl = 'run' | 'doubleJump' | 'slam' | 'dodge' | 'hit' | 'interact' | 'leave' | 'flashlight' | 'shoot' | 'gauntlet';
+type TapControl = 'run' | 'doubleJump' | 'slam' | 'dodge' | 'hit' | 'interact' | 'leave' | 'flashlight' | 'medkit' | 'shoot' | 'gauntlet';
 
 export function GamePage() {
   const [screen, setScreen] = useState<'menu' | 'credits' | 'help' | 'shop' | 'game'>('menu');
@@ -90,6 +90,7 @@ export function GamePage() {
     if (control === 'hit') inputRef.current.hitPressed = true;
     if (control === 'interact') inputRef.current.interactPressed = true;
     if (control === 'leave') inputRef.current.leavePressed = true;
+    if (control === 'medkit') inputRef.current.medkitPressed = true;
     if (control === 'gauntlet') inputRef.current.gauntletPressed = true;
   };
 
@@ -216,6 +217,7 @@ export function GamePage() {
       if (pressed && ['e', 'E'].includes(event.key)) inputRef.current.interactPressed = true;
       if (pressed && ['o', 'O'].includes(event.key)) inputRef.current.leavePressed = true;
       if (pressed && ['q', 'Q'].includes(event.key)) inputRef.current.flashlightPressed = true;
+      if (pressed && ['m', 'M'].includes(event.key)) inputRef.current.medkitPressed = true;
       if (pressed && ['f', 'F'].includes(event.key)) inputRef.current.shootPressed = true;
       if (pressed && ['c', 'C'].includes(event.key)) inputRef.current.shortcutPressed = true;
       if (pressed && ['g', 'G'].includes(event.key)) inputRef.current.gauntletPressed = true;

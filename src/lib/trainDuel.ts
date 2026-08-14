@@ -37,6 +37,7 @@ export function updateTrainDuel(state: PlatformGameState, input: InputState, dt:
         stamina: state.player.stamina,
         unlimitedGun: state.unlimitedGun,
         armorCount: state.armorCount,
+        maxHp: state.player.maxHp,
       }),
       message: 'Duel won. Revolver acquired with 24 bullets.',
     };
@@ -90,6 +91,7 @@ function advanceTrainFloor(state: PlatformGameState, message: string) {
       unlimitedGun: state.unlimitedGun,
       infinityStones: state.infinityStones,
       armorCount: state.armorCount,
+      maxHp: state.player.maxHp,
     }),
     message,
   };

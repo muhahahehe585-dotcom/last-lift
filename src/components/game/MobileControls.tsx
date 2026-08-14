@@ -2,6 +2,8 @@ import type { InventoryItem } from './actionHitboxArt';
 
 type HoldControl = 'left' | 'right' | 'jump' | 'down';
 
+type MobileAction = 'run' | 'doubleJump' | 'slam' | 'dodge' | 'hit' | 'interact' | 'leave' | 'medkit' | 'gauntlet';
+
 type MobileControlsProps = {
   flashlights: number;
   medkits: number;
@@ -9,7 +11,7 @@ type MobileControlsProps = {
   hasGun: boolean;
   selectedInventory: InventoryItem;
   onHold: (control: HoldControl, pressed: boolean) => void;
-  onTap: (control: 'run' | 'doubleJump' | 'slam' | 'dodge' | 'hit' | 'interact' | 'leave' | 'gauntlet') => void;
+  onTap: (control: MobileAction) => void;
   onSelectInventory: (item: InventoryItem) => void;
   onMenu: () => void;
 };
@@ -21,7 +23,7 @@ export function MobileControls({ flashlights, medkits, bullets, hasGun, selected
     <div className="mobile-controls" aria-label="Mobile controls">
       <div className="mobile-inventory">
         <InventoryButton label="Gun" count={gunCount} selected={selectedInventory === 'gun'} onClick={() => onSelectInventory('gun')} />
-        <InventoryButton label="Medkit" count={medkits} selected={selectedInventory === 'medkit'} onClick={() => onSelectInventory('medkit')} />
+        <InventoryButton label="Medkit" count={medkits} selected={false} onClick={() => onTap('medkit')} />
         <InventoryButton label="Light" count={flashlights} selected={selectedInventory === 'flashlight'} onClick={() => onSelectInventory('flashlight')} />
         <button type="button" className="mobile-menu-button" onClick={onMenu}>Menu</button>
       </div>

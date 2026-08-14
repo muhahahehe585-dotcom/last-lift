@@ -16,6 +16,7 @@ export type Player = Rect & {
   vx: number;
   vy: number;
   hp: number;
+  maxHp: number;
   stamina: number;
   grounded: boolean;
   facing: 1 | -1;
