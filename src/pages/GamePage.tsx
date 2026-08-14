@@ -354,7 +354,19 @@ export function GamePage() {
         onTrainDuel={() => setState(chooseTrainDuel)}
         selectedInventory={selectedInventory}
         onUseInventory={useSelectedInventory}
-      />
+      >
+        <MobileControls
+          flashlights={state.flashlights}
+          medkits={state.medkits}
+          bullets={state.unlimitedGun ? 'unlimited' : state.shots}
+          hasGun={state.hasGun}
+          selectedInventory={selectedInventory}
+          onHold={setMobileHold}
+          onTap={tapMobileControl}
+          onSelectInventory={selectInventory}
+          onMenu={returnToMenu}
+        />
+      </PlatformCanvas>
       {confirmLobby && (
         <div className="lobby-confirm" role="dialog" aria-modal="true" aria-label="Return to lobby confirmation">
           <div className="lobby-confirm-panel">
@@ -366,17 +378,6 @@ export function GamePage() {
           </div>
         </div>
       )}
-      <MobileControls
-        flashlights={state.flashlights}
-        medkits={state.medkits}
-        bullets={state.unlimitedGun ? 'unlimited' : state.shots}
-        hasGun={state.hasGun}
-        selectedInventory={selectedInventory}
-        onHold={setMobileHold}
-        onTap={tapMobileControl}
-        onSelectInventory={selectInventory}
-        onMenu={returnToMenu}
-      />
     </main>
   );
 }

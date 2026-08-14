@@ -128,7 +128,7 @@
 
 .mobile-controls {
   display: none;
-  gap: 12px;
+  gap: 8px;
   user-select: none;
   touch-action: none;
 }
@@ -145,9 +145,9 @@
 }
 
 .mobile-pad {
-  width: min(210px, 48vw);
+  width: 138px;
   grid-template-columns: repeat(3, minmax(0, 1fr));
-  grid-template-rows: repeat(2, 58px);
+  grid-template-rows: repeat(2, 42px);
   justify-self: start;
 }
 
@@ -156,25 +156,25 @@
 }
 
 .mobile-controls button {
-  min-height: 48px;
-  padding: 8px 6px;
+  min-height: 34px;
+  padding: 5px 4px;
   border: 2px solid #596057;
   border-radius: 8px;
-  background: #fffdf7;
+  background: rgba(255, 253, 247, 0.78);
   color: #171817;
-  font-size: 13px;
+  font-size: 11px;
   font-weight: 900;
 }
 
 .mobile-controls .arrow-button {
-  min-height: 58px;
+  min-height: 42px;
   padding: 0;
-  font-size: 28px;
+  font-size: 24px;
   line-height: 1;
 }
 
 .mobile-pad-spacer {
-  min-height: 58px;
+  min-height: 42px;
 }
 
 .mobile-inventory button {
@@ -353,35 +353,32 @@ h1 {
 }
 
 @media (hover: none), (pointer: coarse), (max-width: 860px) {
-  .platform-shell {
-    padding-bottom: 260px;
-  }
-
   .mobile-controls {
     display: grid;
-    grid-template-columns: minmax(180px, 0.8fr) minmax(0, 1fr);
+    grid-template-columns: 138px minmax(0, 1fr);
     align-items: end;
-    position: fixed;
-    left: 0;
-    right: 0;
-    bottom: 0;
+    position: absolute;
+    left: 10px;
+    right: 10px;
+    bottom: 10px;
     z-index: 30;
-    padding: 10px max(10px, env(safe-area-inset-left)) max(10px, env(safe-area-inset-bottom)) max(10px, env(safe-area-inset-right));
-    border-top: 2px solid #596057;
-    background: rgba(17, 19, 17, 0.94);
-    box-shadow: 0 -18px 45px rgba(0, 0, 0, 0.42);
+    pointer-events: none;
   }
 
   .mobile-controls button {
-    min-height: 44px;
+    min-height: 34px;
+    pointer-events: auto;
   }
 
   .mobile-inventory {
     grid-column: 1 / -1;
+    width: min(360px, 70%);
+    justify-self: end;
   }
 
   .mobile-actions {
     justify-self: end;
+    max-width: min(380px, 58vw);
   }
 }
 

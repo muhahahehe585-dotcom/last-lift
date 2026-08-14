@@ -1,4 +1,4 @@
-import { useEffect, useRef } from 'react';
+import { type ReactNode, useEffect, useRef } from 'react';
 import { viewWidth, worldHeight } from '../../lib/platformLevel';
 import type { ItemKind, PlatformGameState } from '../../lib/platformTypes';
 import { drawActionHitboxes, type InventoryItem } from './actionHitboxArt';
@@ -18,6 +18,7 @@ type PlatformCanvasProps = {
   onTrainDuel: () => void;
   selectedInventory: InventoryItem;
   onUseInventory: (x: number, y: number) => void;
+  children?: ReactNode;
 };
 
 function drawRoomInterior(ctx: CanvasRenderingContext2D, state: PlatformGameState) {
@@ -62,7 +63,7 @@ function drawRoomLoot(ctx: CanvasRenderingContext2D, loot: ItemKind | 'empty', s
   ctx.fillText(loot.toUpperCase(), 510, 435);
 }
 
-export function PlatformCanvas({ state, onAim, onMeteorClick, onTrainBullet, onTrainHealth, onTrainDuel, selectedInventory, onUseInventory }: PlatformCanvasProps) {
+export function PlatformCanvas({ state, onAim, onMeteorClick, onTrainBullet, onTrainHealth, onTrainDuel, selectedInventory, onUseInventory, children }: PlatformCanvasProps) {
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
 
   useEffect(() => {
@@ -173,6 +174,7 @@ export function PlatformCanvas({ state, onAim, onMeteorClick, onTrainBullet, onT
           <button type="button" onClick={onTrainDuel}>Duel</button>
         </div>
       )}
+      {children}
     </div>
   );
 }
