@@ -1,6 +1,7 @@
 import { floorY } from '../../lib/platformLevel';
 import type { Enemy, Item, PlatformGameState } from '../../lib/platformTypes';
 import { drawBoss } from './bossArt';
+import { drawSpritePlayer } from './playerSprite';
 
 function px(ctx: CanvasRenderingContext2D, color: string, x: number, y: number, w: number, h: number) {
   ctx.fillStyle = color;
@@ -10,6 +11,7 @@ function px(ctx: CanvasRenderingContext2D, color: string, x: number, y: number, 
 export function drawPlayer(ctx: CanvasRenderingContext2D, state: PlatformGameState) {
   const p = state.player;
   if (state.inVent) return drawCrawlingPlayer(ctx, state);
+  if (drawSpritePlayer(ctx, state)) return;
   const walk = Math.abs(p.vx) > 5 ? Math.sin(p.x / (p.running ? 6 : 9)) : 0;
   px(ctx, '#2a1812', p.x + 6, p.y - 4, 22, 9);
   px(ctx, '#3b2118', p.x + 3, p.y + 1, 9, 10);

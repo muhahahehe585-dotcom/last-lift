@@ -180,6 +180,8 @@ export function createLevel(floor: number, hp = 100, carry: LevelCarry = {}): Pl
       slamPulse: 0,
       dodgeCooldown: 0,
       dodgePulse: 0,
+      hitPulse: 0,
+      shootPulse: 0,
       hurtCooldown: 0,
       doubleJumpUsed: false,
     },

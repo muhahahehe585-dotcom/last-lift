@@ -37,7 +37,9 @@ export function normalHit(state: PlatformGameState) {
       return enemy;
     })
     .filter((enemy) => enemy.hp > 0);
-  return landed ? { ...state, enemies, message: 'Hit landed.' } : { ...state, message: 'Hit missed. Get closer or face the enemy.' };
+  return landed
+    ? { ...state, enemies, player: { ...state.player, hitPulse: 0.24 }, message: 'Hit landed.' }
+    : { ...state, player: { ...state.player, hitPulse: 0.24 }, message: 'Hit missed. Get closer or face the enemy.' };
 }
 
 function hitNest(state: PlatformGameState) {
@@ -48,7 +50,7 @@ function hitNest(state: PlatformGameState) {
   const close = Math.abs(nestCenter - playerCenter) < hitRange + 25 && Math.abs(state.nest.y - state.player.y) < 150;
   const touching = overlaps({ ...state.player, width: state.player.width + 28 }, state.nest);
   if (!((inFront && close) || touching)) return null;
-  return damageNest(state);
+  return damageNest({ ...state, player: { ...state.player, hitPulse: 0.24 } });
 }
 
 export function slamEnemies(state: PlatformGameState) {

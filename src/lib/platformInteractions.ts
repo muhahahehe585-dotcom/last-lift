@@ -117,8 +117,9 @@ function shootEnemy(state: PlatformGameState, input: InputState) {
 
   const shots = state.unlimitedGun ? state.shots : state.shots - 1;
   const nest = state.inVent && state.nest && facing === 1 && bulletEnd >= state.nest.x ? state.nest : null;
-  if (!target && nest) return damageNest(state, { shots, bulletTrail: trail });
-  if (!target) return { ...state, shots, bulletTrail: trail, message: 'Shot missed.' };
+  const shootingPlayer = { ...state.player, shootPulse: 0.22 };
+  if (!target && nest) return damageNest({ ...state, player: shootingPlayer }, { shots, bulletTrail: trail });
+  if (!target) return { ...state, player: shootingPlayer, shots, bulletTrail: trail, message: 'Shot missed.' };
   const damage = target.kind === 'boss' ? 3 : target.kind === 'vent-monster' ? 4 : 999;
   const enemies = state.enemies
     .map((enemy) => (enemy.id === target.id ? { ...enemy, hp: enemy.hp - damage } : enemy))
@@ -126,6 +127,7 @@ function shootEnemy(state: PlatformGameState, input: InputState) {
 
   return {
     ...state,
+    player: shootingPlayer,
     shots,
     bulletTrail: trail,
     enemies,

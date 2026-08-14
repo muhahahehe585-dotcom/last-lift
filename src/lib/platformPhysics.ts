@@ -163,6 +163,8 @@ export function updatePlatformGame(state: PlatformGameState, input: InputState, 
   player.slamPulse = Math.max(0, player.slamPulse - dt);
   player.dodgeCooldown = Math.max(0, player.dodgeCooldown - dt);
   player.dodgePulse = Math.max(0, player.dodgePulse - dt);
+  player.hitPulse = Math.max(0, player.hitPulse - dt);
+  player.shootPulse = Math.max(0, player.shootPulse - dt);
   player.hurtCooldown = Math.max(0, player.hurtCooldown - dt);
 
   const wasAirSlamming = player.isSlamming;
