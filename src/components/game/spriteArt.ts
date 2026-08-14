@@ -1,6 +1,7 @@
 import { floorY } from '../../lib/platformLevel';
 import type { Enemy, Item, PlatformGameState } from '../../lib/platformTypes';
 import { drawBoss } from './bossArt';
+import { drawBrokenBotSprite } from './brokenBotArt';
 import { drawSpritePlayer } from './playerSprite';
 
 function px(ctx: CanvasRenderingContext2D, color: string, x: number, y: number, w: number, h: number) {
@@ -63,6 +64,7 @@ function drawDrone(ctx: CanvasRenderingContext2D, enemy: Enemy) {
 }
 
 function drawBrokenBot(ctx: CanvasRenderingContext2D, enemy: Enemy) {
+  if (drawBrokenBotSprite(ctx, enemy)) return;
   px(ctx, '#4d5650', enemy.x + 7, enemy.y, 31, 17);
   px(ctx, '#6f7b72', enemy.x + 2, enemy.y + 17, 42, 28);
   px(ctx, '#3c4542', enemy.x - 5, enemy.y + 24, 8, 25);
