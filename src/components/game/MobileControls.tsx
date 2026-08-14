@@ -29,13 +29,15 @@ export function MobileControls({ flashlights, medkits, bullets, hasGun, selected
       </div>
 
       <div className="mobile-pad">
-        <HoldButton label="Left" onChange={(pressed) => onHold('left', pressed)} />
-        <HoldButton label="Down" onChange={(pressed) => onHold('down', pressed)} />
-        <HoldButton label="Right" onChange={(pressed) => onHold('right', pressed)} />
+        <span className="mobile-pad-spacer" aria-hidden="true" />
+        <HoldButton label="↑" ariaLabel="Jump" className="arrow-button" onChange={(pressed) => onHold('jump', pressed)} />
+        <span className="mobile-pad-spacer" aria-hidden="true" />
+        <HoldButton label="←" ariaLabel="Left" className="arrow-button" onChange={(pressed) => onHold('left', pressed)} />
+        <HoldButton label="↓" ariaLabel="Down" className="arrow-button" onChange={(pressed) => onHold('down', pressed)} />
+        <HoldButton label="→" ariaLabel="Right" className="arrow-button" onChange={(pressed) => onHold('right', pressed)} />
       </div>
 
       <div className="mobile-actions">
-        <HoldButton label="Jump" onChange={(pressed) => onHold('jump', pressed)} />
         <button type="button" onClick={() => onTap('doubleJump')}>Double</button>
         <button type="button" onClick={() => onTap('slam')}>Slam</button>
         <button type="button" onClick={() => onTap('dodge')}>Dodge</button>
@@ -58,10 +60,12 @@ function InventoryButton({ label, count, selected, onClick }: { label: string; c
   );
 }
 
-function HoldButton({ label, onChange }: { label: string; onChange: (pressed: boolean) => void }) {
+function HoldButton({ label, ariaLabel, className, onChange }: { label: string; ariaLabel?: string; className?: string; onChange: (pressed: boolean) => void }) {
   return (
     <button
       type="button"
+      className={className}
+      aria-label={ariaLabel ?? label}
       onPointerDown={(event) => {
         event.currentTarget.setPointerCapture(event.pointerId);
         onChange(true);
