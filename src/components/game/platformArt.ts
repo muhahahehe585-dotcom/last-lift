@@ -1,5 +1,6 @@
 import { bossEscapeDoor, finalFloor, floorY, rageFire, viewWidth, worldHeight, worldWidth } from '../../lib/platformLevel';
 import type { HotelRoom, PlatformGameState } from '../../lib/platformTypes';
+import { drawElevatorDoor } from './elevatorDoorArt';
 import { drawRoof } from './roofArt';
 import { drawTrainFloor } from './trainFloorArt';
 import { drawVentWorld } from './ventArt';
@@ -37,8 +38,7 @@ export function drawHotel(ctx: CanvasRenderingContext2D, state: PlatformGameStat
   if (state.mode === 'lava') drawLava(ctx, state);
   if (state.mode === 'lava') drawBoxes(ctx, state);
   if (state.mode === 'supply') drawSupplyLights(ctx);
-  px(ctx, '#5e8f86', worldWidth - 108, floorY - 132, 70, 132);
-  px(ctx, '#0d0f0d', worldWidth - 78, floorY - 102, 10, 84);
+  drawElevatorDoor(ctx);
 }
 
 function drawTurnBackDoor(ctx: CanvasRenderingContext2D) {
