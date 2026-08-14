@@ -28,6 +28,7 @@ export type Player = Rect & {
   dodgePulse: number;
   hitPulse: number;
   shootPulse: number;
+  doubleJumpPulse: number;
   hurtCooldown: number;
   doubleJumpUsed: boolean;
 };

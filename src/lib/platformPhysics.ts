@@ -149,6 +149,7 @@ export function updatePlatformGame(state: PlatformGameState, input: InputState, 
     running,
     isSlamming,
     doubleJumpUsed: wantsDoubleJump ? true : state.player.doubleJumpUsed,
+    doubleJumpPulse: wantsDoubleJump ? 0.34 : state.player.doubleJumpPulse,
     facing: vx < 0 ? -1 : vx > 0 ? 1 : state.player.facing,
   };
   player.x = Math.max(0, Math.min(worldWidth - player.width, player.x + player.vx * dt));
@@ -165,6 +166,7 @@ export function updatePlatformGame(state: PlatformGameState, input: InputState, 
   player.dodgePulse = Math.max(0, player.dodgePulse - dt);
   player.hitPulse = Math.max(0, player.hitPulse - dt);
   player.shootPulse = Math.max(0, player.shootPulse - dt);
+  player.doubleJumpPulse = Math.max(0, player.doubleJumpPulse - dt);
   player.hurtCooldown = Math.max(0, player.hurtCooldown - dt);
 
   const wasAirSlamming = player.isSlamming;
