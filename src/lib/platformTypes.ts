@@ -41,6 +41,7 @@ export type Enemy = Rect & {
   patrolLeft: number;
   patrolRight: number;
   wakeDelay: number;
+  attackPulse: number;
 };
 
 export type Item = Rect & {

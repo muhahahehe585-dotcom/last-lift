@@ -42,6 +42,7 @@ function enemyFor(floor: number, index: number): Enemy {
     patrolLeft: Math.max(180, x - 180),
     patrolRight: Math.min(worldWidth - 160, x + 210),
     wakeDelay: 0,
+    attackPulse: 0,
   };
 }
 
@@ -58,6 +59,7 @@ function seaMonsterFor(floor: number): Enemy {
     patrolLeft: -700,
     patrolRight: worldWidth,
     wakeDelay: 5,
+    attackPulse: 0,
   };
 }
 
@@ -74,6 +76,7 @@ export function ventMonsterFor(floor: number): Enemy {
     patrolLeft: 1180,
     patrolRight: 1780,
     wakeDelay: 0,
+    attackPulse: 0,
   };
 }
 

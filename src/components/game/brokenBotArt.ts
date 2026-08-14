@@ -24,6 +24,18 @@ const frames = {
     { x: 1076, y: 88, width: 112, height: 152 },
     { x: 1215, y: 88, width: 102, height: 152 },
   ],
+  hitRight: [
+    { x: 88, y: 326, width: 122, height: 154 },
+    { x: 235, y: 326, width: 150, height: 154 },
+    { x: 380, y: 326, width: 150, height: 154 },
+    { x: 515, y: 326, width: 128, height: 154 },
+  ],
+  hitLeft: [
+    { x: 760, y: 326, width: 128, height: 154 },
+    { x: 903, y: 326, width: 150, height: 154 },
+    { x: 1046, y: 326, width: 150, height: 154 },
+    { x: 1198, y: 326, width: 122, height: 154 },
+  ],
   idleRight: [
     { x: 88, y: 588, width: 100, height: 150 },
     { x: 224, y: 588, width: 106, height: 150 },
@@ -44,8 +56,9 @@ export function drawBrokenBotSprite(ctx: CanvasRenderingContext2D, enemy: Enemy)
   if (!sheet.complete || sheet.naturalWidth === 0) return false;
   const facing = enemy.vx >= 0 ? 'Right' : 'Left';
   const moving = Math.abs(enemy.vx) > 5;
-  const group = moving ? frames[`walk${facing}`] : frames[`idle${facing}`];
-  const source = group[frameIndex(enemy, group.length, moving)];
+  const attacking = enemy.attackPulse > 0;
+  const group = attacking ? frames[`hit${facing}`] : moving ? frames[`walk${facing}`] : frames[`idle${facing}`];
+  const source = group[frameIndex(enemy, group.length, moving, attacking)];
   const frame = cleanFrame(source);
   const height = 84;
   const width = (source.width / source.height) * height;
@@ -55,7 +68,8 @@ export function drawBrokenBotSprite(ctx: CanvasRenderingContext2D, enemy: Enemy)
   return true;
 }
 
-function frameIndex(enemy: Enemy, total: number, moving: boolean) {
+function frameIndex(enemy: Enemy, total: number, moving: boolean, attacking: boolean) {
+  if (attacking) return Math.min(total - 1, Math.floor((1 - enemy.attackPulse / 0.34) * total));
   if (!moving) return Math.floor(performance.now() / 180) % total;
   return Math.abs(Math.floor(enemy.x / 22)) % total;
 }

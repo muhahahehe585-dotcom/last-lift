@@ -236,7 +236,10 @@ export function updatePlatformGame(state: PlatformGameState, input: InputState, 
   if (touchingEnemy) {
     if (touchingEnemy.kind === 'boss' && Math.abs(next.player.vx) < 5) return next;
     const cause = touchingEnemy.kind === 'drone' ? 'drone' : touchingEnemy.kind === 'bot-guard' ? 'guard' : touchingEnemy.kind === 'boss' ? 'boss' : 'bot';
-    next = hitPlayer(next, damageForEnemyTouch(next, touchingEnemy.kind), `${touchingEnemy.kind} hit you.`, cause);
+    next = startEnemyAttack(next, touchingEnemy.id);
+    next = touchingEnemy.kind === 'broken-bot' && Math.abs(next.player.vx) < 5
+      ? damagePlayerPerSecond(next, damageForEnemyTouch(next, touchingEnemy.kind) * 1.3, dt, 'broken-bot is hitting you.', 'bot')
+      : hitPlayer(next, damageForEnemyTouch(next, touchingEnemy.kind), `${touchingEnemy.kind} hit you.`, cause);
   }
   next = tryVentNest(next);
   next = tryTrainGuard(next);
@@ -244,6 +247,24 @@ export function updatePlatformGame(state: PlatformGameState, input: InputState, 
   next = tryLift(next);
 
   return next;
+}
+
+function damagePlayerPerSecond(state: PlatformGameState, damagePerSecond: number, dt: number, message: string, cause: NonNullable<PlatformGameState['deathCause']>) {
+  const hp = Math.max(0, state.player.hp - damagePerSecond * dt);
+  return {
+    ...state,
+    player: { ...state.player, hp },
+    status: hp <= 0 ? 'lost' as const : state.status,
+    deathCause: hp <= 0 ? cause : state.deathCause,
+    message,
+  };
+}
+
+function startEnemyAttack(state: PlatformGameState, enemyId: string) {
+  return {
+    ...state,
+    enemies: state.enemies.map((enemy) => (enemy.id === enemyId ? { ...enemy, attackPulse: 0.34 } : enemy)),
+  };
 }
 
 function tryDodge(state: PlatformGameState, input: InputState) {
@@ -397,6 +418,7 @@ function updateVentSpawns(state: PlatformGameState, dt: number) {
     patrolLeft: Math.max(state.player.x + 120, x - 260),
     patrolRight: Math.min(worldWidth - 120, x + 120),
     wakeDelay: 0,
+    attackPulse: 0,
   };
   return { ...state, ventSpawnTimer: 60, enemies: [...state.enemies, enemy], message: 'A vent monster crawls in ahead.' };
 }

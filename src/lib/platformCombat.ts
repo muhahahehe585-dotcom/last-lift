@@ -77,10 +77,18 @@ export function updateEnemies(state: PlatformGameState, dt: number, blinded: boo
       return { ...enemy, x: target };
     }
     if (blinded && ['broken-bot', 'bot-guard'].includes(enemy.kind)) return enemy;
+    if (enemy.kind === 'broken-bot' && Math.abs(state.player.vx) < 5 && overlaps(state.player, enemy)) {
+      return { ...enemy, vx: 0, attackPulse: 0.34 };
+    }
     const x = enemy.x + enemy.vx * dt;
     const hitPatrol = x <= enemy.patrolLeft || x + enemy.width >= enemy.patrolRight;
     const hitHole = enemyWouldCrossHole(state, enemy, x);
-    return { ...enemy, x: hitPatrol || hitHole ? enemy.x : x, vx: hitPatrol || hitHole ? -enemy.vx : enemy.vx };
+    return {
+      ...enemy,
+      x: hitPatrol || hitHole ? enemy.x : x,
+      vx: hitPatrol || hitHole ? -enemy.vx : enemy.vx,
+      attackPulse: Math.max(0, enemy.attackPulse - dt),
+    };
   });
 }
 
