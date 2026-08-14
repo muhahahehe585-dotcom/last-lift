@@ -2,7 +2,7 @@ import { bossEscapeDoor, createLevel, finalFloor, floorY, rageFire, worldWidth }
 import { overlaps } from './platformGeometry';
 import { hitPlayer, normalHit, slamEnemies, updateEnemies } from './platformCombat';
 import { applyEventDamage } from './platformHazards';
-import { collectItems, handleActionInputs } from './platformInteractions';
+import { collectItems, enterVentRoute, handleActionInputs } from './platformInteractions';
 import { startTrainDuel, updateTrainDuel } from './trainDuel';
 import type { InputState, PlatformGameState } from './platformTypes';
 import { awardCoins, awardFloorCoin } from './progress';
@@ -52,13 +52,8 @@ function tryTrainGuard(state: PlatformGameState) {
 }
 
 function tryVentNest(state: PlatformGameState) {
-  if (!state.nest) return state;
-  if (state.inVent) return state.nestHp <= 0 ? { ...state, status: 'won' as const, ending: 'sunset' as const, message: 'Vent ending found. You saved the whole world.' } : state;
-  const reachedNest = overlaps(state.player, state.nest);
-  const monsterAlive = state.enemies.some((enemy) => enemy.kind === 'vent-monster');
-  if (!reachedNest) return state;
-  if (monsterAlive) return { ...state, message: 'The nest is blocked by the vent monster.' };
-  return { ...state, status: 'won' as const, ending: 'sunset' as const, message: 'Vent ending found. You saved the whole world.' };
+  if (!state.inVent || !state.nest) return state;
+  return state.nestHp <= 0 ? { ...state, status: 'won' as const, ending: 'sunset' as const, message: 'Vent ending found. You saved the whole world.' } : state;
 }
 
 function tryTurnedBackDoor(state: PlatformGameState, player: PlatformGameState['player']) {
@@ -109,18 +104,7 @@ function trySecretFloorOneHoles(state: PlatformGameState, player: PlatformGameSt
     };
   }
   const ventLevel = createLevel(13, player.hp, { ...getCarry(state), hasGun: true, shots: 0, unlimitedGun: true });
-  return {
-    ...ventLevel,
-    inVent: true,
-    player: {
-      ...ventLevel.player,
-      x: 80,
-      y: floorY - 104,
-      height: 44,
-      grounded: true,
-    },
-    message: 'Second secret vent found. You are inside the vents with an unlimited revolver.',
-  };
+  return enterVentRoute(ventLevel, 'Second secret vent found. You are inside the vents with an unlimited revolver.');
 }
 
 export function updatePlatformGame(state: PlatformGameState, input: InputState, dt: number): PlatformGameState {
@@ -385,7 +369,14 @@ function updateGauntletSnap(state: PlatformGameState, dt: number): PlatformGameS
 }
 
 function updateVentSpawns(state: PlatformGameState, dt: number) {
-  if (!state.inVent || state.status !== 'playing') return state;
+  if (!state.inVent) {
+    return {
+      ...state,
+      enemies: state.enemies.filter((enemy) => enemy.kind !== 'vent-monster'),
+      nest: null,
+    };
+  }
+  if (state.status !== 'playing') return state;
   const timer = state.ventSpawnTimer - dt;
   if (timer > 0) return { ...state, ventSpawnTimer: timer };
   const x = Math.min(worldWidth - 170, state.player.x + 620);
