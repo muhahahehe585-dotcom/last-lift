@@ -1,6 +1,7 @@
 import lightningEmptyUrl from '../../assets/lightning-empty.jpg';
 import lightningPowerUrl from '../../assets/lightning-power.jpg';
 import type { PlatformGameState } from '../../lib/platformTypes';
+import { LightningIcon } from './LightningIcon';
 
 type PlatformHudProps = {
   state: PlatformGameState;
@@ -21,13 +22,13 @@ export function PlatformHud({ state, onRestart, onMenu, tutorialMode }: Platform
   const bullets = state.hasGun ? (state.unlimitedGun ? `Unlimited (${loaded})` : `${state.shots} (${loaded})`) : 'None';
   const maxHealth = state.player.maxHp;
   const healthWidth = Math.min(100, (state.player.hp / maxHealth) * 100);
-  const powerSlots = Array.from({ length: state.batteriesNeeded || 4 }, (_, index) => index < state.batteries);
+  const powerSlots = Array.from({ length: 4 }, (_, index) => index < Math.min(4, state.batteries));
 
   return (
     <aside className="platform-hud" aria-label="Game status">
       <div className="hud-power" aria-label={`Power ${state.batteries}/${state.batteriesNeeded}`}>
         {powerSlots.map((filled, index) => (
-          <img key={index} src={filled ? lightningPowerUrl : lightningEmptyUrl} alt="" />
+          <LightningIcon key={index} src={filled ? lightningPowerUrl : lightningEmptyUrl} />
         ))}
       </div>
 

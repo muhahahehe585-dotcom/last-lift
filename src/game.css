@@ -292,12 +292,12 @@ h1 {
   transform: translateX(-50%);
 }
 
-.hud-power img {
+.lightning-icon {
   width: 42px;
   height: 42px;
-  object-fit: cover;
   border: 2px solid rgba(255, 248, 220, 0.72);
   border-radius: 8px;
+  background: #020302;
   image-rendering: pixelated;
 }
 
