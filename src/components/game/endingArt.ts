@@ -1,9 +1,15 @@
 import { viewWidth, worldHeight } from '../../lib/platformLevel';
+import type { Enemy, Rect } from '../../lib/platformTypes';
+import { drawBrokenBotSprite } from './brokenBotArt';
+import { drawBulletSprite, drawDroneSprite } from './droneBulletArt';
+import { frames, type SourceFrame } from './playerSpriteFrames';
 
 function px(ctx: CanvasRenderingContext2D, color: string, x: number, y: number, w: number, h: number) {
   ctx.fillStyle = color;
   ctx.fillRect(Math.round(x), Math.round(y), Math.round(w), Math.round(h));
 }
+
+const cleanedEndingFrames = new Map<string, HTMLCanvasElement>();
 
 export function drawRulerEnding(ctx: CanvasRenderingContext2D) {
   px(ctx, '#090807', 0, 0, viewWidth, worldHeight);
@@ -78,19 +84,95 @@ export function drawLastStandEnding(ctx: CanvasRenderingContext2D) {
   px(ctx, '#101210', 0, 0, viewWidth, worldHeight);
   px(ctx, '#2b302c', 0, 390, viewWidth, 250);
   for (let x = 0; x < viewWidth; x += 120) px(ctx, '#1b1d1c', x, 80, 70, 310);
-  drawGunHero(ctx, 210, 292);
-  drawRobotLine(ctx, 610, 310);
-  drawRobotLine(ctx, 820, 282);
-  drawRobotLine(ctx, 1010, 326);
-  px(ctx, '#f2dc5d', 355, 330, 240, 6);
-  px(ctx, '#f2dc5d', 365, 348, 335, 5);
-  px(ctx, '#f2dc5d', 360, 366, 430, 4);
+  drawEndingShootingPlayer(ctx, 230, 330);
+  drawEndingDrone(ctx, 630, 210);
+  drawEndingDrone(ctx, 820, 175);
+  drawEndingBrokenBot(ctx, 610, 352, -1);
+  drawEndingBrokenBot(ctx, 790, 362, -1);
+  drawEndingBrokenBot(ctx, 965, 346, -1);
+  drawEndingBullet(ctx, 375, 324, 465, -32);
+  drawEndingBullet(ctx, 375, 344, 650, 22);
+  drawEndingBullet(ctx, 375, 364, 515, 58);
   ctx.fillStyle = '#f2dc5d';
   ctx.font = '42px monospace';
   ctx.fillText('TURNED BACK', 440, 90);
   ctx.fillStyle = '#cfc7b3';
   ctx.font = '20px monospace';
   ctx.fillText('You avoided the challenge, but now you must survive.', 315, 125);
+}
+
+function drawEndingShootingPlayer(ctx: CanvasRenderingContext2D, x: number, footY: number) {
+  const source = frames.shootRight[2];
+  if (!source.sheet.complete || source.sheet.naturalWidth === 0) {
+    drawGunHero(ctx, x, footY - 122);
+    return;
+  }
+  const frame = cleanEndingFrame(source);
+  const height = 118;
+  const width = (source.width / source.height) * height;
+  ctx.drawImage(frame, x, footY - height, width, height);
+}
+
+function drawEndingDrone(ctx: CanvasRenderingContext2D, x: number, y: number) {
+  const enemy = makeEndingEnemy('drone', x, y, 70, 52, -40);
+  if (!drawDroneSprite(ctx, enemy)) drawThreatDrone(ctx, x, y);
+}
+
+function drawEndingBrokenBot(ctx: CanvasRenderingContext2D, x: number, y: number, facing: -1 | 1) {
+  const enemy = makeEndingEnemy('broken-bot', x, y, 58, 78, facing * 40);
+  if (!drawBrokenBotSprite(ctx, enemy)) drawRobotLine(ctx, x, y);
+}
+
+function drawEndingBullet(ctx: CanvasRenderingContext2D, x: number, y: number, width: number, height: number) {
+  const trail: Rect = { x, y, width, height };
+  if (drawBulletSprite(ctx, trail)) return;
+  px(ctx, '#f2dc5d', x, y, width, 5);
+}
+
+function makeEndingEnemy(kind: Enemy['kind'], x: number, y: number, width: number, height: number, vx: number): Enemy {
+  return {
+    id: `ending-${kind}-${x}`,
+    kind,
+    x,
+    y,
+    width,
+    height,
+    hp: 1,
+    vx,
+    patrolLeft: x - 80,
+    patrolRight: x + 80,
+    wakeDelay: 0,
+    attackPulse: 0.18,
+  };
+}
+
+function cleanEndingFrame(source: SourceFrame) {
+  const key = `${source.x}-${source.y}`;
+  const cached = cleanedEndingFrames.get(key);
+  if (cached) return cached;
+  const canvas = document.createElement('canvas');
+  canvas.width = source.width;
+  canvas.height = source.height;
+  const ctx = canvas.getContext('2d');
+  if (!ctx) return canvas;
+  ctx.drawImage(source.sheet, source.x, source.y, source.width, source.height, 0, 0, source.width, source.height);
+  eraseEndingFrameBackground(ctx, source.width, source.height);
+  cleanedEndingFrames.set(key, canvas);
+  return canvas;
+}
+
+function eraseEndingFrameBackground(ctx: CanvasRenderingContext2D, width: number, height: number) {
+  const image = ctx.getImageData(0, 0, width, height);
+  const data = image.data;
+  for (let index = 0; index < data.length; index += 4) {
+    const r = data[index];
+    const g = data[index + 1];
+    const b = data[index + 2];
+    const max = Math.max(r, g, b);
+    const min = Math.min(r, g, b);
+    if (min > 54 && max < 198 && max - min < 48) data[index + 3] = 0;
+  }
+  ctx.putImageData(image, 0, 0);
 }
 
 export function drawSuperheroEnding(ctx: CanvasRenderingContext2D) {
