@@ -82,23 +82,37 @@ function drawHalfPlanet(ctx: CanvasRenderingContext2D, x: number, y: number, siz
 
 export function drawLastStandEnding(ctx: CanvasRenderingContext2D) {
   px(ctx, '#101210', 0, 0, viewWidth, worldHeight);
-  px(ctx, '#2b302c', 0, 390, viewWidth, 250);
-  for (let x = 0; x < viewWidth; x += 120) px(ctx, '#1b1d1c', x, 80, 70, 310);
-  drawEndingShootingPlayer(ctx, 230, 330);
-  drawEndingDrone(ctx, 630, 210);
-  drawEndingDrone(ctx, 820, 175);
-  drawEndingBrokenBot(ctx, 610, 352, -1);
-  drawEndingBrokenBot(ctx, 790, 362, -1);
-  drawEndingBrokenBot(ctx, 965, 346, -1);
-  drawEndingBullet(ctx, 375, 324, 465, -32);
-  drawEndingBullet(ctx, 375, 344, 650, 22);
-  drawEndingBullet(ctx, 375, 364, 515, 58);
+  px(ctx, '#111923', 0, 0, viewWidth, 440);
+  for (let x = 0; x < viewWidth; x += 120) {
+    px(ctx, x % 240 ? '#182028' : '#202b32', x, 150, 76, 305);
+    px(ctx, '#f2dc5d', x + 18, 205 + (x % 4) * 26, 10, 8);
+    px(ctx, '#5e8f86', x + 48, 292 + (x % 5) * 18, 10, 8);
+  }
+  drawStreet(ctx);
+  drawEndingShootingPlayer(ctx, 220, 510);
+  drawEndingDrone(ctx, 610, 230);
+  drawEndingDrone(ctx, 850, 205);
+  drawEndingDrone(ctx, 1040, 250);
+  drawEndingBrokenBot(ctx, 610, 432, -1);
+  drawEndingBrokenBot(ctx, 800, 432, -1);
+  drawEndingBrokenBot(ctx, 980, 432, -1);
+  drawEndingBullet(ctx, 372, 422, 455, -122);
+  drawEndingBullet(ctx, 372, 444, 630, -18);
+  drawEndingBullet(ctx, 372, 466, 508, 42);
   ctx.fillStyle = '#f2dc5d';
   ctx.font = '42px monospace';
   ctx.fillText('TURNED BACK', 440, 90);
   ctx.fillStyle = '#cfc7b3';
   ctx.font = '20px monospace';
   ctx.fillText('You avoided the challenge, but now you must survive.', 315, 125);
+}
+
+function drawStreet(ctx: CanvasRenderingContext2D) {
+  px(ctx, '#181a1b', 0, 440, viewWidth, 200);
+  px(ctx, '#2d3031', 0, 454, viewWidth, 58);
+  px(ctx, '#0a0b0a', 0, 512, viewWidth, 128);
+  for (let x = 35; x < viewWidth; x += 170) px(ctx, '#d8d2c2', x, 476, 92, 8);
+  for (let x = 0; x < viewWidth; x += 74) px(ctx, '#34383a', x, 520, 42, 5);
 }
 
 function drawEndingShootingPlayer(ctx: CanvasRenderingContext2D, x: number, footY: number) {
