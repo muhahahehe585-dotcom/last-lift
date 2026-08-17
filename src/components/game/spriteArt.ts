@@ -35,7 +35,6 @@ export function drawPlayer(ctx: CanvasRenderingContext2D, state: PlatformGameSta
 }
 
 export function drawEnemy(ctx: CanvasRenderingContext2D, enemy: Enemy) {
-  if (enemy.wakeDelay > 0) return;
   if (enemy.kind === 'drone') return drawDrone(ctx, enemy);
   if (enemy.kind === 'bot-guard') return drawGuard(ctx, enemy);
   if (enemy.kind === 'sea-monster') return drawSeaMonster(ctx, enemy);

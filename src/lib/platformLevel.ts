@@ -43,7 +43,7 @@ function enemyFor(floor: number, index: number): Enemy {
     vx: boss ? -72 : 45 + index * 8,
     patrolLeft: Math.max(180, x - 180),
     patrolRight: Math.min(worldWidth - 160, x + 210),
-    wakeDelay: 3,
+    wakeDelay: 0,
     attackPulse: 0,
   };
 }
@@ -77,7 +77,7 @@ export function ventMonsterFor(floor: number): Enemy {
     vx: 360,
     patrolLeft: -80,
     patrolRight: 1700,
-    wakeDelay: 0,
+    wakeDelay: 3,
     attackPulse: 0,
   };
 }
