@@ -1,6 +1,7 @@
 import { bossEscapeDoor, finalFloor, floorY, rageFire, viewWidth, worldHeight, worldWidth } from '../../lib/platformLevel';
 import type { HotelRoom, PlatformGameState } from '../../lib/platformTypes';
 import { drawElevatorDoor } from './elevatorDoorArt';
+import { drawRoomDoor } from './roomDoorArt';
 import { drawRoof } from './roofArt';
 import { drawTrainFloor } from './trainFloorArt';
 import { drawVentWorld } from './ventArt';
@@ -110,12 +111,7 @@ function drawSupplyLights(ctx: CanvasRenderingContext2D) {
 
 function drawRooms(ctx: CanvasRenderingContext2D, rooms: HotelRoom[]) {
   rooms.forEach((room, index) => {
-    px(ctx, '#111311', room.x - 8, room.y - 10, room.width + 16, room.height + 10);
-    px(ctx, room.opened ? '#15120f' : '#6f543b', room.x, room.y + 10, room.width, room.height - 10);
-    px(ctx, room.opened ? '#070807' : '#2a211a', room.x + 8, room.y + 20, room.width - 16, room.height - 26);
-    if (!room.opened) px(ctx, '#c49b55', room.x + room.width - 16, room.y + 66, 5, 5);
-    if (room.opened) px(ctx, room.searched ? '#596057' : '#f2dc5d', room.x + 20, room.y + 34, 18, 8);
-    px(ctx, index % 2 ? '#151611' : '#333029', room.x + 14, room.y - 38, 30, 18);
+    drawRoomDoor(ctx, room, index % 2 ? '#151611' : '#333029');
   });
 }
 
