@@ -147,7 +147,6 @@
 .mobile-pad {
   width: 138px;
   grid-template-columns: repeat(3, minmax(0, 1fr));
-  grid-template-rows: repeat(2, 42px);
   justify-self: start;
 }
 
@@ -175,6 +174,10 @@
 
 .mobile-pad-spacer {
   min-height: 42px;
+}
+
+.mobile-controls .jump-button {
+  display: none;
 }
 
 .mobile-inventory button {
@@ -379,6 +382,18 @@ h1 {
   .mobile-actions {
     justify-self: end;
     max-width: min(380px, 58vw);
+    transform: translateY(-52px);
+  }
+
+  .mobile-controls .jump-button {
+    display: block;
+    position: absolute;
+    right: 0;
+    bottom: 0;
+    width: 54px;
+    height: 54px;
+    min-height: 54px;
+    border-color: #f2dc5d;
   }
 }
 
@@ -389,5 +404,6 @@ h1 {
 
   .mobile-actions {
     grid-template-columns: repeat(3, minmax(0, 1fr));
+    transform: translateY(-38px);
   }
 }

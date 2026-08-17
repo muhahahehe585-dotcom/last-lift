@@ -119,6 +119,7 @@ export function GamePage() {
   const startTutorial = () => {
     refreshProgress();
     tutorialCoinsRef.current = getCoins();
+    inputRef.current = { ...emptyInput };
     setTrainTestMode(false);
     setTutorialMode(true);
     setSelectedInventory(null);
@@ -142,6 +143,7 @@ export function GamePage() {
       };
     }
     if (current.status !== 'lost') return current;
+    inputRef.current = { ...emptyInput };
     return {
       ...createLevel(current.floor),
       message: 'Revived for tutorial. In the real game, dying sends you back to the lobby.',
@@ -268,6 +270,8 @@ export function GamePage() {
       inputRef.current.runPressed = false;
       inputRef.current.shortcutPressed = false;
       inputRef.current.gauntletPressed = false;
+      inputRef.current.aimX = null;
+      inputRef.current.aimY = null;
       frame = requestAnimationFrame(loop);
     };
 

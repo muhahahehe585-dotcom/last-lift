@@ -29,9 +29,6 @@ export function MobileControls({ flashlights, medkits, bullets, hasGun, selected
       </div>
 
       <div className="mobile-pad">
-        <span className="mobile-pad-spacer" aria-hidden="true" />
-        <HoldButton label="↑" ariaLabel="Jump" className="arrow-button" onChange={(pressed) => onHold('jump', pressed)} />
-        <span className="mobile-pad-spacer" aria-hidden="true" />
         <HoldButton label="←" ariaLabel="Left" className="arrow-button" onChange={(pressed) => onHold('left', pressed)} />
         <HoldButton label="↓" ariaLabel="Down" className="arrow-button" onChange={(pressed) => onHold('down', pressed)} />
         <HoldButton label="→" ariaLabel="Right" className="arrow-button" onChange={(pressed) => onHold('right', pressed)} />
@@ -47,6 +44,8 @@ export function MobileControls({ flashlights, medkits, bullets, hasGun, selected
         <button type="button" onClick={() => onTap('leave')}>Leave</button>
         <button type="button" onClick={() => onTap('gauntlet')}>Snap</button>
       </div>
+
+      <HoldButton label="↑" ariaLabel="Jump" className="arrow-button jump-button" onChange={(pressed) => onHold('jump', pressed)} />
     </div>
   );
 }
