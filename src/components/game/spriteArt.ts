@@ -1,7 +1,7 @@
 import { floorY } from '../../lib/platformLevel';
 import type { Enemy, Item, PlatformGameState } from '../../lib/platformTypes';
 import { drawBoss } from './bossArt';
-import { drawBrokenBotSprite } from './brokenBotArt';
+import { drawBotGuardSprite, drawBrokenBotSprite } from './brokenBotArt';
 import { drawSpritePlayer } from './playerSprite';
 import { drawVentMonsterSprite } from './ventMonsterArt';
 
@@ -63,7 +63,7 @@ function drawBrokenBot(ctx: CanvasRenderingContext2D, enemy: Enemy) {
 }
 
 function drawBotGuard(ctx: CanvasRenderingContext2D, enemy: Enemy) {
-  if (drawBrokenBotSprite(ctx, enemy)) return;
+  if (drawBotGuardSprite(ctx, enemy)) return;
   px(ctx, '#151817', enemy.x + 9, enemy.y, 28, 14);
   px(ctx, '#7c8781', enemy.x + 7, enemy.y + 14, 32, 33);
   px(ctx, '#3c4542', enemy.x - 1, enemy.y + 23, 9, 28);

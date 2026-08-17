@@ -1,4 +1,5 @@
 import botSheetUrl from '../../assets/broken-bot-sheet.jpg';
+import botGuardSheetUrl from '../../assets/bot-guard-sheet.jpg';
 import type { Enemy } from '../../lib/platformTypes';
 
 type Frame = {
@@ -8,8 +9,11 @@ type Frame = {
   height: number;
 };
 
-const sheet = new Image();
-sheet.src = botSheetUrl;
+const brokenSheet = new Image();
+brokenSheet.src = botSheetUrl;
+
+const guardSheet = new Image();
+guardSheet.src = botGuardSheetUrl;
 
 const frames = {
   walkRight: [
@@ -53,13 +57,21 @@ const frames = {
 const cleanedFrames = new Map<string, HTMLCanvasElement>();
 
 export function drawBrokenBotSprite(ctx: CanvasRenderingContext2D, enemy: Enemy) {
+  return drawBotSprite(ctx, enemy, brokenSheet, 'broken');
+}
+
+export function drawBotGuardSprite(ctx: CanvasRenderingContext2D, enemy: Enemy) {
+  return drawBotSprite(ctx, enemy, guardSheet, 'guard');
+}
+
+function drawBotSprite(ctx: CanvasRenderingContext2D, enemy: Enemy, sheet: HTMLImageElement, variant: string) {
   if (!sheet.complete || sheet.naturalWidth === 0) return false;
   const facing = enemy.vx >= 0 ? 'Right' : 'Left';
   const moving = Math.abs(enemy.vx) > 5;
   const attacking = enemy.attackPulse > 0;
   const group = attacking ? frames[`hit${facing}`] : moving ? frames[`walk${facing}`] : frames[`idle${facing}`];
   const source = group[frameIndex(enemy, group.length, moving, attacking)];
-  const frame = cleanFrame(source);
+  const frame = cleanFrame(source, sheet, variant);
   const height = 84;
   const width = (source.width / source.height) * height;
   const x = enemy.x + enemy.width / 2 - width / 2;
@@ -74,8 +86,8 @@ function frameIndex(enemy: Enemy, total: number, moving: boolean, attacking: boo
   return Math.abs(Math.floor(enemy.x / 22)) % total;
 }
 
-function cleanFrame(source: Frame) {
-  const key = `${source.x}-${source.y}`;
+function cleanFrame(source: Frame, sheet: HTMLImageElement, variant: string) {
+  const key = `${variant}-${source.x}-${source.y}`;
   const cached = cleanedFrames.get(key);
   if (cached) return cached;
   const canvas = document.createElement('canvas');

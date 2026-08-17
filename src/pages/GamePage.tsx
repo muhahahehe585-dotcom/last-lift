@@ -340,12 +340,6 @@ export function GamePage() {
 
   return (
     <main className="platform-shell">
-      <PlatformHud
-        state={state}
-        onRestart={() => setState(restartRun())}
-        onMenu={returnToMenu}
-        tutorialMode={tutorialMode}
-      />
       <PlatformCanvas
         state={state}
         onAim={(x, y) => {
@@ -359,6 +353,12 @@ export function GamePage() {
         selectedInventory={selectedInventory}
         onUseInventory={useSelectedInventory}
       >
+        <PlatformHud
+          state={state}
+          onRestart={() => setState(restartRun())}
+          onMenu={returnToMenu}
+          tutorialMode={tutorialMode}
+        />
         <MobileControls
           flashlights={state.flashlights}
           medkits={state.medkits}

@@ -1,12 +1,10 @@
 .platform-shell {
-  width: min(1280px, 100%);
+  width: 100vw;
   min-height: 100vh;
-  margin: 0 auto;
-  padding: 18px;
-  display: grid;
-  grid-template-columns: 280px minmax(0, 1fr);
-  gap: 18px;
-  align-items: center;
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+  background: #050706;
 }
 
 .auth-screen {
@@ -42,17 +40,21 @@
 
 .platform-canvas {
   width: 100%;
+  height: 100vh;
   aspect-ratio: 1400 / 640;
-  border: 2px solid #596057;
-  border-radius: 8px;
+  border: 0;
+  border-radius: 0;
   background: #111311;
   cursor: crosshair;
   image-rendering: pixelated;
-  box-shadow: 0 24px 90px rgba(0, 0, 0, 0.36);
+  box-shadow: none;
 }
 
 .platform-stage {
   position: relative;
+  width: 100vw;
+  height: 100vh;
+  overflow: hidden;
 }
 
 .platform-stage .platform-canvas {
@@ -200,13 +202,11 @@
 }
 
 .platform-hud {
-  display: grid;
-  gap: 16px;
-  padding: 18px;
-  border: 1px solid #cfc7b3;
-  border-radius: 8px;
-  background: var(--panel);
-  color: var(--ink);
+  position: absolute;
+  inset: 0;
+  z-index: 24;
+  pointer-events: none;
+  color: #fff8dc;
 }
 
 .eyebrow {
@@ -227,9 +227,9 @@ h1 {
 .stamina-shell {
   height: 18px;
   overflow: hidden;
-  border: 2px solid #171817;
+  border: 2px solid rgba(255, 248, 220, 0.85);
   border-radius: 6px;
-  background: #d8d2c2;
+  background: rgba(8, 9, 8, 0.82);
 }
 
 .health-fill,
@@ -246,19 +246,40 @@ h1 {
   background: linear-gradient(90deg, #4aa3ff, #5e8f86);
 }
 
-.platform-stats {
-  display: grid;
-  grid-template-columns: 1fr;
-  gap: 8px;
+.hud-bars,
+.hud-items,
+.hud-menu,
+.game-message {
+  position: absolute;
+  border: 2px solid rgba(255, 248, 220, 0.72);
+  border-radius: 8px;
+  background: rgba(5, 7, 6, 0.74);
+  box-shadow: 0 12px 34px rgba(0, 0, 0, 0.35);
+  backdrop-filter: blur(2px);
+  pointer-events: auto;
 }
 
-.combat-status-card {
+.hud-bars {
+  left: 18px;
+  top: 18px;
+  width: min(360px, calc(100vw - 36px));
   display: grid;
   gap: 8px;
   padding: 12px;
-  border: 1px solid #d5cfbf;
-  border-radius: 8px;
-  background: #fffdf7;
+}
+
+.hud-items {
+  left: 18px;
+  top: 132px;
+  min-width: 190px;
+  display: grid;
+  gap: 6px;
+  padding: 10px;
+}
+
+.hud-items > strong {
+  font-size: 14px;
+  text-transform: uppercase;
 }
 
 .meter-row,
@@ -267,34 +288,27 @@ h1 {
   align-items: center;
   justify-content: space-between;
   gap: 10px;
-  color: #363a35;
+  color: #fff8dc;
   font-size: 14px;
   font-weight: 900;
 }
 
 .resource-row {
   padding-top: 4px;
-  border-top: 1px solid #e4dece;
-}
-
-.platform-stats span,
-.controls-card {
-  border: 1px solid #d5cfbf;
-  border-radius: 8px;
-  background: #fffdf7;
-}
-
-.platform-stats span {
-  padding: 9px 10px;
-  font-size: 14px;
-  font-weight: 800;
+  border-top: 1px solid rgba(255, 248, 220, 0.22);
 }
 
 .game-message {
-  min-height: 50px;
+  left: 50%;
+  bottom: 18px;
+  width: min(620px, calc(100vw - 36px));
+  min-height: 0;
+  padding: 10px 14px;
   margin: 0;
-  color: #363a35;
+  color: #fff8dc;
   line-height: 1.4;
+  text-align: center;
+  transform: translateX(-50%);
 }
 
 .game-message.won,
@@ -303,23 +317,29 @@ h1 {
 }
 
 .game-message.won {
-  color: #2e7566;
+  color: #86f0d9;
 }
 
 .game-message.lost {
-  color: var(--danger);
+  color: #ff8f86;
 }
 
-.controls-card {
-  display: grid;
-  gap: 6px;
-  padding: 12px;
-  color: var(--muted);
-  font-size: 14px;
+.hud-menu {
+  right: 18px;
+  top: 18px;
+  display: flex;
+  gap: 8px;
+  padding: 8px;
 }
 
-.controls-card p {
-  margin: 0;
+.hud-menu button {
+  min-height: 34px;
+  padding: 7px 10px;
+  border: 2px solid rgba(255, 248, 220, 0.8);
+  border-radius: 8px;
+  background: rgba(17, 19, 17, 0.92);
+  color: #fff8dc;
+  font-weight: 900;
 }
 
 .not-found {
@@ -336,15 +356,6 @@ h1 {
 }
 
 @media (max-width: 860px) {
-  .platform-shell {
-    grid-template-columns: 1fr;
-    align-items: start;
-  }
-
-  .platform-hud {
-    order: 2;
-  }
-
   .train-choice-buttons {
     grid-template-columns: 1fr;
     top: 20%;

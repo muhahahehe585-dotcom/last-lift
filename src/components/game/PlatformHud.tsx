@@ -21,13 +21,8 @@ export function PlatformHud({ state, onRestart, onMenu, tutorialMode }: Platform
   const healthWidth = Math.min(100, (state.player.hp / maxHealth) * 100);
 
   return (
-    <aside className="platform-hud">
-      <div>
-        <p className="eyebrow">Last Lift</p>
-        <h1>Floor {state.floor}/100</h1>
-      </div>
-
-      <div className="combat-status-card">
+    <aside className="platform-hud" aria-label="Game status">
+      <div className="hud-bars">
         <div className="meter-row">
           <span>Health</span>
           <strong>{Math.round(state.player.hp)}/{maxHealth}</strong>
@@ -42,69 +37,38 @@ export function PlatformHud({ state, onRestart, onMenu, tutorialMode }: Platform
         <div className="stamina-shell" aria-label="Stamina">
           <div className="stamina-fill" style={{ width: `${state.player.stamina}%` }} />
         </div>
+      </div>
+
+      <div className="hud-items">
+        <strong>Floor {state.floor}/100</strong>
         <div className="resource-row">
-          <span>Flashlights</span>
-          <strong>{state.flashlights}</strong>
+          <span>Power</span>
+          <strong>{state.batteries}/{state.batteriesNeeded}</strong>
         </div>
         <div className="resource-row">
-          <span>Medkits</span>
+          <span>Medkit</span>
           <strong>{state.medkits}</strong>
+        </div>
+        <div className="resource-row">
+          <span>Light</span>
+          <strong>{state.flashlights}</strong>
         </div>
         <div className="resource-row">
           <span>Bullets</span>
           <strong>{bullets}</strong>
         </div>
         <div className="resource-row">
-          <span>Armor</span>
-          <strong>{state.armorCount}</strong>
+          <span>Timer</span>
+          <strong>{timer}</strong>
         </div>
       </div>
 
-      <div className="platform-stats">
-        <span>Power {state.batteries}/{state.batteriesNeeded}</span>
-        <span>Coins {state.coins}</span>
-        <span>Double jump {state.doubleJumpUnlocked ? 'owned' : 'locked'}</span>
-        <span>Stones {state.infinityStones}/6</span>
-        <span>Gauntlet {state.gauntletOwned ? 'owned' : 'locked'}</span>
-        <span>Mode {state.mode}</span>
-        <span>Move {state.player.running ? 'running' : 'walking'}</span>
-        <span>Enemies {state.enemies.length}</span>
-        <span>Timer {timer}</span>
+      <p className={`game-message ${state.status}`}>{tutorialMode ? `Tutorial: ${state.message}` : state.message}</p>
+
+      <div className="hud-menu">
+        <button type="button" onClick={onRestart}>Restart</button>
+        <button type="button" onClick={onMenu}>Menu</button>
       </div>
-
-      <p className={`game-message ${state.status}`}>{state.message}</p>
-      {tutorialMode && (
-        <div className="controls-card">
-          <p>Tutorial: you revive until floor 13 is complete.</p>
-          <p>Real game warning: dying will not revive you.</p>
-          <p>A/D or arrows move. Shift toggles run.</p>
-          <p>Space jumps. Double Space slams. I double jumps.</p>
-          <p>J hits. W inside enemy circle slides behind.</p>
-          <p>E uses doors, rooms, vents, and the roof exit. O leaves rooms.</p>
-          <p>M uses medkit. Q uses flashlight. F shoots. G snaps the gauntlet.</p>
-          <p>0 or Menu returns to the lobby.</p>
-        </div>
-      )}
-
-      <div className="controls-card">
-        <p>A/D or arrows: walk</p>
-        <p>Shift: toggle run</p>
-        <p>W/Up/Space: jump</p>
-        <p>W near enemy circle: dodge</p>
-        <p>Shop upgrade: press I in air to double jump</p>
-        <p>J: hit nearby enemies</p>
-        <p>Double Space in air: slam</p>
-        <p>E near door: enter room</p>
-        <p>Vent floors: E under ceiling hole</p>
-        <p>E inside room: open drawer, O: leave</p>
-        <p>M: use medkit, Q: blind bots, F: shoot guard</p>
-        <p>Boss: G uses full gauntlet</p>
-        <p>Train guard: F bullet, J health, E duel</p>
-        <p>Duel: Space focus, mouse/trackpad aim, F mark</p>
-      </div>
-
-      <button type="button" onClick={onRestart}>Restart</button>
-      <button type="button" onClick={onMenu}>Menu (0)</button>
     </aside>
   );
 }
