@@ -35,12 +35,12 @@ export function collectItems(state: PlatformGameState) {
 }
 
 const ventPlatforms = [
-  { x: 350, y: floorY - 78, width: 230, height: 24 },
-  { x: 680, y: floorY - 136, width: 230, height: 24 },
-  { x: 1035, y: floorY - 96, width: 235, height: 24 },
-  { x: 1395, y: floorY - 154, width: 235, height: 24 },
-  { x: 1740, y: floorY - 92, width: 245, height: 24 },
-  { x: 2055, y: floorY - 34, width: 315, height: 24 },
+  { x: 330, y: floorY - 78, width: 260, height: 34 },
+  { x: 655, y: floorY - 136, width: 270, height: 34 },
+  { x: 1010, y: floorY - 96, width: 280, height: 34 },
+  { x: 1370, y: floorY - 154, width: 280, height: 34 },
+  { x: 1715, y: floorY - 92, width: 290, height: 34 },
+  { x: 2040, y: floorY - 34, width: 330, height: 34 },
 ];
 
 const ventGaps = [

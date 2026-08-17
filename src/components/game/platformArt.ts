@@ -121,7 +121,7 @@ function drawWoodFloor(ctx: CanvasRenderingContext2D, state: PlatformGameState) 
 }
 
 export function drawDarkness(ctx: CanvasRenderingContext2D, state: PlatformGameState, cameraX: number) {
-  if (state.floor === finalFloor) return;
+  if (state.floor === finalFloor || state.inVent) return;
   const x = state.player.x - cameraX + state.player.width / 2;
   const y = state.player.y + state.player.height / 2;
   const outer = state.mode === 'blackout' ? 170 : state.mode === 'supply' ? 520 : 330;

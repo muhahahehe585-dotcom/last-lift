@@ -11,27 +11,39 @@ function px(ctx: CanvasRenderingContext2D, color: string, x: number, y: number, 
 }
 
 export function drawVentWorld(ctx: CanvasRenderingContext2D, state: PlatformGameState) {
-  drawVentBackground(ctx);
+  drawVentShell(ctx);
+  drawVentSprites(ctx);
   drawVentWalkway(ctx);
   drawVentGaps(ctx, state);
   drawVentPlatforms(ctx, state);
   drawExitVent(ctx);
 }
 
-function drawVentBackground(ctx: CanvasRenderingContext2D) {
-  if (!ventBackground.complete || ventBackground.naturalWidth === 0) {
-    px(ctx, '#070807', 0, 0, worldWidth, worldHeight);
-    return;
+function drawVentShell(ctx: CanvasRenderingContext2D) {
+  px(ctx, '#101412', 0, 0, worldWidth, worldHeight);
+  for (let x = 0; x < worldWidth; x += 96) {
+    px(ctx, x % 192 ? '#18201c' : '#202923', x, 52, 72, 360);
+    px(ctx, '#07100d', x + 70, 52, 8, 360);
   }
-  ctx.drawImage(ventBackground, 0, 0, worldWidth, worldHeight);
-  ctx.fillStyle = 'rgba(3, 7, 6, 0.18)';
-  ctx.fillRect(0, 0, worldWidth, worldHeight);
+}
+
+function drawVentSprites(ctx: CanvasRenderingContext2D) {
+  if (!ventBackground.complete || ventBackground.naturalWidth === 0) return;
+  drawSprite(ctx, 245, 80, 328, 310, 60, 72, 470, 318);
+  drawSprite(ctx, 660, 108, 360, 310, 690, 78, 520, 340);
+  drawSprite(ctx, 1080, 280, 250, 250, 1680, 130, 360, 300);
+  drawSprite(ctx, 0, 405, 410, 145, 0, floorY - 122, 420, 150);
+  drawSprite(ctx, 1030, 385, 300, 130, 1950, floorY - 116, 390, 160);
+}
+
+function drawSprite(ctx: CanvasRenderingContext2D, sx: number, sy: number, sw: number, sh: number, x: number, y: number, w: number, h: number) {
+  ctx.drawImage(ventBackground, sx, sy, sw, sh, x, y, w, h);
 }
 
 function drawVentWalkway(ctx: CanvasRenderingContext2D) {
-  px(ctx, 'rgba(7, 8, 7, 0.72)', 0, floorY - 38, worldWidth, 86);
+  px(ctx, '#111916', 0, floorY - 38, worldWidth, 86);
   for (let x = 0; x < worldWidth; x += 86) {
-    px(ctx, x % 172 ? 'rgba(52, 58, 59, 0.78)' : 'rgba(89, 96, 87, 0.72)', x, floorY - 58, 54, 8);
+    px(ctx, x % 172 ? '#343c39' : '#596057', x, floorY - 58, 54, 8);
   }
 }
 
@@ -45,9 +57,13 @@ function drawVentGaps(ctx: CanvasRenderingContext2D, state: PlatformGameState) {
 
 function drawVentPlatforms(ctx: CanvasRenderingContext2D, state: PlatformGameState) {
   state.boxes.forEach((box) => {
-    px(ctx, '#1d2926', box.x, box.y, box.width, box.height);
-    px(ctx, '#596057', box.x + 8, box.y + 4, box.width - 16, 5);
-    px(ctx, '#0a0f0d', box.x, box.y + box.height - 5, box.width, 5);
+    if (ventBackground.complete && ventBackground.naturalWidth > 0) {
+      drawSprite(ctx, 1035, 394, 280, 86, box.x, box.y - 10, box.width, box.height + 26);
+    } else {
+      px(ctx, '#1d2926', box.x, box.y, box.width, box.height);
+    }
+    px(ctx, '#91d5c8', box.x, box.y, box.width, 4);
+    px(ctx, 'rgba(145, 213, 200, 0.24)', box.x, box.y, box.width, box.height);
   });
 }
 

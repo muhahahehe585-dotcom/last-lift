@@ -84,7 +84,7 @@ function updateVentMonster(state: PlatformGameState, enemy: Enemy, dt: number) {
     const x = closeToFight ? Math.max(enemy.patrolLeft, Math.min(enemy.patrolRight, enemy.x + direction * 120 * dt)) : enemy.x;
     return { ...enemy, x, y: floorY - 132, width: 178, height: 132, vx: closeToFight ? direction * 120 : 0 };
   }
-  const targetX = state.player.x - 18;
+  const targetX = state.player.x - 128;
   const nextX = Math.min(targetX, enemy.x + Math.abs(enemy.vx) * dt);
   return { ...enemy, x: nextX, y: floorY - 112, width: 150, height: 112, vx: Math.abs(enemy.vx) };
 }
