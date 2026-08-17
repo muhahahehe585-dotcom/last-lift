@@ -1,5 +1,5 @@
 import { overlaps } from './platformGeometry';
-import { finalVentMonsterFor, floorY, ventMonsterFor } from './platformLevel';
+import { floorY, ventMonsterFor } from './platformLevel';
 import type { InputState, ItemKind, PlatformGameState } from './platformTypes';
 
 function randomGunBullets() {
@@ -64,7 +64,7 @@ export function enterVentRoute(state: PlatformGameState, message = 'Vent chase. 
   return {
     ...state,
     inVent: true,
-    enemies: [ventMonsterFor(state.floor), finalVentMonsterFor(state.floor)],
+    enemies: [ventMonsterFor(state.floor)],
     items: ventBatteries,
     boxes: ventPlatforms,
     holes: ventGaps,

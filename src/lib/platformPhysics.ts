@@ -1,4 +1,4 @@
-import { bossEscapeDoor, createLevel, finalFloor, floorY, rageFire, worldWidth } from './platformLevel';
+import { bossEscapeDoor, createLevel, finalFloor, finalVentMonsterFor, floorY, rageFire, worldWidth } from './platformLevel';
 import { overlaps } from './platformGeometry';
 import { hitPlayer, normalHit, slamEnemies, updateEnemies } from './platformCombat';
 import { applyEventDamage } from './platformHazards';
@@ -52,12 +52,29 @@ function tryTrainGuard(state: PlatformGameState) {
 
 function tryVentBossFight(state: PlatformGameState) {
   if (!state.inVent) return state;
+  const chaserAlive = state.enemies.some((enemy) => enemy.id.startsWith('vent-chaser'));
+  if (chaserAlive) return state;
   const finalAlive = state.enemies.some((enemy) => enemy.id.startsWith('vent-final'));
   if (finalAlive) return state;
   awardFloorCoin();
   return {
     ...createLevel(finalFloor, state.player.hp, getCarry(state)),
     message: 'The final vent monster is dead. The boss fight is straight ahead.',
+  };
+}
+
+function tryVentHallwayBoss(state: PlatformGameState) {
+  if (!state.inVent || state.player.x < 1960) return state;
+  const hasChaser = state.enemies.some((enemy) => enemy.id.startsWith('vent-chaser'));
+  const hasFinal = state.enemies.some((enemy) => enemy.id.startsWith('vent-final'));
+  if (!hasChaser || hasFinal) return state;
+  return {
+    ...state,
+    enemies: [
+      ...state.enemies.filter((enemy) => !enemy.id.startsWith('vent-chaser')),
+      finalVentMonsterFor(state.floor),
+    ],
+    message: 'The chase monster crashes behind you. Boss fight.',
   };
 }
 
@@ -232,8 +249,9 @@ export function updatePlatformGame(state: PlatformGameState, input: InputState, 
     if (next.status !== 'playing') return next;
   }
   if (wasAirSlamming && player.grounded) next = slamEnemies(next);
+  next = tryVentHallwayBoss(next);
   const touchingEnemy = next.enemies.find((enemy) => overlaps(next.player, enemy));
-  if (next.inVent && touchingEnemy?.kind === 'vent-monster' && touchingEnemy.wakeDelay <= 0) {
+  if (next.inVent && touchingEnemy?.id.startsWith('vent-chaser') && touchingEnemy.wakeDelay <= 0) {
     return { ...next, status: 'lost', deathCause: 'bot', player: { ...next.player, hp: 0 }, message: 'The vent monster caught you.' };
   }
   if (touchingEnemy?.kind === 'sea-monster') {
