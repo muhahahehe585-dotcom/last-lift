@@ -28,17 +28,19 @@ export function drawDroneSprite(ctx: CanvasRenderingContext2D, enemy: Enemy) {
 export function drawBulletSprite(ctx: CanvasRenderingContext2D, trail: Rect) {
   if (!sheet.complete || sheet.naturalWidth === 0) return false;
   const frame = cleanFrame(bulletFrame, 'bullet');
+  const progress = 'progress' in trail && typeof trail.progress === 'number' ? trail.progress : 1;
+  const currentX = trail.x + trail.width * progress;
+  const currentY = trail.y + trail.height * progress;
   const facing = trail.width >= 0 ? 1 : -1;
   const width = Math.min(108, Math.max(54, Math.abs(trail.width) * 0.24));
   const height = (bulletFrame.height / bulletFrame.width) * width;
-  const endX = trail.x + trail.width;
   ctx.save();
   if (facing < 0) {
-    ctx.translate(endX + width / 2, trail.y);
+    ctx.translate(currentX + width / 2, currentY);
     ctx.scale(-1, 1);
     ctx.drawImage(frame, -width / 2, -height / 2, width, height);
   } else {
-    ctx.drawImage(frame, endX - width, trail.y - height / 2, width, height);
+    ctx.drawImage(frame, currentX - width, currentY - height / 2, width, height);
   }
   ctx.restore();
   return true;

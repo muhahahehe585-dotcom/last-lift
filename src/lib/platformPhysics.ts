@@ -237,11 +237,11 @@ export function updatePlatformGame(state: PlatformGameState, input: InputState, 
   }
 
   const blinded = state.botBlindTime > 0;
-  const bulletTrail = state.bulletTrail ? { ...state.bulletTrail, height: state.bulletTrail.height - dt } : null;
+  const bulletTrail = updateBulletTrail(state, dt);
   let next = collectItems({
     ...state,
     player,
-    bulletTrail: bulletTrail && bulletTrail.height > 0 ? bulletTrail : null,
+    bulletTrail,
     meteorites: updateMeteorites(state, dt),
     botBlindTime: Math.max(0, state.botBlindTime - dt),
     enemies: updateEnemies({ ...state, player }, dt, blinded),
@@ -251,13 +251,26 @@ export function updatePlatformGame(state: PlatformGameState, input: InputState, 
   next = applyEventDamage(next, dt);
   if (next.status !== 'playing') return next;
   const shootingDrone = next.enemies.find((enemy) => enemy.kind === 'drone' && Math.abs(enemy.x - next.player.x) < 220 && Math.abs(enemy.y - next.player.y) < 95);
-  if (shootingDrone) {
+  if (shootingDrone && !next.bulletTrail) {
     next = {
       ...next,
-      bulletTrail: { x: shootingDrone.x + shootingDrone.width / 2, y: shootingDrone.y + 18, width: next.player.x - shootingDrone.x, height: 0.12 },
+      bulletTrail: {
+        x: shootingDrone.x + shootingDrone.width / 2,
+        y: shootingDrone.y + 18,
+        width: next.player.x + next.player.width / 2 - (shootingDrone.x + shootingDrone.width / 2),
+        height: next.player.y + next.player.height / 2 - (shootingDrone.y + 18),
+        targetX: next.player.x + next.player.width / 2,
+        targetY: next.player.y + next.player.height / 2,
+        progress: 0,
+        damage: 4,
+      },
     };
-    next = hitPlayer(next, 4, 'Drone shot you.', 'drone');
-    next = { ...next, player: { ...next.player, hurtCooldown: Math.max(next.player.hurtCooldown, 2) } };
+    next = { ...next, enemies: next.enemies.map((enemy) => (enemy.id === shootingDrone.id ? { ...enemy, attackPulse: 0.34 } : enemy)) };
+    if (next.status !== 'playing') return next;
+  }
+  if (next.bulletTrail?.damage && (next.bulletTrail.progress ?? 0) >= 1) {
+    next = hitPlayer(next, next.bulletTrail.damage, 'Drone shot you.', 'drone');
+    next = { ...next, bulletTrail: null, player: { ...next.player, hurtCooldown: Math.max(next.player.hurtCooldown, 1.2) } };
     if (next.status !== 'playing') return next;
   }
   if (wasAirSlamming && player.grounded) next = slamEnemies(next);
@@ -294,6 +307,17 @@ function damagePlayerPerSecond(state: PlatformGameState, damagePerSecond: number
     deathCause: hp <= 0 ? cause : state.deathCause,
     message,
   };
+}
+
+function updateBulletTrail(state: PlatformGameState, dt: number) {
+  const trail = state.bulletTrail;
+  if (!trail) return null;
+  if (trail.damage) {
+    const progress = Math.min(1, (trail.progress ?? 0) + dt * 5.2);
+    return { ...trail, progress };
+  }
+  const height = trail.height - dt;
+  return height > 0 ? { ...trail, height } : null;
 }
 
 function startEnemyAttack(state: PlatformGameState, enemyId: string) {

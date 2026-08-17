@@ -145,10 +145,14 @@ function shootEnemy(state: PlatformGameState, input: InputState) {
   const loaded = state.revolverLoaded > 0 ? state.revolverLoaded : Math.min(6, state.unlimitedGun ? 6 : state.shots);
   if (loaded < 1) return { ...state, reloadTimer: 0.85, message: 'Revolver reloading.' };
   const bulletRange = 520;
-  const bulletY = state.player.y + 28;
   const bulletStart = state.player.x + state.player.width / 2;
   const facing = input.aimX === null ? (state.inVent ? 1 : state.player.facing) : input.aimX >= bulletStart ? 1 : -1;
   const bulletEnd = bulletStart + facing * bulletRange;
+  const droneTarget = state.enemies
+    .filter((enemy) => enemy.kind === 'drone')
+    .filter((enemy) => (facing === 1 ? enemy.x >= bulletStart && enemy.x <= bulletEnd : enemy.x + enemy.width <= bulletStart && enemy.x + enemy.width >= bulletEnd))
+    .sort((a, b) => Math.abs(a.x - bulletStart) - Math.abs(b.x - bulletStart))[0];
+  const bulletY = input.aimY ?? (droneTarget ? droneTarget.y + droneTarget.height / 2 : state.player.y + 28);
   const trail = {
     x: bulletStart,
     y: bulletY,

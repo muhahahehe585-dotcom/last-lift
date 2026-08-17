@@ -12,6 +12,13 @@ export type Rect = {
   height: number;
 };
 
+export type BulletTrail = Rect & {
+  progress?: number;
+  targetX?: number;
+  targetY?: number;
+  damage?: number;
+};
+
 export type Player = Rect & {
   vx: number;
   vy: number;
@@ -86,7 +93,7 @@ export type PlatformGameState = {
   revolverLoaded: number;
   reloadTimer: number;
   unlimitedGun: boolean;
-  bulletTrail: Rect | null;
+  bulletTrail: BulletTrail | null;
   meteorites: Rect[];
   grabbedMeteor: Rect | null;
   duel: DuelState | null;
