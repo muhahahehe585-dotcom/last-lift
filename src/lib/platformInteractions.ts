@@ -40,7 +40,8 @@ const ventPlatforms = [
   { x: 1010, y: floorY - 96, width: 280, height: 34 },
   { x: 1370, y: floorY - 154, width: 280, height: 34 },
   { x: 1715, y: floorY - 92, width: 290, height: 34 },
-  { x: 2040, y: floorY - 34, width: 330, height: 34 },
+  { x: 2030, y: floorY - 104, width: 340, height: 34 },
+  { x: 1975, y: floorY - 34, width: 410, height: 34 },
 ];
 
 const ventGaps = [

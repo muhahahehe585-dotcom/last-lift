@@ -58,8 +58,10 @@ function tryVentBossFight(state: PlatformGameState) {
   if (finalAlive) return state;
   awardFloorCoin();
   return {
-    ...createLevel(finalFloor, state.player.hp, getCarry(state)),
-    message: 'The final vent monster is dead. The boss fight is straight ahead.',
+    ...state,
+    status: 'won' as const,
+    ending: 'sunset' as const,
+    message: 'Vent boss defeated. Sunset ending unlocked.',
   };
 }
 
