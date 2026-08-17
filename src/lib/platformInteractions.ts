@@ -39,7 +39,7 @@ export function enterVentRoute(state: PlatformGameState, message = 'You crawled 
     enemies: [ventMonsterFor(state.floor)],
     nest: { x: 1120, y: floorY - 92, width: 120, height: 92 },
     nestHp: 5,
-    player: { ...state.player, x: 80, y: floorY - 104, height: 44, grounded: true },
+    player: { ...state.player, x: 80, y: floorY - 72, height: 72, grounded: true },
     message,
   };
 }

@@ -155,7 +155,8 @@ export function updatePlatformGame(state: PlatformGameState, input: InputState, 
   player.x = Math.max(0, Math.min(worldWidth - player.width, player.x + player.vx * dt));
   player.y += player.vy * dt;
   if (state.inVent) {
-    player.y = floorY - 104;
+    player.height = 72;
+    player.y = floorY - player.height;
     player.vy = 0;
     player.grounded = true;
     player.isSlamming = false;
@@ -410,9 +411,9 @@ function updateVentSpawns(state: PlatformGameState, dt: number) {
     id: `vent-spawn-${Date.now()}`,
     kind: 'vent-monster' as const,
     x,
-    y: floorY - 102,
-    width: 78,
-    height: 52,
+    y: floorY - 112,
+    width: 150,
+    height: 112,
     hp: 8,
     vx: -70,
     patrolLeft: Math.max(state.player.x + 120, x - 260),

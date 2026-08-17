@@ -11,26 +11,16 @@ function px(ctx: CanvasRenderingContext2D, color: string, x: number, y: number, 
 }
 
 export function drawVentWorld(ctx: CanvasRenderingContext2D, state: PlatformGameState) {
-  if (ventBackground.complete && ventBackground.naturalWidth > 0) {
-    drawVentBackground(ctx);
-    drawVentWalkway(ctx);
-    drawNest(ctx, state);
-    return;
-  }
-  px(ctx, '#070807', 0, 0, worldWidth, worldHeight);
-  px(ctx, '#101211', 0, floorY - 120, worldWidth, 36);
-  px(ctx, '#1b1d1c', 0, floorY - 104, worldWidth, 48);
-  px(ctx, '#343a3b', 0, floorY - 120, worldWidth, 16);
-  px(ctx, '#343a3b', 0, floorY - 56, worldWidth, 16);
-  px(ctx, '#070807', 0, floorY - 40, worldWidth, 82);
-  for (let x = 0; x < worldWidth; x += 72) {
-    px(ctx, x % 144 ? '#596057' : '#3c4542', x, floorY - 104, 8, 48);
-    px(ctx, '#252a2b', x + 18, floorY - 92, 32, 5);
-  }
+  drawVentBackground(ctx);
+  drawVentWalkway(ctx);
   drawNest(ctx, state);
 }
 
 function drawVentBackground(ctx: CanvasRenderingContext2D) {
+  if (!ventBackground.complete || ventBackground.naturalWidth === 0) {
+    px(ctx, '#070807', 0, 0, worldWidth, worldHeight);
+    return;
+  }
   ctx.drawImage(ventBackground, 0, 0, worldWidth, worldHeight);
   ctx.fillStyle = 'rgba(3, 7, 6, 0.18)';
   ctx.fillRect(0, 0, worldWidth, worldHeight);

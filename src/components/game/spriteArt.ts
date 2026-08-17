@@ -12,7 +12,6 @@ function px(ctx: CanvasRenderingContext2D, color: string, x: number, y: number, 
 
 export function drawPlayer(ctx: CanvasRenderingContext2D, state: PlatformGameState) {
   const p = state.player;
-  if (state.inVent) return drawCrawlingPlayer(ctx, state);
   if (drawSpritePlayer(ctx, state)) return;
   const walk = Math.abs(p.vx) > 5 ? Math.sin(p.x / (p.running ? 6 : 9)) : 0;
   px(ctx, '#2a1812', p.x + 6, p.y - 4, 22, 9);
@@ -33,19 +32,6 @@ export function drawPlayer(ctx: CanvasRenderingContext2D, state: PlatformGameSta
     ctx.lineWidth = 6;
     ctx.strokeRect(p.x + p.width / 2 - radius, floorY - 18, radius * 2, 34);
   }
-}
-
-function drawCrawlingPlayer(ctx: CanvasRenderingContext2D, state: PlatformGameState) {
-  const p = state.player;
-  const crawl = Math.abs(p.vx) > 5 ? Math.sin(p.x / 7) : 0;
-  px(ctx, '#2a1812', p.x + 3, p.y - 6, 24, 8);
-  px(ctx, '#f1c08b', p.x + 7, p.y + 2, 22, 18);
-  px(ctx, '#111311', p.x + (p.facing === 1 ? 24 : 10), p.y + 10, 4, 4);
-  px(ctx, '#5e8f86', p.x + 14, p.y + 17, 10, 3);
-  px(ctx, '#365f88', p.x + 28, p.y + 12, 44, 20);
-  px(ctx, '#1b2632', p.x + 48, p.y + 26, 32, 12);
-  px(ctx, '#f1c08b', p.x + 30 + crawl * 5, p.y + 30, 22, 8);
-  px(ctx, '#f1c08b', p.x + 63 - crawl * 5, p.y + 30, 22, 8);
 }
 
 export function drawEnemy(ctx: CanvasRenderingContext2D, enemy: Enemy) {

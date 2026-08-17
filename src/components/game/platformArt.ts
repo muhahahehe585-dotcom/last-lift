@@ -61,18 +61,10 @@ function drawCeiling(ctx: CanvasRenderingContext2D) {
 
 function drawVentRoute(ctx: CanvasRenderingContext2D, state: PlatformGameState) {
   if (state.ventHole) {
-    px(ctx, '#050605', state.ventHole.x, state.ventHole.y, state.ventHole.width, state.ventHole.height);
-    px(ctx, '#596057', state.ventHole.x + 8, state.ventHole.y + 8, state.ventHole.width - 16, 6);
-    px(ctx, '#596057', state.ventHole.x + 8, state.ventHole.y + 22, state.ventHole.width - 16, 6);
-    drawVentLadder(ctx, state.ventHole.x + state.ventHole.width / 2 - 18);
-  }
-}
-
-function drawVentLadder(ctx: CanvasRenderingContext2D, x: number) {
-  px(ctx, '#6f543b', x, 108, 8, floorY - 108);
-  px(ctx, '#6f543b', x + 30, 108, 8, floorY - 108);
-  for (let y = 126; y < floorY - 16; y += 34) {
-    px(ctx, '#9a744c', x, y, 38, 8);
+    px(ctx, '#030504', state.ventHole.x - 14, state.ventHole.y - 10, state.ventHole.width + 28, state.ventHole.height + 20);
+    px(ctx, '#1c2823', state.ventHole.x - 4, state.ventHole.y - 2, state.ventHole.width + 8, state.ventHole.height + 4);
+    px(ctx, '#050807', state.ventHole.x + 8, state.ventHole.y + 6, state.ventHole.width - 16, state.ventHole.height - 12);
+    px(ctx, 'rgba(94, 143, 134, 0.45)', state.ventHole.x + 12, state.ventHole.y + 10, state.ventHole.width - 24, 4);
   }
 }
 
