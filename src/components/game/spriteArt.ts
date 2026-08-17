@@ -3,6 +3,7 @@ import type { Enemy, Item, PlatformGameState } from '../../lib/platformTypes';
 import { drawBoss } from './bossArt';
 import { drawBrokenBotSprite } from './brokenBotArt';
 import { drawSpritePlayer } from './playerSprite';
+import { drawVentMonsterSprite } from './ventMonsterArt';
 
 function px(ctx: CanvasRenderingContext2D, color: string, x: number, y: number, w: number, h: number) {
   ctx.fillStyle = color;
@@ -99,6 +100,7 @@ function drawSeaMonster(ctx: CanvasRenderingContext2D, enemy: Enemy) {
 }
 
 function drawVentMonster(ctx: CanvasRenderingContext2D, enemy: Enemy) {
+  if (drawVentMonsterSprite(ctx, enemy)) return;
   px(ctx, '#dfe6df', enemy.x + 8, enemy.y + 18, enemy.width - 12, 26);
   px(ctx, '#f4f8ff', enemy.x + 18, enemy.y, 42, 30);
   px(ctx, '#0a0b0a', enemy.x + 26, enemy.y + 9, 8, 10);
