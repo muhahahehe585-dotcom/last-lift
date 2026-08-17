@@ -3,6 +3,10 @@ import { floorY, ventMonsterFor } from './platformLevel';
 import { damageNest } from './platformNest';
 import type { InputState, ItemKind, PlatformGameState } from './platformTypes';
 
+function randomGunBullets() {
+  return 3 + Math.floor(Math.random() * 6);
+}
+
 function grantLoot(state: PlatformGameState, loot: ItemKind) {
   if (loot === 'battery') {
     return {
@@ -12,7 +16,7 @@ function grantLoot(state: PlatformGameState, loot: ItemKind) {
     };
   }
   if (loot === 'flashlight') return { ...state, flashlights: state.flashlights + 1 };
-  if (loot === 'gun') return { ...state, hasGun: true, shots: state.shots + 3 };
+  if (loot === 'gun') return { ...state, hasGun: true, shots: state.shots + randomGunBullets() };
   if (loot === 'stone') return { ...state, infinityStones: Math.min(6, state.infinityStones + 1) };
   return { ...state, medkits: state.medkits + 1 };
 }
