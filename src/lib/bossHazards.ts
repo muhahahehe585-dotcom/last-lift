@@ -1,3 +1,4 @@
+import { groundClawRects } from './bossHazardLayout';
 import { overlaps } from './platformGeometry';
 import { finalFloor, floorY, worldWidth } from './platformLevel';
 import { hitPlayer } from './platformCombat';
@@ -14,20 +15,10 @@ export function updateBossHazards(state: PlatformGameState, dt: number): Platfor
 }
 
 function updateBossClaw(state: PlatformGameState, dt: number): PlatformGameState {
-  const wasActive = state.bossClawTimer > 1.7;
-  let bossClawTimer = state.bossClawTimer - dt;
-  let bossClawX = state.bossClawX;
-  if (bossClawTimer <= 0) {
-    bossClawTimer = 2.35;
-    bossClawX = Math.max(180, Math.min(worldWidth - 220, state.player.x + state.player.width / 2 - 62));
-  }
-  let next = { ...state, bossClawTimer, bossClawX };
-  const active = bossClawTimer > 1.7 && bossClawTimer <= 2.25;
-  const clawRect = { x: bossClawX + 14, y: floorY - 90, width: 98, height: 90 };
-  if (active && wasActive && next.player.grounded && overlaps(next.player, clawRect)) {
-    next = hitPlayer(next, 18, 'Claws burst from the ground.', 'boss');
-  }
-  return next;
+  const bossClawTimer = Math.max(0, state.bossClawTimer - dt);
+  const touchingClaw = state.player.grounded && groundClawRects.some((claw) => overlaps(state.player, claw));
+  const next = { ...state, bossClawTimer };
+  return touchingClaw ? hitPlayer(next, 18, 'The ground claws ripped into you.', 'boss') : next;
 }
 
 function updateBossLightning(state: PlatformGameState, dt: number): PlatformGameState {

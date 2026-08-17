@@ -3,19 +3,19 @@ import type { Enemy, Rect } from './platformTypes';
 
 export function bossHeadSpot(enemy: Enemy): Rect {
   return {
-    x: enemy.x - 900,
-    y: enemy.y - 14,
-    width: 168,
-    height: 136,
+    x: enemy.x - 1088,
+    y: enemy.y - 44,
+    width: 248,
+    height: 188,
   };
 }
 
 export function bossTailSpot(enemy: Enemy): Rect {
   return {
-    x: enemy.x + 74,
-    y: enemy.y + 132,
-    width: 205,
-    height: 62,
+    x: enemy.x - 18,
+    y: enemy.y + 124,
+    width: 330,
+    height: 84,
   };
 }
 
