@@ -26,7 +26,7 @@ export function drawVentMonsterSprite(ctx: CanvasRenderingContext2D, enemy: Enem
   if (!sheet.complete || sheet.naturalWidth === 0) return false;
   const source = runFrames[Math.abs(Math.floor(enemy.x / 24)) % runFrames.length];
   const frame = cleanFrame(source);
-  const height = 168;
+  const height = enemy.id.startsWith('vent-final') ? 220 : 178;
   const width = (source.width / source.height) * height;
   const x = enemy.x + enemy.width / 2 - width / 2;
   const y = enemy.y + enemy.height - height;

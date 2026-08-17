@@ -4,7 +4,7 @@ import { boxesFor, holesFor } from './platformObstacles';
 import { getArmor, getCoins, hasDoubleJump, hasInfinityGauntlet } from './progress';
 
 export const worldWidth = 2400;
-export const viewWidth = 1200;
+export const viewWidth = 1400;
 export const worldHeight = 640;
 export const floorY = 520;
 export const finalFloor = 100;
@@ -16,6 +16,8 @@ type LevelCarry = {
   medkits?: number;
   hasGun?: boolean;
   shots?: number;
+  revolverLoaded?: number;
+  reloadTimer?: number;
   unlimitedGun?: boolean;
   infinityStones?: number;
   stamina?: number;
@@ -65,16 +67,33 @@ function seaMonsterFor(floor: number): Enemy {
 
 export function ventMonsterFor(floor: number): Enemy {
   return {
-    id: `vent-monster-${floor}`,
+    id: `vent-chaser-${floor}`,
     kind: 'vent-monster',
-    x: 1420,
+    x: -180,
     y: floorY - 112,
     width: 150,
     height: 112,
-    hp: 8,
-    vx: 70,
-    patrolLeft: 1180,
-    patrolRight: 1780,
+    hp: 999,
+    vx: 430,
+    patrolLeft: -220,
+    patrolRight: 1700,
+    wakeDelay: 0,
+    attackPulse: 0,
+  };
+}
+
+export function finalVentMonsterFor(floor: number): Enemy {
+  return {
+    id: `vent-final-${floor}`,
+    kind: 'vent-monster',
+    x: 2100,
+    y: floorY - 132,
+    width: 178,
+    height: 132,
+    hp: 20,
+    vx: 0,
+    patrolLeft: 1980,
+    patrolRight: 2280,
     wakeDelay: 0,
     attackPulse: 0,
   };
@@ -210,6 +229,8 @@ export function createLevel(floor: number, hp = 100, carry: LevelCarry = {}): Pl
     eventDamageCooldown: 0,
     hasGun: mode === 'train' ? true : carry.hasGun ?? false,
     shots: mode === 'train' ? Math.max(carry.shots ?? 0, 6) : carry.shots ?? 0,
+    revolverLoaded: carry.revolverLoaded ?? Math.min(6, mode === 'train' ? Math.max(carry.shots ?? 0, 6) : carry.shots ?? 0),
+    reloadTimer: carry.reloadTimer ?? 0,
     unlimitedGun: carry.unlimitedGun ?? false,
     bulletTrail: null,
     meteorites: meteoritesFor(floor),

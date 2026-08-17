@@ -10,7 +10,6 @@ import { awardCoins, awardFloorCoin } from './progress';
 const gravity = 1700;
 const moveSpeed = 250;
 const runSpeed = 390;
-const crawlSpeed = 145;
 const staminaDrain = 24;
 const staminaRecover = 9;
 const jumpPower = 680;
@@ -51,9 +50,15 @@ function tryTrainGuard(state: PlatformGameState) {
   });
 }
 
-function tryVentNest(state: PlatformGameState) {
-  if (!state.inVent || !state.nest) return state;
-  return state.nestHp <= 0 ? { ...state, status: 'won' as const, ending: 'sunset' as const, message: 'Vent ending found. You saved the whole world.' } : state;
+function tryVentBossFight(state: PlatformGameState) {
+  if (!state.inVent) return state;
+  const finalAlive = state.enemies.some((enemy) => enemy.id.startsWith('vent-final'));
+  if (finalAlive) return state;
+  awardFloorCoin();
+  return {
+    ...createLevel(finalFloor, state.player.hp, getCarry(state)),
+    message: 'The final vent monster is dead. The boss fight is straight ahead.',
+  };
 }
 
 function tryTurnedBackDoor(state: PlatformGameState, player: PlatformGameState['player']) {
@@ -75,6 +80,8 @@ function getCarry(state: PlatformGameState) {
     medkits: state.medkits,
     hasGun: state.hasGun,
     shots: state.shots,
+    revolverLoaded: state.revolverLoaded,
+    reloadTimer: state.reloadTimer,
     unlimitedGun: state.unlimitedGun,
     infinityStones: state.infinityStones,
     stamina: state.player.stamina,
@@ -111,6 +118,7 @@ function trySecretFloorOneHoles(state: PlatformGameState, player: PlatformGameSt
 export function updatePlatformGame(state: PlatformGameState, input: InputState, dt: number): PlatformGameState {
   if (state.status === 'lost') return { ...state, deathTimer: state.deathTimer + dt };
   if (state.status !== 'playing') return state;
+  state = updateGunReload(state, dt);
   if (state.rageJumpTimer > 0) return updateRageJump(state, dt);
   if (state.meteorThrowTimer > 0) return updateMeteorThrow(state, dt);
   if (state.gauntletSnapTimer > 0) return updateGauntletSnap(state, dt);
@@ -127,15 +135,15 @@ export function updatePlatformGame(state: PlatformGameState, input: InputState, 
   if (actionState !== state || state.currentRoom) return actionState;
   if (input.hitPressed) return normalHit(state);
 
-  let running = state.inVent ? false : input.runPressed ? !state.player.running : state.player.running;
+  let running = state.inVent ? true : input.runPressed ? !state.player.running : state.player.running;
   let stamina = state.player.stamina;
   if (running && (input.left || input.right)) stamina = Math.max(0, stamina - staminaDrain * dt);
   if (!running) stamina = Math.min(100, stamina + staminaRecover * dt);
   if (stamina <= 0) running = false;
-  const speed = state.inVent ? crawlSpeed : running ? runSpeed : moveSpeed;
+  const speed = running ? runSpeed : moveSpeed;
   const vx = input.left ? -speed : input.right ? speed : 0;
-  const canDoubleJump = !state.inVent && state.doubleJumpUnlocked && !state.player.grounded && !state.player.doubleJumpUsed;
-  const wantsGroundJump = !state.inVent && input.jumpPressed && state.player.grounded;
+  const canDoubleJump = state.doubleJumpUnlocked && !state.player.grounded && !state.player.doubleJumpUsed;
+  const wantsGroundJump = input.jumpPressed && state.player.grounded;
   const wantsDoubleJump = input.doubleJumpPressed && canDoubleJump;
   const wantsJump = wantsGroundJump || wantsDoubleJump;
   const jump = wantsJump ? -jumpPower : state.player.vy;
@@ -156,10 +164,6 @@ export function updatePlatformGame(state: PlatformGameState, input: InputState, 
   player.y += player.vy * dt;
   if (state.inVent) {
     player.height = 72;
-    player.y = floorY - player.height;
-    player.vy = 0;
-    player.grounded = true;
-    player.isSlamming = false;
   }
   player.slamCooldown = Math.max(0, player.slamCooldown - dt);
   player.slamPulse = Math.max(0, player.slamPulse - dt);
@@ -176,13 +180,13 @@ export function updatePlatformGame(state: PlatformGameState, input: InputState, 
   const secretHole = trySecretFloorOneHoles(state, player);
   if (secretHole) return secretHole;
 
-  if (!state.inVent && player.y > floorY + 130) {
+  if (player.y > floorY + 130) {
     return {
       ...state,
       player: { ...player, hp: 0 },
       status: 'lost',
       deathCause: 'fall',
-      message: 'You fell through the broken hotel floor.',
+      message: state.inVent ? 'The vent drops into darkness.' : 'You fell through the broken hotel floor.',
     };
   }
 
@@ -193,8 +197,6 @@ export function updatePlatformGame(state: PlatformGameState, input: InputState, 
     player.grounded = true;
     player.isSlamming = false;
     player.doubleJumpUsed = false;
-  } else if (state.inVent) {
-    player.grounded = true;
   } else if (player.y + player.height >= floorY && !overHole(state, player.x)) {
     player.y = floorY - player.height;
     player.vy = 0;
@@ -242,7 +244,7 @@ export function updatePlatformGame(state: PlatformGameState, input: InputState, 
       ? damagePlayerPerSecond(next, 5, dt, 'broken-bot is hitting you.', 'bot')
       : hitPlayer(next, damageForEnemyTouch(next, touchingEnemy.kind), `${touchingEnemy.kind} hit you.`, cause);
   }
-  next = tryVentNest(next);
+  next = tryVentBossFight(next);
   next = tryTrainGuard(next);
   if (input.interactPressed) next = tryBossRunAwayDoor(next);
   next = tryLift(next);
@@ -316,6 +318,19 @@ function updateMeteorites(state: PlatformGameState, dt: number) {
     if (y > 310 || x < 120) return { ...meteor, x: 420 + index * 520, y: 60 + index * 44 };
     return { ...meteor, x, y };
   });
+}
+
+function updateGunReload(state: PlatformGameState, dt: number) {
+  if (state.reloadTimer <= 0) return state;
+  const reloadTimer = Math.max(0, state.reloadTimer - dt);
+  if (reloadTimer > 0) return { ...state, reloadTimer };
+  const revolverLoaded = state.unlimitedGun ? 6 : Math.min(6, state.shots);
+  return {
+    ...state,
+    reloadTimer: 0,
+    revolverLoaded,
+    message: revolverLoaded > 0 ? 'Revolver reloaded.' : state.message,
+  };
 }
 
 export function triggerMeteorThrow(state: PlatformGameState, x: number, y: number): PlatformGameState {
@@ -395,7 +410,7 @@ function updateGauntletSnap(state: PlatformGameState, dt: number): PlatformGameS
   };
 }
 
-function updateVentSpawns(state: PlatformGameState, dt: number) {
+function updateVentSpawns(state: PlatformGameState, _dt: number) {
   if (!state.inVent) {
     return {
       ...state,
@@ -403,23 +418,5 @@ function updateVentSpawns(state: PlatformGameState, dt: number) {
       nest: null,
     };
   }
-  if (state.status !== 'playing') return state;
-  const timer = state.ventSpawnTimer - dt;
-  if (timer > 0) return { ...state, ventSpawnTimer: timer };
-  const x = Math.min(worldWidth - 170, state.player.x + 620);
-  const enemy = {
-    id: `vent-spawn-${Date.now()}`,
-    kind: 'vent-monster' as const,
-    x,
-    y: floorY - 112,
-    width: 150,
-    height: 112,
-    hp: 8,
-    vx: -70,
-    patrolLeft: Math.max(state.player.x + 120, x - 260),
-    patrolRight: Math.min(worldWidth - 120, x + 120),
-    wakeDelay: 0,
-    attackPulse: 0,
-  };
-  return { ...state, ventSpawnTimer: 60, enemies: [...state.enemies, enemy], message: 'A vent monster crawls in ahead.' };
+  return state;
 }

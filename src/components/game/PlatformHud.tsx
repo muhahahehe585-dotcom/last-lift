@@ -15,7 +15,8 @@ function formatTime(seconds: number) {
 
 export function PlatformHud({ state, onRestart, onMenu, tutorialMode }: PlatformHudProps) {
   const timer = state.bossTimeLeft > 0 ? formatTime(state.bossTimeLeft) : `${state.floorTimeLeft}s`;
-  const bullets = state.hasGun ? (state.unlimitedGun ? 'Unlimited' : state.shots) : 'None';
+  const loaded = state.reloadTimer > 0 ? 'reload' : `${state.revolverLoaded}/6`;
+  const bullets = state.hasGun ? (state.unlimitedGun ? `Unlimited (${loaded})` : `${state.shots} (${loaded})`) : 'None';
   const maxHealth = state.player.maxHp;
   const healthWidth = Math.min(100, (state.player.hp / maxHealth) * 100);
 

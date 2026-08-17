@@ -13,7 +13,9 @@ function px(ctx: CanvasRenderingContext2D, color: string, x: number, y: number, 
 export function drawVentWorld(ctx: CanvasRenderingContext2D, state: PlatformGameState) {
   drawVentBackground(ctx);
   drawVentWalkway(ctx);
-  drawNest(ctx, state);
+  drawVentGaps(ctx, state);
+  drawVentPlatforms(ctx, state);
+  drawExitVent(ctx);
 }
 
 function drawVentBackground(ctx: CanvasRenderingContext2D) {
@@ -33,10 +35,26 @@ function drawVentWalkway(ctx: CanvasRenderingContext2D) {
   }
 }
 
-function drawNest(ctx: CanvasRenderingContext2D, state: PlatformGameState) {
-  if (!state.nest) return;
-  px(ctx, '#2b1d17', state.nest.x, floorY - 112, 150, 60);
-  px(ctx, '#5c2b28', state.nest.x + 18, floorY - 96, 112, 34);
-  px(ctx, '#f2dc5d', state.nest.x + 58, floorY - 79, 20, 12);
-  px(ctx, '#cfc7b3', state.nest.x + 36, floorY - 132, state.nestHp * 18, 8);
+function drawVentGaps(ctx: CanvasRenderingContext2D, state: PlatformGameState) {
+  state.holes.forEach((hole) => {
+    px(ctx, '#020302', hole.x, floorY - 56, hole.width, 130);
+    px(ctx, 'rgba(94, 143, 134, 0.25)', hole.x + 14, floorY - 50, hole.width - 28, 6);
+    px(ctx, 'rgba(0, 0, 0, 0.7)', hole.x + 8, floorY + 18, hole.width - 16, 38);
+  });
+}
+
+function drawVentPlatforms(ctx: CanvasRenderingContext2D, state: PlatformGameState) {
+  state.boxes.forEach((box) => {
+    px(ctx, '#1d2926', box.x, box.y, box.width, box.height);
+    px(ctx, '#596057', box.x + 8, box.y + 4, box.width - 16, 5);
+    px(ctx, '#0a0f0d', box.x, box.y + box.height - 5, box.width, 5);
+  });
+}
+
+function drawExitVent(ctx: CanvasRenderingContext2D) {
+  px(ctx, '#030504', worldWidth - 180, floorY - 178, 150, 178);
+  px(ctx, '#1c2823', worldWidth - 164, floorY - 160, 118, 128);
+  px(ctx, '#050807', worldWidth - 146, floorY - 142, 82, 92);
+  px(ctx, 'rgba(94, 143, 134, 0.45)', worldWidth - 136, floorY - 128, 62, 5);
+  px(ctx, 'rgba(94, 143, 134, 0.35)', worldWidth - 136, floorY - 98, 62, 5);
 }

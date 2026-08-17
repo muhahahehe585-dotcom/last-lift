@@ -1,6 +1,5 @@
 import { overlaps } from './platformGeometry';
-import { floorY, ventMonsterFor } from './platformLevel';
-import { damageNest } from './platformNest';
+import { finalVentMonsterFor, floorY, ventMonsterFor } from './platformLevel';
 import type { InputState, ItemKind, PlatformGameState } from './platformTypes';
 
 function randomGunBullets() {
@@ -16,7 +15,10 @@ function grantLoot(state: PlatformGameState, loot: ItemKind) {
     };
   }
   if (loot === 'flashlight') return { ...state, flashlights: state.flashlights + 1 };
-  if (loot === 'gun') return { ...state, hasGun: true, shots: state.shots + randomGunBullets() };
+  if (loot === 'gun') {
+    const shots = state.shots + randomGunBullets();
+    return { ...state, hasGun: true, shots, revolverLoaded: state.hasGun ? state.revolverLoaded : Math.min(6, shots) };
+  }
   if (loot === 'stone') return { ...state, infinityStones: Math.min(6, state.infinityStones + 1) };
   return { ...state, medkits: state.medkits + 1 };
 }
@@ -32,14 +34,37 @@ export function collectItems(state: PlatformGameState) {
   return { ...next, items, message: next === state ? state.message : 'Supplies collected.' };
 }
 
-export function enterVentRoute(state: PlatformGameState, message = 'You crawled into the vents. No sprinting. The nest is forward.') {
+const ventPlatforms = [
+  { x: 350, y: floorY - 78, width: 230, height: 24 },
+  { x: 680, y: floorY - 136, width: 230, height: 24 },
+  { x: 1035, y: floorY - 96, width: 235, height: 24 },
+  { x: 1395, y: floorY - 154, width: 235, height: 24 },
+  { x: 1740, y: floorY - 92, width: 245, height: 24 },
+  { x: 2055, y: floorY - 34, width: 315, height: 24 },
+];
+
+const ventGaps = [
+  { x: 292, y: floorY, width: 305, height: 72 },
+  { x: 630, y: floorY, width: 315, height: 72 },
+  { x: 990, y: floorY, width: 315, height: 72 },
+  { x: 1348, y: floorY, width: 315, height: 72 },
+  { x: 1688, y: floorY, width: 330, height: 72 },
+];
+
+export function enterVentRoute(state: PlatformGameState, message = 'Vent chase. Run right, jump the platforms, then kill the monster at the far vent.') {
   return {
     ...state,
     inVent: true,
-    enemies: [ventMonsterFor(state.floor)],
-    nest: { x: 1120, y: floorY - 92, width: 120, height: 92 },
-    nestHp: 5,
-    player: { ...state.player, x: 80, y: floorY - 72, height: 72, grounded: true },
+    enemies: [ventMonsterFor(state.floor), finalVentMonsterFor(state.floor)],
+    boxes: ventPlatforms,
+    holes: ventGaps,
+    nest: null,
+    nestHp: 0,
+    hasGun: true,
+    shots: state.unlimitedGun ? state.shots : Math.max(state.shots, 8),
+    revolverLoaded: 6,
+    reloadTimer: 0,
+    player: { ...state.player, x: 80, y: floorY - 72, height: 72, grounded: true, running: true, facing: 1 as const },
     message,
   };
 }
@@ -102,6 +127,9 @@ function useMedkit(state: PlatformGameState) {
 
 function shootEnemy(state: PlatformGameState, input: InputState) {
   if (!state.hasGun || (!state.unlimitedGun && state.shots < 1)) return state;
+  if (state.reloadTimer > 0) return { ...state, message: 'Revolver reloading.' };
+  const loaded = state.revolverLoaded > 0 ? state.revolverLoaded : Math.min(6, state.unlimitedGun ? 6 : state.shots);
+  if (loaded < 1) return { ...state, reloadTimer: 0.85, message: 'Revolver reloading.' };
   const bulletRange = 520;
   const bulletY = state.player.y + 28;
   const bulletStart = state.player.x + state.player.width / 2;
@@ -120,10 +148,10 @@ function shootEnemy(state: PlatformGameState, input: InputState) {
     .sort((a, b) => Math.abs(a.x - bulletStart) - Math.abs(b.x - bulletStart))[0];
 
   const shots = state.unlimitedGun ? state.shots : state.shots - 1;
-  const nest = state.inVent && state.nest && facing === 1 && bulletEnd >= state.nest.x ? state.nest : null;
+  const revolverLoaded = loaded - 1;
+  const reloadTimer = revolverLoaded <= 0 && (state.unlimitedGun || shots > 0) ? 0.85 : 0;
   const shootingPlayer = { ...state.player, shootPulse: 0.22 };
-  if (!target && nest) return damageNest({ ...state, player: shootingPlayer }, { shots, bulletTrail: trail });
-  if (!target) return { ...state, player: shootingPlayer, shots, bulletTrail: trail, message: 'Shot missed.' };
+  if (!target) return { ...state, player: shootingPlayer, shots, revolverLoaded, reloadTimer, bulletTrail: trail, message: 'Shot missed.' };
   const damage = target.kind === 'boss' ? 3 : target.kind === 'vent-monster' ? 4 : 999;
   const enemies = state.enemies
     .map((enemy) => (enemy.id === target.id ? { ...enemy, hp: enemy.hp - damage } : enemy))
@@ -133,6 +161,8 @@ function shootEnemy(state: PlatformGameState, input: InputState) {
     ...state,
     player: shootingPlayer,
     shots,
+    revolverLoaded,
+    reloadTimer,
     bulletTrail: trail,
     enemies,
     message: target.kind === 'boss' ? 'Boss hit by the shot.' : `${target.kind} destroyed by the shot.`,

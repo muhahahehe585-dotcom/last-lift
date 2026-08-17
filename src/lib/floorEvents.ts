@@ -28,6 +28,6 @@ export function modeMessage(floor: number, mode: FloorMode, bossFloor: boolean) 
   if (mode === 'collapse') return `Floor ${floor}: collapsing floor. More gaps, less mercy.`;
   if (mode === 'supply') return `Floor ${floor}: supply floor. Grab what you can.`;
   if (mode === 'train') return `Floor ${floor}: train event. Get to the last cart.`;
-  if (mode === 'vent') return `Floor ${floor}: ceiling vent route. Find the nest ending.`;
+  if (mode === 'vent') return `Floor ${floor}: vent chase. Run the platforms to reach the monster fight.`;
   return `Floor ${floor}. Find batteries before the lift drops.`;
 }

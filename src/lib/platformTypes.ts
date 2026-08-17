@@ -83,6 +83,8 @@ export type PlatformGameState = {
   eventDamageCooldown: number;
   hasGun: boolean;
   shots: number;
+  revolverLoaded: number;
+  reloadTimer: number;
   unlimitedGun: boolean;
   bulletTrail: Rect | null;
   meteorites: Rect[];

@@ -1,6 +1,5 @@
 import { floorY } from './platformLevel';
 import { overlaps } from './platformGeometry';
-import { damageNest } from './platformNest';
 import type { DeathCause, Enemy, PlatformGameState } from './platformTypes';
 
 const slamRadius = 110;
@@ -19,9 +18,6 @@ export function hitPlayer(state: PlatformGameState, damage: number, message: str
 }
 
 export function normalHit(state: PlatformGameState) {
-  const nestHit = hitNest(state);
-  if (nestHit) return nestHit;
-
   const playerCenter = state.player.x + state.player.width / 2;
   let landed = false;
   const enemies = state.enemies
@@ -40,17 +36,6 @@ export function normalHit(state: PlatformGameState) {
   return landed
     ? { ...state, enemies, player: { ...state.player, hitPulse: 0.24 }, message: 'Hit landed.' }
     : { ...state, player: { ...state.player, hitPulse: 0.24 }, message: 'Hit missed. Get closer or face the enemy.' };
-}
-
-function hitNest(state: PlatformGameState) {
-  if (!state.nest) return null;
-  const playerCenter = state.player.x + state.player.width / 2;
-  const nestCenter = state.nest.x + state.nest.width / 2;
-  const inFront = state.player.facing === 1 ? nestCenter > playerCenter : nestCenter < playerCenter;
-  const close = Math.abs(nestCenter - playerCenter) < hitRange + 25 && Math.abs(state.nest.y - state.player.y) < 150;
-  const touching = overlaps({ ...state.player, width: state.player.width + 28 }, state.nest);
-  if (!((inFront && close) || touching)) return null;
-  return damageNest({ ...state, player: { ...state.player, hitPulse: 0.24 } });
 }
 
 export function slamEnemies(state: PlatformGameState) {
@@ -93,9 +78,15 @@ export function updateEnemies(state: PlatformGameState, dt: number, blinded: boo
 }
 
 function updateVentMonster(state: PlatformGameState, enemy: Enemy, dt: number) {
-  const nextX = enemy.x - Math.abs(enemy.vx) * dt;
-  const minX = state.player.x + state.player.width + 26;
-  return { ...enemy, x: Math.max(minX, nextX), y: floorY - 112, width: 150, height: 112, vx: -Math.abs(enemy.vx) };
+  if (enemy.id.startsWith('vent-final')) {
+    const closeToFight = state.player.x > 1780;
+    const direction = state.player.x < enemy.x ? -1 : 1;
+    const x = closeToFight ? Math.max(enemy.patrolLeft, Math.min(enemy.patrolRight, enemy.x + direction * 120 * dt)) : enemy.x;
+    return { ...enemy, x, y: floorY - 132, width: 178, height: 132, vx: closeToFight ? direction * 120 : 0 };
+  }
+  const targetX = state.player.x - 18;
+  const nextX = Math.min(targetX, enemy.x + Math.abs(enemy.vx) * dt);
+  return { ...enemy, x: nextX, y: floorY - 112, width: 150, height: 112, vx: Math.abs(enemy.vx) };
 }
 
 function updateBoss(state: PlatformGameState, enemy: Enemy, dt: number) {
