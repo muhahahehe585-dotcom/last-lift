@@ -40,8 +40,6 @@ const ventPlatforms = [
   { x: 1010, y: floorY - 96, width: 280, height: 34 },
   { x: 1370, y: floorY - 154, width: 280, height: 34 },
   { x: 1715, y: floorY - 92, width: 290, height: 34 },
-  { x: 2030, y: floorY - 104, width: 340, height: 34 },
-  { x: 1975, y: floorY - 34, width: 410, height: 34 },
 ];
 
 const ventGaps = [
@@ -50,6 +48,11 @@ const ventGaps = [
   { x: 990, y: floorY, width: 315, height: 72 },
   { x: 1348, y: floorY, width: 315, height: 72 },
   { x: 1688, y: floorY, width: 330, height: 72 },
+];
+
+export const ventBossPlatforms = [
+  { x: 1935, y: floorY - 34, width: 450, height: 34 },
+  { x: 2055, y: floorY - 126, width: 260, height: 34 },
 ];
 
 const ventBatteries = ventPlatforms.slice(0, 5).map((platform, index) => ({

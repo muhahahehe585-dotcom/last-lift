@@ -2,7 +2,7 @@ import { bossEscapeDoor, createLevel, finalFloor, finalVentMonsterFor, floorY, r
 import { overlaps } from './platformGeometry';
 import { hitPlayer, normalHit, slamEnemies, updateEnemies } from './platformCombat';
 import { applyEventDamage } from './platformHazards';
-import { collectItems, enterVentRoute, handleActionInputs } from './platformInteractions';
+import { collectItems, enterVentRoute, handleActionInputs, ventBossPlatforms } from './platformInteractions';
 import { startTrainDuel, updateTrainDuel } from './trainDuel';
 import type { InputState, PlatformGameState } from './platformTypes';
 import { awardCoins, awardFloorCoin } from './progress';
@@ -76,6 +76,9 @@ function tryVentHallwayBoss(state: PlatformGameState) {
       ...state.enemies.filter((enemy) => !enemy.id.startsWith('vent-chaser')),
       finalVentMonsterFor(state.floor),
     ],
+    boxes: ventBossPlatforms,
+    holes: [],
+    player: { ...state.player, x: 1975, y: floorY - 106, vy: 0, grounded: true },
     message: 'The chase monster crashes behind you. Boss fight.',
   };
 }
