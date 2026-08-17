@@ -31,7 +31,7 @@ export function drawHotel(ctx: CanvasRenderingContext2D, state: PlatformGameStat
   for (let x = 0; x < worldWidth; x += 96) px(ctx, x % 192 ? '#1b1c18' : '#303029', x, 86, 48, 88);
   for (let x = 40; x < worldWidth; x += 260) px(ctx, '#141511', x, 150, 90, 8);
   drawRooms(ctx, state.rooms);
-  if (state.floor === 1) drawTurnBackDoor(ctx);
+  if (state.floor === 1 && !state.tutorialRun) drawTurnBackDoor(ctx);
   drawWoodFloor(ctx, state);
   if (state.mode === 'train') drawTrainFloor(ctx);
   if (state.mode === 'vent') drawVentRoute(ctx, state);

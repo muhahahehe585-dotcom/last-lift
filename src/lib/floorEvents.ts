@@ -3,7 +3,7 @@ import type { FloorMode } from './platformTypes';
 const finalFloorNumber = 100;
 
 export function batteryNeed(floor: number) {
-  return floor === finalFloorNumber ? 0 : 3 + Math.floor(floor / 34);
+  return floor === finalFloorNumber ? 0 : 4;
 }
 
 export function modeFor(floor: number): FloorMode {

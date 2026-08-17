@@ -57,6 +57,12 @@ function tryVentBossFight(state: PlatformGameState) {
   const finalAlive = state.enemies.some((enemy) => enemy.id.startsWith('vent-final'));
   if (finalAlive) return state;
   awardFloorCoin();
+  if (state.tutorialRun) {
+    return {
+      ...createLevel(state.floor + 1, state.player.hp, getCarry(state)),
+      message: 'Tutorial floor 13 complete. Press 0 or Menu when you want to leave.',
+    };
+  }
   return {
     ...state,
     status: 'won' as const,
@@ -84,7 +90,7 @@ function tryVentHallwayBoss(state: PlatformGameState) {
 }
 
 function tryTurnedBackDoor(state: PlatformGameState, player: PlatformGameState['player']) {
-  if (state.floor !== 1 || state.inVent || player.x > 14 || player.vx >= 0) return null;
+  if (state.tutorialRun || state.floor !== 1 || state.inVent || player.x > 14 || player.vx >= 0) return null;
   const coins = awardCoins(100);
   return {
     ...state,
@@ -109,6 +115,7 @@ function getCarry(state: PlatformGameState) {
     stamina: state.player.stamina,
     armorCount: state.armorCount,
     maxHp: state.player.maxHp,
+    tutorialRun: state.tutorialRun,
   };
 }
 

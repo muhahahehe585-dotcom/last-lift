@@ -1,3 +1,4 @@
+import lightningPowerUrl from '../../assets/lightning-power.jpg';
 import type { PlatformGameState } from '../../lib/platformTypes';
 
 type PlatformHudProps = {
@@ -42,7 +43,10 @@ export function PlatformHud({ state, onRestart, onMenu, tutorialMode }: Platform
       <div className="hud-items">
         <strong>Floor {state.floor}/100</strong>
         <div className="resource-row">
-          <span>Power</span>
+          <span className="power-label">
+            <img src={lightningPowerUrl} alt="" />
+            Power
+          </span>
           <strong>{state.batteries}/{state.batteriesNeeded}</strong>
         </div>
         <div className="resource-row">

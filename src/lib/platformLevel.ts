@@ -23,6 +23,7 @@ type LevelCarry = {
   stamina?: number;
   armorCount?: number;
   maxHp?: number;
+  tutorialRun?: boolean;
 };
 
 const enemyKinds: EnemyKind[] = ['drone', 'broken-bot', 'bot-guard'];
@@ -248,6 +249,7 @@ export function createLevel(floor: number, hp = 100, carry: LevelCarry = {}): Pl
     coins: getCoins(),
     armorCount: carry.armorCount ?? getArmor(),
     doubleJumpUnlocked: hasDoubleJump(),
+    tutorialRun: carry.tutorialRun ?? false,
   };
 }
 

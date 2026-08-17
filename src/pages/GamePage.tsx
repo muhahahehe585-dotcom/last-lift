@@ -118,12 +118,12 @@ export function GamePage() {
 
   const restartRun = () => {
     if (trainTestMode) return createLevel(11);
-    if (tutorialMode) return tutorialLevel(tutorialStepRef.current);
+    if (tutorialMode) return tutorialLevel(state.floor, tutorialStepRef.current);
     return startArmoredRun();
   };
 
-  const tutorialLevel = (step = 0) => ({
-    ...createLevel(1, 70, { flashlights: 2, medkits: 1, hasGun: true, shots: 12, revolverLoaded: 6, stamina: 100 }),
+  const tutorialLevel = (floor = 1, step = 0) => ({
+    ...createLevel(floor, 70, { flashlights: 2, medkits: 1, hasGun: true, shots: 12, revolverLoaded: 6, stamina: 100, tutorialRun: true }),
     doubleJumpUnlocked: true,
     message: tutorialMessage(step),
   });
@@ -136,16 +136,24 @@ export function GamePage() {
     setTutorialMode(true);
     setTutorialStep(0);
     setSelectedInventory(null);
-    setState(tutorialLevel(0));
+    setState(tutorialLevel(1, 0));
     setScreen('game');
   };
 
   const continueTutorial = (current: PlatformGameState) => {
     if (!tutorialModeRef.current) return current;
     if (current.coins !== tutorialCoinsRef.current) setCoins(tutorialCoinsRef.current);
+    if (current.floor > 13) {
+      tutorialModeRef.current = false;
+      setTutorialMode(false);
+      return {
+        ...createLevel(1),
+        message: 'Tutorial complete through floor 13. Press 0 or Menu when you want to leave.',
+      };
+    }
     if (current.status !== 'lost') return current;
     inputRef.current = { ...emptyInput };
-    return tutorialLevel(tutorialStepRef.current);
+    return tutorialLevel(current.floor, tutorialStepRef.current);
   };
 
   const selectInventory = (item: InventoryItem) => {
@@ -259,10 +267,7 @@ export function GamePage() {
         const tutorialNext = continueTutorial(next);
         if (tutorialModeRef.current) {
           if (tutorialStepRef.current >= tutorialSteps.length) {
-            setTutorialMode(false);
-            setScreen('menu');
-            refreshProgress();
-            return { ...createLevel(1), message: 'Tutorial complete. You know the buttons now.' };
+            return { ...tutorialNext, message: 'Controls complete. Keep playing tutorial until floor 13.' };
           }
           return { ...tutorialNext, message: tutorialMessage(tutorialStepRef.current) };
         }

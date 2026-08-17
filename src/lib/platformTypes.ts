@@ -102,6 +102,7 @@ export type PlatformGameState = {
   coins: number;
   armorCount: number;
   doubleJumpUnlocked: boolean;
+  tutorialRun: boolean;
 };
 
 export type DuelState = {
