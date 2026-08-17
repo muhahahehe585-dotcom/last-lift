@@ -36,7 +36,7 @@ export function drawPlayer(ctx: CanvasRenderingContext2D, state: PlatformGameSta
 
 export function drawEnemy(ctx: CanvasRenderingContext2D, enemy: Enemy) {
   if (enemy.kind === 'drone') return drawDrone(ctx, enemy);
-  if (enemy.kind === 'bot-guard') return drawGuard(ctx, enemy);
+  if (enemy.kind === 'bot-guard') return drawBotGuard(ctx, enemy);
   if (enemy.kind === 'sea-monster') return drawSeaMonster(ctx, enemy);
   if (enemy.kind === 'vent-monster') return drawVentMonster(ctx, enemy);
   if (enemy.kind === 'boss') return drawBoss(ctx, enemy);
@@ -62,7 +62,8 @@ function drawBrokenBot(ctx: CanvasRenderingContext2D, enemy: Enemy) {
   px(ctx, '#111311', enemy.x + 27, enemy.y + 9, 4, 3);
 }
 
-function drawGuard(ctx: CanvasRenderingContext2D, enemy: Enemy) {
+function drawBotGuard(ctx: CanvasRenderingContext2D, enemy: Enemy) {
+  if (drawBrokenBotSprite(ctx, enemy)) return;
   px(ctx, '#151817', enemy.x + 9, enemy.y, 28, 14);
   px(ctx, '#7c8781', enemy.x + 7, enemy.y + 14, 32, 33);
   px(ctx, '#3c4542', enemy.x - 1, enemy.y + 23, 9, 28);
