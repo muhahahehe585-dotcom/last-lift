@@ -9,6 +9,7 @@ import { triggerMeteorThrow, updatePlatformGame } from '../lib/platformPhysics';
 import { tickGameTimers } from '../lib/platformTimers';
 import { buyArmor, buyDoubleJump, buyInfinityGauntlet, consumeArmor, getArmor, getCoins, getSavedEndings, hasDoubleJump, hasInfinityGauntlet, loadProgress, saveEnding, setCoins } from '../lib/progress';
 import { chooseTrainBullet, chooseTrainDuel, chooseTrainHealth } from '../lib/trainDuel';
+import { nextTutorialStep, tutorialMessage, tutorialSteps } from '../lib/tutorial';
 import type { InputState, PlatformGameState } from '../lib/platformTypes';
 
 const emptyInput: InputState = {
@@ -40,6 +41,7 @@ export function GamePage() {
   const [screen, setScreen] = useState<'menu' | 'credits' | 'help' | 'shop' | 'game'>('menu');
   const [trainTestMode, setTrainTestMode] = useState(false);
   const [tutorialMode, setTutorialMode] = useState(false);
+  const [tutorialStep, setTutorialStep] = useState(0);
   const [confirmLobby, setConfirmLobby] = useState(false);
   const [selectedInventory, setSelectedInventory] = useState<InventoryItem>(null);
   const [progress, setProgress] = useState(() => ({
@@ -53,6 +55,7 @@ export function GamePage() {
   const inputRef = useRef<InputState>({ ...emptyInput });
   const trainTestModeRef = useRef(false);
   const tutorialModeRef = useRef(false);
+  const tutorialStepRef = useRef(0);
   const tutorialCoinsRef = useRef(0);
   const lastJumpRef = useRef(0);
   const spaceDownRef = useRef(false);
@@ -90,7 +93,9 @@ export function GamePage() {
     if (control === 'hit') inputRef.current.hitPressed = true;
     if (control === 'interact') inputRef.current.interactPressed = true;
     if (control === 'leave') inputRef.current.leavePressed = true;
+    if (control === 'flashlight') inputRef.current.flashlightPressed = true;
     if (control === 'medkit') inputRef.current.medkitPressed = true;
+    if (control === 'shoot') inputRef.current.shootPressed = true;
     if (control === 'gauntlet') inputRef.current.gauntletPressed = true;
   };
 
@@ -100,6 +105,7 @@ export function GamePage() {
     refreshProgress();
     setTrainTestMode(false);
     setTutorialMode(false);
+    setTutorialStep(0);
     setSelectedInventory(null);
     setScreen('menu');
   };
@@ -112,9 +118,15 @@ export function GamePage() {
 
   const restartRun = () => {
     if (trainTestMode) return createLevel(11);
-    if (tutorialMode) return createLevel(1);
+    if (tutorialMode) return tutorialLevel(tutorialStepRef.current);
     return startArmoredRun();
   };
+
+  const tutorialLevel = (step = 0) => ({
+    ...createLevel(1, 70, { flashlights: 2, medkits: 1, hasGun: true, shots: 12, revolverLoaded: 6, stamina: 100 }),
+    doubleJumpUnlocked: true,
+    message: tutorialMessage(step),
+  });
 
   const startTutorial = () => {
     refreshProgress();
@@ -122,32 +134,18 @@ export function GamePage() {
     inputRef.current = { ...emptyInput };
     setTrainTestMode(false);
     setTutorialMode(true);
+    setTutorialStep(0);
     setSelectedInventory(null);
-    setState({
-      ...createLevel(1),
-      message: 'Tutorial started. You will revive here, but the real game will not do this.',
-    });
+    setState(tutorialLevel(0));
     setScreen('game');
   };
 
   const continueTutorial = (current: PlatformGameState) => {
     if (!tutorialModeRef.current) return current;
     if (current.coins !== tutorialCoinsRef.current) setCoins(tutorialCoinsRef.current);
-    if (current.floor > 13 || (current.floor >= 13 && current.status === 'won')) {
-      setTutorialMode(false);
-      setScreen('menu');
-      refreshProgress();
-      return {
-        ...createLevel(1),
-        message: 'Tutorial complete. Floors 1-13 are practiced. Normal mode is dangerous now.',
-      };
-    }
     if (current.status !== 'lost') return current;
     inputRef.current = { ...emptyInput };
-    return {
-      ...createLevel(current.floor),
-      message: 'Revived for tutorial. In the real game, dying sends you back to the lobby.',
-    };
+    return tutorialLevel(tutorialStepRef.current);
   };
 
   const selectInventory = (item: InventoryItem) => {
@@ -169,6 +167,10 @@ export function GamePage() {
   useEffect(() => {
     tutorialModeRef.current = tutorialMode;
   }, [tutorialMode]);
+
+  useEffect(() => {
+    tutorialStepRef.current = tutorialStep;
+  }, [tutorialStep]);
 
   useEffect(() => {
     loadProgress().then(() => {
@@ -245,9 +247,25 @@ export function GamePage() {
       const dt = Math.min(0.03, (time - last) / 1000);
       last = time;
       const input = { ...inputRef.current };
+      if (tutorialModeRef.current) {
+        const nextStep = nextTutorialStep(tutorialStepRef.current, input);
+        if (nextStep !== tutorialStepRef.current) {
+          tutorialStepRef.current = nextStep;
+          setTutorialStep(nextStep);
+        }
+      }
       setState((current) => {
         const next = updatePlatformGame(current, input, dt);
         const tutorialNext = continueTutorial(next);
+        if (tutorialModeRef.current) {
+          if (tutorialStepRef.current >= tutorialSteps.length) {
+            setTutorialMode(false);
+            setScreen('menu');
+            refreshProgress();
+            return { ...createLevel(1), message: 'Tutorial complete. You know the buttons now.' };
+          }
+          return { ...tutorialNext, message: tutorialMessage(tutorialStepRef.current) };
+        }
         if (tutorialNext !== next) return tutorialNext;
         if (trainTestModeRef.current && current.duel && (next.floor !== 11 || next.status !== 'playing')) {
           trainTestModeRef.current = false;
