@@ -1,4 +1,5 @@
 import { floorY } from './platformLevel';
+import { hitsBossWeakSpot } from './bossWeakSpots';
 import { overlaps } from './platformGeometry';
 import type { DeathCause, Enemy, PlatformGameState } from './platformTypes';
 
@@ -19,6 +20,12 @@ export function hitPlayer(state: PlatformGameState, damage: number, message: str
 
 export function normalHit(state: PlatformGameState) {
   const playerCenter = state.player.x + state.player.width / 2;
+  const attackRect = {
+    x: state.player.facing === 1 ? state.player.x + state.player.width - 4 : state.player.x - hitRange + 4,
+    y: state.player.y - 8,
+    width: hitRange,
+    height: state.player.height + 18,
+  };
   let landed = false;
   const enemies = state.enemies
     .map((enemy) => {
@@ -26,7 +33,8 @@ export function normalHit(state: PlatformGameState) {
       const inFront = state.player.facing === 1 ? enemyCenter > playerCenter : enemyCenter < playerCenter;
       const close = Math.abs(enemyCenter - playerCenter) < hitRange && Math.abs(enemy.y - state.player.y) < 150;
       const touching = overlaps({ ...state.player, width: state.player.width + 24 }, enemy);
-      if ((inFront && close) || touching) {
+      const bossWeakHit = enemy.kind === 'boss' && hitsBossWeakSpot(enemy, attackRect);
+      if (bossWeakHit || (enemy.kind !== 'boss' && ((inFront && close) || touching))) {
         landed = true;
         return { ...enemy, hp: enemy.hp - 2 };
       }
@@ -45,7 +53,12 @@ export function slamEnemies(state: PlatformGameState) {
     .map((enemy) => {
       const enemyCenter = enemy.x + enemy.width / 2;
       const inRange = Math.abs(enemyCenter - center) < slamRadius && enemy.y + enemy.height > floorY - 135;
-      return inRange ? { ...enemy, hp: enemy.hp - 3 } : enemy;
+      if (enemy.kind === 'boss') {
+        const slamRect = { x: center - slamRadius, y: floorY - 145, width: slamRadius * 2, height: 150 };
+        return hitsBossWeakSpot(enemy, slamRect) ? { ...enemy, hp: enemy.hp - 3 } : enemy;
+      }
+      if (!inRange) return enemy;
+      return { ...enemy, hp: enemy.hp - 3 };
     })
     .filter((enemy) => enemy.hp > 0);
 
@@ -89,17 +102,9 @@ function updateVentMonster(state: PlatformGameState, enemy: Enemy, dt: number) {
   return { ...enemy, x: nextX, y: floorY - 112, width: 150, height: 112, vx: Math.abs(enemy.vx) };
 }
 
-function updateBoss(state: PlatformGameState, enemy: Enemy, dt: number) {
-  if (Math.abs(state.player.vx) < 5) return { ...enemy, y: floorY - enemy.height, vx: 0 };
-  const bossCenter = enemy.x + enemy.width / 2;
-  const playerCenter = state.player.x + state.player.width / 2;
-  const direction = playerCenter < bossCenter ? -1 : 1;
-  const chaseSpeed = 120;
-  const leftEdge = 360;
-  const rightEdge = 2260;
-  const targetX = enemy.x + direction * chaseSpeed * dt;
-  const x = Math.max(leftEdge, Math.min(rightEdge - enemy.width, targetX));
-  return { ...enemy, x, y: floorY - enemy.height, vx: direction * chaseSpeed };
+function updateBoss(_state: PlatformGameState, enemy: Enemy, dt: number) {
+  const pulse = Math.max(0, enemy.attackPulse - dt);
+  return { ...enemy, y: floorY - enemy.height, vx: 0, attackPulse: pulse };
 }
 
 function enemyWouldCrossHole(state: PlatformGameState, enemy: Enemy, x: number) {

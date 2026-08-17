@@ -1,4 +1,5 @@
 import { overlaps } from './platformGeometry';
+import { bulletHitsBossWeakSpot } from './bossWeakSpots';
 import { floorY, ventMonsterFor } from './platformLevel';
 import type { InputState, ItemKind, PlatformGameState } from './platformTypes';
 
@@ -161,8 +162,8 @@ function shootEnemy(state: PlatformGameState, input: InputState) {
   };
   const target = state.enemies
     .filter((enemy) => enemy.kind !== 'sea-monster')
-    .filter((enemy) => bulletY >= enemy.y - 8 && bulletY <= enemy.y + enemy.height + 8)
-    .filter((enemy) => (facing === 1 ? enemy.x >= bulletStart && enemy.x <= bulletEnd : enemy.x + enemy.width <= bulletStart && enemy.x + enemy.width >= bulletEnd))
+    .filter((enemy) => enemy.kind === 'boss' ? bulletHitsBossWeakSpot(enemy, bulletY, bulletStart, bulletEnd) : bulletY >= enemy.y - 8 && bulletY <= enemy.y + enemy.height + 8)
+    .filter((enemy) => enemy.kind === 'boss' || (facing === 1 ? enemy.x >= bulletStart && enemy.x <= bulletEnd : enemy.x + enemy.width <= bulletStart && enemy.x + enemy.width >= bulletEnd))
     .sort((a, b) => Math.abs(a.x - bulletStart) - Math.abs(b.x - bulletStart))[0];
 
   const shots = state.unlimitedGun ? state.shots : state.shots - 1;

@@ -2,6 +2,7 @@ import { type ReactNode, useEffect, useRef } from 'react';
 import { viewWidth, worldHeight } from '../../lib/platformLevel';
 import type { ItemKind, PlatformGameState } from '../../lib/platformTypes';
 import { drawActionHitboxes, type InventoryItem } from './actionHitboxArt';
+import { drawBossHazards } from './bossArt';
 import { cameraXFor, drawDarkness, drawDoorPrompt, drawHotel } from './platformArt';
 import { drawDeathAnimation } from './deathArt';
 import { drawBulletSprite } from './droneBulletArt';
@@ -115,6 +116,7 @@ export function PlatformCanvas({ state, onAim, onMeteorClick, onTrainBullet, onT
     ctx.translate(-cameraX, 0);
     drawHotel(ctx, state);
     drawMeteorShower(ctx, state);
+    drawBossHazards(ctx, state);
     state.items.forEach((item) => drawItem(ctx, item));
     state.enemies.forEach((enemy) => drawEnemy(ctx, enemy));
     if (state.status === 'lost') drawDeathAnimation(ctx, state);

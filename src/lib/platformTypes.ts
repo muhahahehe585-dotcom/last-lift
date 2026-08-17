@@ -99,6 +99,11 @@ export type PlatformGameState = {
   duel: DuelState | null;
   floorTimeLeft: number;
   bossTimeLeft: number;
+  bossClawTimer: number;
+  bossClawX: number;
+  bossLightningWarning: number;
+  bossLightningStrike: number;
+  bossLightningX: number;
   gauntletSnapTimer: number;
   meteorThrowTimer: number;
   rageJumpTimer: number;

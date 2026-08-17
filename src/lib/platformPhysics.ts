@@ -1,6 +1,7 @@
 import { bossEscapeDoor, createLevel, finalFloor, finalVentMonsterFor, floorY, rageFire, worldWidth } from './platformLevel';
 import { overlaps } from './platformGeometry';
 import { hitPlayer, normalHit, slamEnemies, updateEnemies } from './platformCombat';
+import { updateBossHazards } from './bossHazards';
 import { applyEventDamage } from './platformHazards';
 import { collectItems, enterVentRoute, handleActionInputs, ventBossPlatforms } from './platformInteractions';
 import { startTrainDuel, updateTrainDuel } from './trainDuel';
@@ -249,6 +250,7 @@ export function updatePlatformGame(state: PlatformGameState, input: InputState, 
   next = tryDodge(next, input);
   next = updateVentSpawns(next, dt);
   next = applyEventDamage(next, dt);
+  next = updateBossHazards(next, dt);
   if (next.status !== 'playing') return next;
   const shootingDrone = next.enemies.find((enemy) => enemy.kind === 'drone' && Math.abs(enemy.x - next.player.x) < 220 && Math.abs(enemy.y - next.player.y) < 95);
   if (shootingDrone && !next.bulletTrail) {
