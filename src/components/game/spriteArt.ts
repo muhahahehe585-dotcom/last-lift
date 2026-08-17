@@ -2,6 +2,7 @@ import { floorY } from '../../lib/platformLevel';
 import type { Enemy, Item, PlatformGameState } from '../../lib/platformTypes';
 import { drawBoss } from './bossArt';
 import { drawBotGuardSprite, drawBrokenBotSprite } from './brokenBotArt';
+import { drawDroneSprite } from './droneBulletArt';
 import { drawSpritePlayer } from './playerSprite';
 import { drawVentMonsterSprite } from './ventMonsterArt';
 
@@ -44,6 +45,7 @@ export function drawEnemy(ctx: CanvasRenderingContext2D, enemy: Enemy) {
 }
 
 function drawDrone(ctx: CanvasRenderingContext2D, enemy: Enemy) {
+  if (drawDroneSprite(ctx, enemy)) return;
   px(ctx, '#2d3335', enemy.x, enemy.y + 14, enemy.width, 10);
   px(ctx, '#8b969d', enemy.x + 12, enemy.y + 4, 26, 26);
   px(ctx, '#f2dc5d', enemy.x + 21, enemy.y + 13, 8, 5);

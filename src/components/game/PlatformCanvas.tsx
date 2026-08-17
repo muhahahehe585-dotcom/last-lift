@@ -4,6 +4,7 @@ import type { ItemKind, PlatformGameState } from '../../lib/platformTypes';
 import { drawActionHitboxes, type InventoryItem } from './actionHitboxArt';
 import { cameraXFor, drawDarkness, drawDoorPrompt, drawHotel } from './platformArt';
 import { drawDeathAnimation } from './deathArt';
+import { drawBulletSprite } from './droneBulletArt';
 import { drawEscapeEnding, drawHalfUniverseEnding, drawLastStandEnding, drawRageEnding, drawRanAwayEnding, drawRulerEnding, drawSunsetEnding, drawSuperheroEnding } from './endingArt';
 import { drawMeteorShower, drawMeteorThrow } from './meteorArt';
 import { drawEnemy, drawItem, drawPlayer } from './spriteArt';
@@ -288,6 +289,7 @@ function drawBossBeingKilled(ctx: CanvasRenderingContext2D, x: number, y: number
 
 function drawBulletTrail(ctx: CanvasRenderingContext2D, state: PlatformGameState) {
   if (!state.bulletTrail) return;
+  if (drawBulletSprite(ctx, state.bulletTrail)) return;
   ctx.strokeStyle = '#f2dc5d';
   ctx.lineWidth = 4;
   ctx.beginPath();
