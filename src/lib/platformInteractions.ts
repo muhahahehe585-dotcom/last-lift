@@ -51,11 +51,21 @@ const ventGaps = [
   { x: 1688, y: floorY, width: 330, height: 72 },
 ];
 
+const ventBatteries = ventPlatforms.slice(0, 5).map((platform, index) => ({
+  id: `vent-stamina-battery-${index}`,
+  kind: 'battery' as const,
+  x: platform.x + platform.width / 2 - 13,
+  y: platform.y - 34,
+  width: 26,
+  height: 34,
+}));
+
 export function enterVentRoute(state: PlatformGameState, message = 'Vent chase. Run right, jump the platforms, then kill the monster at the far vent.') {
   return {
     ...state,
     inVent: true,
     enemies: [ventMonsterFor(state.floor), finalVentMonsterFor(state.floor)],
+    items: ventBatteries,
     boxes: ventPlatforms,
     holes: ventGaps,
     nest: null,
