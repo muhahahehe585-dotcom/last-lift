@@ -1,3 +1,4 @@
+import sunsetEndingUrl from '../../assets/sunset-ending.jpg';
 import { viewWidth, worldHeight } from '../../lib/platformLevel';
 import type { Enemy, Rect } from '../../lib/platformTypes';
 import { drawBrokenBotSprite } from './brokenBotArt';
@@ -10,6 +11,8 @@ function px(ctx: CanvasRenderingContext2D, color: string, x: number, y: number, 
 }
 
 const cleanedEndingFrames = new Map<string, HTMLCanvasElement>();
+const sunsetEndingImage = new Image();
+sunsetEndingImage.src = sunsetEndingUrl;
 
 export function drawRulerEnding(ctx: CanvasRenderingContext2D) {
   px(ctx, '#090807', 0, 0, viewWidth, worldHeight);
@@ -27,6 +30,10 @@ export function drawRulerEnding(ctx: CanvasRenderingContext2D) {
 }
 
 export function drawSunsetEnding(ctx: CanvasRenderingContext2D) {
+  if (sunsetEndingImage.complete && sunsetEndingImage.naturalWidth > 0) {
+    ctx.drawImage(sunsetEndingImage, 0, 0, viewWidth, worldHeight);
+    return;
+  }
   const sky = ctx.createLinearGradient(0, 0, 0, worldHeight);
   sky.addColorStop(0, '#7d3b34');
   sky.addColorStop(0.45, '#f2dc5d');
