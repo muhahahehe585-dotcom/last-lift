@@ -1,3 +1,4 @@
+import lightningEmptyUrl from '../../assets/lightning-empty.jpg';
 import lightningPowerUrl from '../../assets/lightning-power.jpg';
 import type { PlatformGameState } from '../../lib/platformTypes';
 
@@ -20,9 +21,16 @@ export function PlatformHud({ state, onRestart, onMenu, tutorialMode }: Platform
   const bullets = state.hasGun ? (state.unlimitedGun ? `Unlimited (${loaded})` : `${state.shots} (${loaded})`) : 'None';
   const maxHealth = state.player.maxHp;
   const healthWidth = Math.min(100, (state.player.hp / maxHealth) * 100);
+  const powerSlots = Array.from({ length: state.batteriesNeeded || 4 }, (_, index) => index < state.batteries);
 
   return (
     <aside className="platform-hud" aria-label="Game status">
+      <div className="hud-power" aria-label={`Power ${state.batteries}/${state.batteriesNeeded}`}>
+        {powerSlots.map((filled, index) => (
+          <img key={index} src={filled ? lightningPowerUrl : lightningEmptyUrl} alt="" />
+        ))}
+      </div>
+
       <div className="hud-bars">
         <div className="meter-row">
           <span>Health</span>
@@ -42,13 +50,6 @@ export function PlatformHud({ state, onRestart, onMenu, tutorialMode }: Platform
 
       <div className="hud-items">
         <strong>Floor {state.floor}/100</strong>
-        <div className="resource-row">
-          <span className="power-label">
-            <img src={lightningPowerUrl} alt="" />
-            Power
-          </span>
-          <strong>{state.batteries}/{state.batteriesNeeded}</strong>
-        </div>
         <div className="resource-row">
           <span>Medkit</span>
           <strong>{state.medkits}</strong>

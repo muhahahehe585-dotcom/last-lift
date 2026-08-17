@@ -248,6 +248,7 @@ h1 {
 
 .hud-bars,
 .hud-items,
+.hud-power,
 .hud-menu,
 .game-message {
   position: absolute;
@@ -282,6 +283,24 @@ h1 {
   text-transform: uppercase;
 }
 
+.hud-power {
+  top: 18px;
+  left: 50%;
+  display: flex;
+  gap: 10px;
+  padding: 8px 12px;
+  transform: translateX(-50%);
+}
+
+.hud-power img {
+  width: 42px;
+  height: 42px;
+  object-fit: cover;
+  border: 2px solid rgba(255, 248, 220, 0.72);
+  border-radius: 8px;
+  image-rendering: pixelated;
+}
+
 .meter-row,
 .resource-row {
   display: flex;
@@ -296,21 +315,6 @@ h1 {
 .resource-row {
   padding-top: 4px;
   border-top: 1px solid rgba(255, 248, 220, 0.22);
-}
-
-.power-label {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-}
-
-.power-label img {
-  width: 22px;
-  height: 22px;
-  object-fit: cover;
-  border: 1px solid rgba(255, 248, 220, 0.6);
-  border-radius: 4px;
-  image-rendering: pixelated;
 }
 
 .game-message {
