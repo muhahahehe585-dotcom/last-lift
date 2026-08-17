@@ -233,7 +233,7 @@ export function updatePlatformGame(state: PlatformGameState, input: InputState, 
   }
   if (wasAirSlamming && player.grounded) next = slamEnemies(next);
   const touchingEnemy = next.enemies.find((enemy) => overlaps(next.player, enemy));
-  if (next.inVent && touchingEnemy?.kind === 'vent-monster') {
+  if (next.inVent && touchingEnemy?.kind === 'vent-monster' && touchingEnemy.wakeDelay <= 0) {
     return { ...next, status: 'lost', deathCause: 'bot', player: { ...next.player, hp: 0 }, message: 'The vent monster caught you.' };
   }
   if (touchingEnemy?.kind === 'sea-monster') {
