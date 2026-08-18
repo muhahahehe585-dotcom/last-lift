@@ -249,6 +249,7 @@ export function updatePlatformGame(state: PlatformGameState, input: InputState, 
   });
   next = tryDodge(next, input);
   next = updateVentSpawns(next, dt);
+  next = updateVentClaws(next, dt);
   next = applyEventDamage(next, dt);
   next = updateBossHazards(next, dt);
   if (next.status !== 'playing') return next;
@@ -322,6 +323,20 @@ function updateBulletTrail(state: PlatformGameState, dt: number) {
   return height > 0 ? { ...trail, height } : null;
 }
 
+function updateVentClaws(state: PlatformGameState, dt: number) {
+  if (!state.inVent) return state;
+  let ventSpawnTimer = state.ventSpawnTimer - dt;
+  if (ventSpawnTimer <= 0) ventSpawnTimer = 2.8;
+  let next = { ...state, ventSpawnTimer };
+  const active = ventSpawnTimer <= 0.7;
+  const dodging = next.player.dodgePulse > 0 || next.player.hurtCooldown > 0;
+  const clawHit = [510, 925, 1340, 1745].some((x) => overlaps(next.player, { x: x - 78, y: 54, width: 156, height: floorY - 104 }));
+  if (active && clawHit && !dodging) {
+    next = hitPlayer(next, 16, 'Ceiling claws dropped from the vent.', 'bot');
+  }
+  return next;
+}
+
 function startEnemyAttack(state: PlatformGameState, enemyId: string) {
   return {
     ...state,
@@ -331,7 +346,9 @@ function startEnemyAttack(state: PlatformGameState, enemyId: string) {
 
 function tryDodge(state: PlatformGameState, input: InputState) {
   if (!input.dodgePressed || state.player.dodgeCooldown > 0) return state;
-  const enemy = state.enemies.find((item) => distanceBetweenCenters(state.player, item) <= dodgeRadius);
+  const radius = state.inVent ? 360 : dodgeRadius;
+  const enemy = state.enemies.find((item) => distanceBetweenCenters(state.player, item) <= radius);
+  if (!enemy && state.inVent) return ventDodge(state);
   if (!enemy) return state;
   const playerCenter = state.player.x + state.player.width / 2;
   const enemyCenter = enemy.x + enemy.width / 2;
@@ -351,6 +368,21 @@ function tryDodge(state: PlatformGameState, input: InputState) {
     },
     bossDodged: state.bossDodged || enemy.kind === 'boss',
     message: enemy.kind === 'boss' ? 'You slid under the boss. The far roof door is open.' : 'Slid behind the enemy.',
+  };
+}
+
+function ventDodge(state: PlatformGameState) {
+  return {
+    ...state,
+    player: {
+      ...state.player,
+      vx: runSpeed,
+      facing: 1 as const,
+      hurtCooldown: 0.55,
+      dodgeCooldown: 0.65,
+      dodgePulse: 0.42,
+    },
+    message: 'Dodged through the ceiling claws.',
   };
 }
 

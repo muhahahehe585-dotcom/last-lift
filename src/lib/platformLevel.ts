@@ -214,7 +214,7 @@ export function createLevel(floor: number, hp = 100, carry: LevelCarry = {}): Pl
     rooms: bossFloor || mode === 'flood' ? [] : roomsFor(floor),
     holes: bossFloor || mode === 'supply' || mode === 'lava' ? [] : mode === 'collapse' ? [...holesFor(floor), ...holesFor(floor + 1)] : holesFor(floor),
     boxes,
-    ventHole: mode === 'vent' ? { x: 520, y: 70, width: 92, height: 38 } : null,
+    ventHole: mode === 'vent' ? { x: 500, y: floorY - 178, width: 150, height: 178 } : null,
     nest: null,
     nestHp: 5,
     inVent: false,

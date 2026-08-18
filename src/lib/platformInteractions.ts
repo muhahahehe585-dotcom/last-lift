@@ -35,46 +35,31 @@ export function collectItems(state: PlatformGameState) {
   return { ...next, items, message: next === state ? state.message : 'Supplies collected.' };
 }
 
-const ventPlatforms = [
-  { x: 330, y: floorY - 78, width: 260, height: 34 },
-  { x: 655, y: floorY - 136, width: 270, height: 34 },
-  { x: 1010, y: floorY - 96, width: 280, height: 34 },
-  { x: 1370, y: floorY - 154, width: 280, height: 34 },
-  { x: 1715, y: floorY - 92, width: 290, height: 34 },
-];
-
-const ventGaps = [
-  { x: 292, y: floorY, width: 305, height: 72 },
-  { x: 630, y: floorY, width: 315, height: 72 },
-  { x: 990, y: floorY, width: 315, height: 72 },
-  { x: 1348, y: floorY, width: 315, height: 72 },
-  { x: 1688, y: floorY, width: 330, height: 72 },
-];
-
 export const ventBossPlatforms = [
   { x: 1935, y: floorY - 34, width: 450, height: 34 },
   { x: 2055, y: floorY - 126, width: 260, height: 34 },
 ];
 
-const ventBatteries = ventPlatforms.slice(0, 5).map((platform, index) => ({
+const ventBatteries = [360, 720, 1080, 1440, 1780].map((x, index) => ({
   id: `vent-stamina-battery-${index}`,
   kind: 'battery' as const,
-  x: platform.x + platform.width / 2 - 13,
-  y: platform.y - 34,
+  x,
+  y: floorY - 40,
   width: 26,
   height: 34,
 }));
 
-export function enterVentRoute(state: PlatformGameState, message = 'Vent chase. Run right, jump the platforms, then kill the monster at the far vent.') {
+export function enterVentRoute(state: PlatformGameState, message = 'Vent chase. Run right through the big vents and dodge the ceiling claws.') {
   return {
     ...state,
     inVent: true,
     enemies: [ventMonsterFor(state.floor)],
     items: ventBatteries,
-    boxes: ventPlatforms,
-    holes: ventGaps,
+    boxes: [],
+    holes: [],
     nest: null,
     nestHp: 0,
+    ventSpawnTimer: 1.2,
     hasGun: true,
     shots: state.unlimitedGun ? state.shots : Math.max(state.shots, 8),
     revolverLoaded: 6,

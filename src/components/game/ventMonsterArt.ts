@@ -1,41 +1,49 @@
-import monsterSheetUrl from '../../assets/vent-monster-run-sheet.jpg';
+import monsterSheetUrl from '../../assets/vent-monster-sheet.jpg';
 import type { Enemy } from '../../lib/platformTypes';
 
-type Frame = {
-  x: number;
-  y: number;
-  width: number;
-  height: number;
-};
+type Frame = { x: number; y: number; width: number; height: number };
 
 const sheet = new Image();
 sheet.src = monsterSheetUrl;
 
-const runFrames: Frame[] = [
-  { x: 14, y: 346, width: 200, height: 112 },
-  { x: 236, y: 346, width: 205, height: 112 },
-  { x: 475, y: 346, width: 202, height: 112 },
-  { x: 714, y: 346, width: 203, height: 112 },
-  { x: 953, y: 346, width: 200, height: 112 },
-  { x: 1189, y: 346, width: 198, height: 112 },
+const idleFrames: Frame[] = [
+  { x: 16, y: 30, width: 130, height: 105 },
+  { x: 172, y: 28, width: 145, height: 108 },
+  { x: 332, y: 28, width: 145, height: 108 },
+  { x: 488, y: 28, width: 145, height: 108 },
 ];
-
+const walkFrames: Frame[] = [
+  { x: 14, y: 188, width: 200, height: 110 },
+  { x: 236, y: 188, width: 205, height: 110 },
+  { x: 474, y: 188, width: 205, height: 110 },
+  { x: 712, y: 188, width: 205, height: 110 },
+  { x: 952, y: 188, width: 205, height: 110 },
+  { x: 1188, y: 188, width: 200, height: 110 },
+];
+const attackFrames: Frame[] = [
+  { x: 8, y: 488, width: 190, height: 118 },
+  { x: 224, y: 488, width: 198, height: 118 },
+  { x: 452, y: 488, width: 238, height: 118 },
+  { x: 720, y: 488, width: 196, height: 118 },
+];
 const cleanedFrames = new Map<string, HTMLCanvasElement>();
 
 export function drawVentMonsterSprite(ctx: CanvasRenderingContext2D, enemy: Enemy) {
   if (!sheet.complete || sheet.naturalWidth === 0) return false;
-  const source = runFrames[Math.abs(Math.floor(enemy.x / 24)) % runFrames.length];
-  const frame = cleanFrame(source);
-  const height = enemy.id.startsWith('vent-final') ? 220 : 178;
+  const attacking = enemy.attackPulse > 0;
+  const moving = !attacking && Math.abs(enemy.vx) > 5;
+  const frames = attacking ? attackFrames : moving ? walkFrames : idleFrames;
+  const source = frames[Math.abs(Math.floor((enemy.x + performance.now() / 18) / 30)) % frames.length];
+  const height = enemy.id.startsWith('vent-final') ? 176 : 154;
   const width = (source.width / source.height) * height;
   const x = enemy.x + enemy.width / 2 - width / 2;
-  const y = enemy.y + enemy.height - height;
-  ctx.drawImage(frame, x, y, width, height);
+  const y = enemy.y + enemy.height - height + 8;
+  ctx.drawImage(cleanFrame(source), x, y, width, height);
   return true;
 }
 
 function cleanFrame(source: Frame) {
-  const key = `${source.x}-${source.y}`;
+  const key = `${source.x}-${source.y}-${source.width}-${source.height}`;
   const cached = cleanedFrames.get(key);
   if (cached) return cached;
   const canvas = document.createElement('canvas');
@@ -54,21 +62,12 @@ function eraseEdgeBackground(ctx: CanvasRenderingContext2D, width: number, heigh
   const data = image.data;
   const seen = new Uint8Array(width * height);
   const queue: number[] = [];
-  for (let x = 0; x < width; x += 1) {
-    queueIfBackground(x, 0);
-    queueIfBackground(x, height - 1);
-  }
-  for (let y = 0; y < height; y += 1) {
-    queueIfBackground(0, y);
-    queueIfBackground(width - 1, y);
-  }
+  for (let x = 0; x < width; x += 1) { queueIfBackground(x, 0); queueIfBackground(x, height - 1); }
+  for (let y = 0; y < height; y += 1) { queueIfBackground(0, y); queueIfBackground(width - 1, y); }
   for (let index = 0; index < queue.length; index += 1) {
-    const point = queue[index];
+    const point = queue[index], x = point % width, y = Math.floor(point / width);
     data[point * 4 + 3] = 0;
-    queueIfBackground(point % width + 1, Math.floor(point / width));
-    queueIfBackground(point % width - 1, Math.floor(point / width));
-    queueIfBackground(point % width, Math.floor(point / width) + 1);
-    queueIfBackground(point % width, Math.floor(point / width) - 1);
+    queueIfBackground(x + 1, y); queueIfBackground(x - 1, y); queueIfBackground(x, y + 1); queueIfBackground(x, y - 1);
   }
   ctx.putImageData(image, 0, 0);
 

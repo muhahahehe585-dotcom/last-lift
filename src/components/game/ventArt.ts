@@ -13,9 +13,8 @@ function px(ctx: CanvasRenderingContext2D, color: string, x: number, y: number, 
 export function drawVentWorld(ctx: CanvasRenderingContext2D, state: PlatformGameState) {
   drawVentShell(ctx);
   drawVentSprites(ctx);
+  drawCeilingClaws(ctx, state);
   drawVentWalkway(ctx);
-  drawVentGaps(ctx, state);
-  drawVentPlatforms(ctx, state);
   drawExitVent(ctx);
 }
 
@@ -32,8 +31,8 @@ function drawVentSprites(ctx: CanvasRenderingContext2D) {
   drawSprite(ctx, 245, 80, 328, 310, 60, 72, 470, 318);
   drawSprite(ctx, 660, 108, 360, 310, 690, 78, 520, 340);
   drawSprite(ctx, 1080, 280, 250, 250, 1680, 130, 360, 300);
-  drawSprite(ctx, 0, 405, 410, 145, 0, floorY - 122, 420, 150);
-  drawSprite(ctx, 1030, 385, 300, 130, 1950, floorY - 116, 390, 160);
+  drawSprite(ctx, 0, 405, 410, 145, 0, floorY - 136, 520, 168);
+  drawSprite(ctx, 1030, 385, 300, 130, 1870, floorY - 138, 500, 180);
 }
 
 function drawSprite(ctx: CanvasRenderingContext2D, sx: number, sy: number, sw: number, sh: number, x: number, y: number, w: number, h: number) {
@@ -47,23 +46,17 @@ function drawVentWalkway(ctx: CanvasRenderingContext2D) {
   }
 }
 
-function drawVentGaps(ctx: CanvasRenderingContext2D, state: PlatformGameState) {
-  state.holes.forEach((hole) => {
-    px(ctx, '#020302', hole.x, floorY - 56, hole.width, 130);
-    px(ctx, 'rgba(94, 143, 134, 0.25)', hole.x + 14, floorY - 50, hole.width - 28, 6);
-    px(ctx, 'rgba(0, 0, 0, 0.7)', hole.x + 8, floorY + 18, hole.width - 16, 38);
-  });
-}
-
-function drawVentPlatforms(ctx: CanvasRenderingContext2D, state: PlatformGameState) {
-  state.boxes.forEach((box) => {
-    if (ventBackground.complete && ventBackground.naturalWidth > 0) {
-      drawSprite(ctx, 1035, 394, 280, 86, box.x, box.y - 10, box.width, box.height + 26);
-    } else {
-      px(ctx, '#1d2926', box.x, box.y, box.width, box.height);
-    }
-    px(ctx, '#91d5c8', box.x, box.y, box.width, 4);
-    px(ctx, 'rgba(145, 213, 200, 0.24)', box.x, box.y, box.width, box.height);
+function drawCeilingClaws(ctx: CanvasRenderingContext2D, state: PlatformGameState) {
+  const active = state.ventSpawnTimer <= 0.7;
+  [510, 925, 1340, 1745].forEach((x, index) => {
+    const length = active ? 390 : 82;
+    px(ctx, '#090b0a', x - 52, 46, 104, length + 14);
+    px(ctx, '#dfe6df', x - 44, 58, 18, length);
+    px(ctx, '#cdd6d0', x - 8, 58, 18, length + (index % 2 ? 26 : 0));
+    px(ctx, '#dfe6df', x + 30, 58, 18, length);
+    px(ctx, '#b83f35', x - 48, 58 + length, 24, 10);
+    px(ctx, '#b83f35', x - 12, 58 + length + 10, 24, 10);
+    px(ctx, '#b83f35', x + 26, 58 + length, 24, 10);
   });
 }
 
