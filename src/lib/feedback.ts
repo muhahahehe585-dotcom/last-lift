@@ -27,8 +27,14 @@ export async function loadFeedback() {
 }
 
 export async function deleteFeedback(id: string) {
-  const { error } = await supabase.from('feedback').delete().eq('id', id);
+  const { data, error } = await supabase.from('feedback').delete().eq('id', id).select('id');
   if (error) return { ok: false, message: feedbackErrorMessage(error.message) };
+  if (data.length === 0) {
+    return {
+      ok: false,
+      message: 'Delete was blocked. Sign in as the admin account and make sure the latest Supabase migrations are pushed.',
+    };
+  }
   return { ok: true, message: 'Feedback deleted.' };
 }
 
