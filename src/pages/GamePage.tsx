@@ -36,9 +36,10 @@ const emptyInput: InputState = {
 
 type HoldControl = 'left' | 'right' | 'jump' | 'down';
 type TapControl = 'run' | 'doubleJump' | 'slam' | 'dodge' | 'hit' | 'interact' | 'leave' | 'flashlight' | 'medkit' | 'shoot' | 'gauntlet';
+type Screen = 'menu' | 'credits' | 'help' | 'shop' | 'feedback' | 'game';
 
 export function GamePage() {
-  const [screen, setScreen] = useState<'menu' | 'credits' | 'help' | 'shop' | 'game'>('menu');
+  const [screen, setScreen] = useState<Screen>('menu');
   const [trainTestMode, setTrainTestMode] = useState(false);
   const [tutorialMode, setTutorialMode] = useState(false);
   const [tutorialStep, setTutorialStep] = useState(0);

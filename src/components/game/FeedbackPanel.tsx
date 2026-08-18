@@ -1,0 +1,62 @@
+import { useEffect, useState } from 'react';
+import { loadFeedback, submitFeedback, type FeedbackItem } from '../../lib/feedback';
+
+type FeedbackPanelProps = {
+  onBack: () => void;
+};
+
+export function FeedbackPanel({ onBack }: FeedbackPanelProps) {
+  const [feedback, setFeedback] = useState('');
+  const [message, setMessage] = useState('');
+  const [items, setItems] = useState<FeedbackItem[]>([]);
+  const [busy, setBusy] = useState(false);
+
+  const refresh = async () => {
+    const result = await loadFeedback();
+    setItems(result.items);
+    if (!result.ok) setMessage(result.message);
+  };
+
+  const send = async () => {
+    setBusy(true);
+    const result = await submitFeedback(feedback);
+    setMessage(result.message);
+    if (result.ok) {
+      setFeedback('');
+      await refresh();
+    }
+    setBusy(false);
+  };
+
+  useEffect(() => {
+    void refresh();
+  }, []);
+
+  return (
+    <div className="menu-copy">
+      <p>Leave a bug report or tell us what to add next.</p>
+      <textarea
+        className="feedback-box"
+        value={feedback}
+        maxLength={1200}
+        placeholder="Type feedback here..."
+        onChange={(event) => setFeedback(event.target.value)}
+      />
+      {message && <p className="feedback-message">{message}</p>}
+      <button type="button" disabled={busy} onClick={send}>
+        {busy ? 'Sending...' : 'Send Feedback'}
+      </button>
+      <div className="feedback-list">
+        <strong>Latest Feedback</strong>
+        {items.length === 0 && <p>No feedback yet.</p>}
+        {items.map((item) => (
+          <article key={item.id} className="feedback-item">
+            <time>{new Date(item.created_at).toLocaleDateString()}</time>
+            <p>{item.message}</p>
+          </article>
+        ))}
+      </div>
+      <button type="button" onClick={onBack}>Back</button>
+    </div>
+  );
+}

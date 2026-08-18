@@ -1,8 +1,11 @@
+import { FeedbackPanel } from './FeedbackPanel';
 import { armorCost, doubleJumpCost, endingLabels, infinityGauntletCost, type SavedEnding } from '../../lib/progress';
 
+type MenuView = 'menu' | 'credits' | 'help' | 'shop' | 'feedback';
+
 type GameMenuProps = {
-  view: 'menu' | 'credits' | 'help' | 'shop';
-  onView: (view: 'menu' | 'credits' | 'help' | 'shop') => void;
+  view: MenuView;
+  onView: (view: MenuView) => void;
   onPlay: () => void;
   onTutorial: () => void;
   onTrainDuel: () => void;
@@ -44,6 +47,7 @@ export function GameMenu({
             <button type="button" onClick={onTrainDuel}>Train Duel</button>
             <button type="button" onClick={() => onView('shop')}>Shop</button>
             <button type="button" onClick={() => onView('help')}>How to Play</button>
+            <button type="button" onClick={() => onView('feedback')}>Feedback</button>
             <button type="button" onClick={() => onView('credits')}>Credits</button>
           </div>
         )}
@@ -97,6 +101,7 @@ export function GameMenu({
             <button type="button" onClick={() => onView('menu')}>Back</button>
           </div>
         )}
+        {view === 'feedback' && <FeedbackPanel onBack={() => onView('menu')} />}
       </section>
     </main>
   );

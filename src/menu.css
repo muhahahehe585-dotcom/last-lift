@@ -61,3 +61,45 @@
   display: block;
   margin-bottom: 4px;
 }
+
+.feedback-box {
+  min-height: 150px;
+  resize: vertical;
+  padding: 12px;
+  border: 2px solid #596057;
+  border-radius: 8px;
+  background: #fffdf7;
+  color: #171817;
+  font: inherit;
+  line-height: 1.4;
+}
+
+.feedback-message {
+  font-weight: 900;
+}
+
+.feedback-list {
+  max-height: 240px;
+  display: grid;
+  gap: 8px;
+  overflow: auto;
+  padding: 10px;
+  border: 2px solid #596057;
+  border-radius: 8px;
+  background: #d9d4c5;
+}
+
+.feedback-item {
+  display: grid;
+  gap: 4px;
+  padding: 10px;
+  border: 2px solid rgba(89, 96, 87, 0.45);
+  border-radius: 8px;
+  background: #fffdf7;
+}
+
+.feedback-item time {
+  color: #596057;
+  font-size: 12px;
+  font-weight: 900;
+}
