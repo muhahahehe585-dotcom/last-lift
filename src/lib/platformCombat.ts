@@ -102,9 +102,15 @@ function updateVentMonster(state: PlatformGameState, enemy: Enemy, dt: number) {
   return { ...enemy, x: nextX, y: floorY - 112, width: 150, height: 112, vx: Math.abs(enemy.vx) };
 }
 
-function updateBoss(_state: PlatformGameState, enemy: Enemy, dt: number) {
+function updateBoss(state: PlatformGameState, enemy: Enemy, dt: number) {
   const pulse = Math.max(0, enemy.attackPulse - dt);
-  return { ...enemy, y: floorY - enemy.height, vx: 0, attackPulse: pulse };
+  const bossCenter = enemy.x + enemy.width / 2;
+  const playerCenter = state.player.x + state.player.width / 2;
+  const direction = playerCenter < bossCenter ? -1 : 1;
+  const resting = Math.abs(playerCenter - bossCenter) < 260 || Math.abs(state.player.vx) < 5;
+  const speed = resting ? 0 : direction * 70;
+  const x = Math.max(1420, Math.min(2190, enemy.x + speed * dt));
+  return { ...enemy, x, y: floorY - enemy.height, vx: speed, attackPulse: pulse };
 }
 
 function enemyWouldCrossHole(state: PlatformGameState, enemy: Enemy, x: number) {

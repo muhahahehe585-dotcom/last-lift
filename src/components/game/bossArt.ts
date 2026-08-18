@@ -1,100 +1,111 @@
-import serpentSheetUrl from '../../assets/serpent-boss-sheet.jpg';
-import { groundClawRects } from '../../lib/bossHazardLayout';
-import { bossHeadSpot, bossTailSpot } from '../../lib/bossWeakSpots';
+import bossSheetUrl from '../../assets/gauntlet-boss-idle-sheet.jpg';
+import bossHitSheetUrl from '../../assets/gauntlet-boss-hit-sheet.jpg';
+import bossWalkSheetUrl from '../../assets/gauntlet-boss-walk-sheet.jpg';
 import { finalFloor, floorY } from '../../lib/platformLevel';
 import type { Enemy, PlatformGameState } from '../../lib/platformTypes';
 
 type Frame = { x: number; y: number; width: number; height: number };
 
-const sheet = new Image();
-sheet.src = serpentSheetUrl;
+const idleSheet = new Image();
+idleSheet.src = bossSheetUrl;
+const hitSheet = new Image();
+hitSheet.src = bossHitSheetUrl;
+const walkSheet = new Image();
+walkSheet.src = bossWalkSheetUrl;
 
-const headFrame = { x: 718, y: 34, width: 238, height: 188 }, bodyFrame = { x: 28, y: 284, width: 1326, height: 218 };
-const tailFrame = { x: 300, y: 585, width: 990, height: 122 }, clawFrame = { x: 72, y: 552, width: 218, height: 174 };
+const idleFrames: Frame[] = [
+  { x: 34, y: 32, width: 294, height: 330 },
+  { x: 388, y: 34, width: 286, height: 326 },
+  { x: 740, y: 34, width: 286, height: 326 },
+  { x: 1092, y: 34, width: 286, height: 326 },
+];
+const walkFrames: Frame[] = [
+  ...idleFrames,
+  { x: 34, y: 416, width: 294, height: 332 },
+  { x: 388, y: 418, width: 286, height: 328 },
+  { x: 740, y: 418, width: 286, height: 328 },
+  { x: 1092, y: 418, width: 286, height: 328 },
+];
+const hitFrames: Frame[] = [
+  { x: 12, y: 58, width: 290, height: 204 },
+  { x: 324, y: 38, width: 280, height: 224 },
+  { x: 625, y: 86, width: 300, height: 176 },
+  { x: 902, y: 112, width: 264, height: 150 },
+  { x: 1132, y: 92, width: 250, height: 170 },
+];
 const cleanedFrames = new Map<string, HTMLCanvasElement>();
 
 export function drawBoss(ctx: CanvasRenderingContext2D, enemy: Enemy) {
-  if (!sheet.complete || sheet.naturalWidth === 0) return drawFallbackBoss(ctx, enemy);
-  drawBossWalls(ctx, enemy);
-  const bodyX = enemy.x - 850;
-  const bodyY = enemy.y + 96;
-  drawFrame(ctx, headFrame, 'head', enemy.x - 1108, enemy.y - 52, 278, 220);
-  drawFrame(ctx, bodyFrame, 'body', bodyX, bodyY, 1080, 162);
-  drawFrame(ctx, tailFrame, 'tail', enemy.x - 36, enemy.y + 118, 380, 94, true);
-  drawWeakSpotGlow(ctx, bossHeadSpot(enemy));
-  drawWeakSpotGlow(ctx, bossTailSpot(enemy));
+  const attacking = enemy.attackPulse > 0;
+  const walking = !attacking && Math.abs(enemy.vx) > 5;
+  const image = attacking ? hitSheet : walking ? walkSheet : idleSheet;
+  const frames = attacking ? hitFrames : walking ? walkFrames : idleFrames;
+  if (!image.complete || image.naturalWidth === 0) return drawFallbackBoss(ctx, enemy);
+  const frameIndex = attacking ? hitIndex(enemy.attackPulse) : Math.floor(performance.now() / (walking ? 115 : 180)) % frames.length;
+  const pulse = attacking || walking ? 1 : 0.9 + Math.sin(performance.now() / 130) * 0.04;
+  const width = (attacking ? 290 : 250) * pulse;
+  const height = (attacking ? 218 : 282) * pulse;
+  const x = enemy.x + enemy.width / 2 - width / 2;
+  const y = floorY - height + 10;
+  const flip = enemy.vx < -5;
+  drawFrame(ctx, image, frames[frameIndex], `${attacking ? 'hit' : walking ? 'walk' : 'idle'}-${frameIndex}`, x, y, width, height, flip);
+  drawGauntlet(ctx, flip ? x + width * 0.12 : x + width * 0.76, y + height * 0.18, pulse);
+}
+
+function hitIndex(attackPulse: number) {
+  const progress = Math.max(0, Math.min(1, 1 - attackPulse / 0.34));
+  return Math.min(hitFrames.length - 1, Math.floor(progress * hitFrames.length));
 }
 
 export function drawBossHazards(ctx: CanvasRenderingContext2D, state: PlatformGameState) {
   if (state.floor !== finalFloor) return;
-  drawLightningWarning(ctx, state); drawGroundClaw(ctx);
+  drawFireballWarning(ctx, state);
 }
 
-function drawGroundClaw(ctx: CanvasRenderingContext2D) {
-  const pulse = 0.92 + Math.sin(performance.now() / 180) * 0.04;
-  groundClawRects.forEach((claw, index) => drawGroundClawAt(ctx, claw.x, claw.y, pulse, index % 2 === 1));
-}
-
-function drawGroundClawAt(ctx: CanvasRenderingContext2D, x: number, y: number, scale: number, flip: boolean) {
-  const width = 205 * scale;
-  const height = 150 * scale;
-  if (sheet.complete && sheet.naturalWidth > 0) {
-    drawFrame(ctx, clawFrame, 'claw', x - 8, y - 38, width, height, flip);
-    return;
-  }
-  ctx.fillStyle = '#5b6368';
-  ctx.fillRect(x, y, width, height);
-}
-
-function drawLightningWarning(ctx: CanvasRenderingContext2D, state: PlatformGameState) {
+function drawFireballWarning(ctx: CanvasRenderingContext2D, state: PlatformGameState) {
   if (state.bossLightningStrike > 0) {
-    const alpha = Math.min(1, state.bossLightningStrike / 0.32);
-    ctx.fillStyle = `rgba(122, 244, 255, ${0.45 + alpha * 0.35})`;
-    ctx.fillRect(state.bossLightningX - 28, 38, 56, floorY - 38);
-    ctx.fillStyle = `rgba(255, 255, 255, ${0.35 + alpha * 0.35})`;
-    ctx.fillRect(state.bossLightningX - 8, 24, 16, floorY);
-    return;
+    return drawFallingFireball(ctx, state);
   }
-  if (state.bossLightningWarning <= 0) return;
-  const pulse = 0.55 + Math.sin(performance.now() / 90) * 0.25;
-  ctx.strokeStyle = `rgba(255, 66, 66, ${pulse})`;
-  ctx.lineWidth = 4;
-  ctx.beginPath();
-  ctx.arc(state.bossLightningX, floorY - 38, 34, 0, Math.PI * 2);
-  ctx.moveTo(state.bossLightningX - 52, floorY - 38);
-  ctx.lineTo(state.bossLightningX + 52, floorY - 38);
-  ctx.moveTo(state.bossLightningX, floorY - 90);
-  ctx.lineTo(state.bossLightningX, floorY + 14);
-  ctx.stroke();
 }
 
-function drawFrame(ctx: CanvasRenderingContext2D, source: Frame, key: string, x: number, y: number, width: number, height: number, flip = false) {
-  const frame = cleanFrame(source, key);
+function drawFallingFireball(ctx: CanvasRenderingContext2D, state: PlatformGameState) {
+  const progress = 1 - Math.max(0, Math.min(1, state.bossLightningStrike)), x = state.bossLightningX, y = 42 + progress * (floorY - 90);
+  ctx.fillStyle = 'rgba(255, 75, 31, 0.36)';
+  ctx.fillRect(x - 28, Math.max(0, y - 124), 56, 126);
+  ctx.fillStyle = '#b83f35'; ctx.fillRect(x - 28, y - 22, 56, 44);
+  ctx.fillStyle = '#ff8a3d'; ctx.fillRect(x - 20, y - 30, 40, 54);
+  ctx.fillStyle = '#f2dc5d'; ctx.fillRect(x - 10, y - 38, 20, 60);
+  if (progress < 0.82) return;
+  const blast = (progress - 0.82) / 0.18;
+  ctx.fillStyle = `rgba(255, 141, 61, ${1 - blast * 0.45})`;
+  ctx.fillRect(x - 76 * blast, floorY - 40 - 52 * blast, 152 * blast, 72 * blast);
+}
+
+function drawFrame(ctx: CanvasRenderingContext2D, image: HTMLImageElement, source: Frame, key: string, x: number, y: number, width: number, height: number, flip: boolean) {
+  const frame = cleanFrame(image, source, key);
+  if (!flip) return void ctx.drawImage(frame, x, y, width, height);
   ctx.save();
-  if (flip) {
-    ctx.translate(x + width, y);
-    ctx.scale(-1, 1);
-    ctx.drawImage(frame, 0, 0, width, height);
-  } else {
-    ctx.drawImage(frame, x, y, width, height);
-  }
+  ctx.translate(x + width, y);
+  ctx.scale(-1, 1);
+  ctx.drawImage(frame, 0, 0, width, height);
   ctx.restore();
 }
 
-function drawWeakSpotGlow(ctx: CanvasRenderingContext2D, spot: { x: number; y: number; width: number; height: number }) {
-  ctx.strokeStyle = 'rgba(122, 244, 255, 0.38)';
-  ctx.lineWidth = 3;
-  ctx.strokeRect(spot.x, spot.y, spot.width, spot.height);
+function drawGauntlet(ctx: CanvasRenderingContext2D, x: number, y: number, scale: number) {
+  const size = 44 * scale;
+  ctx.fillStyle = 'rgba(255, 128, 54, 0.35)';
+  ctx.fillRect(x - size * 0.45, y - size * 0.55, size * 1.6, size * 1.6);
+  ctx.fillStyle = '#c49b55';
+  ctx.fillRect(x, y, size * 0.82, size * 0.66);
+  ctx.fillStyle = '#f2dc5d';
+  for (let i = 0; i < 4; i += 1) ctx.fillRect(x + i * size * 0.2, y - size * (0.5 + i * 0.05), size * 0.14, size * 0.58);
+  ctx.fillStyle = '#4aa3ff';
+  ctx.fillRect(x + size * 0.2, y + size * 0.17, size * 0.14, size * 0.14);
+  ctx.fillStyle = '#b83f35';
+  ctx.fillRect(x + size * 0.46, y + size * 0.12, size * 0.14, size * 0.14);
 }
 
-function drawBossWalls(ctx: CanvasRenderingContext2D, enemy: Enemy) {
-  ctx.fillStyle = '#171b20';
-  ctx.fillRect(enemy.x - 1126, 88, 26, floorY - 88); ctx.fillRect(enemy.x + 330, 88, 26, floorY - 88);
-  ctx.fillStyle = '#2d3840';
-  ctx.fillRect(enemy.x - 1118, 104, 5, floorY - 126); ctx.fillRect(enemy.x + 338, 104, 5, floorY - 126);
-}
-
-function cleanFrame(source: Frame, key: string) {
+function cleanFrame(image: HTMLImageElement, source: Frame, key: string) {
   const cached = cleanedFrames.get(key);
   if (cached) return cached;
   const canvas = document.createElement('canvas');
@@ -102,7 +113,7 @@ function cleanFrame(source: Frame, key: string) {
   canvas.height = source.height;
   const ctx = canvas.getContext('2d');
   if (!ctx) return canvas;
-  ctx.drawImage(sheet, source.x, source.y, source.width, source.height, 0, 0, source.width, source.height);
+  ctx.drawImage(image, source.x, source.y, source.width, source.height, 0, 0, source.width, source.height);
   eraseLightGrid(ctx, source.width, source.height);
   cleanedFrames.set(key, canvas);
   return canvas;
@@ -111,40 +122,16 @@ function cleanFrame(source: Frame, key: string) {
 function eraseLightGrid(ctx: CanvasRenderingContext2D, width: number, height: number) {
   const image = ctx.getImageData(0, 0, width, height);
   const data = image.data;
-  const seen = new Uint8Array(width * height);
-  const queue: number[] = [];
-  for (let x = 0; x < width; x += 1) { queueIfGrid(x, 0); queueIfGrid(x, height - 1); }
-  for (let y = 0; y < height; y += 1) { queueIfGrid(0, y); queueIfGrid(width - 1, y); }
-  for (let index = 0; index < queue.length; index += 1) {
-    const point = queue[index];
-    const x = point % width;
-    const y = Math.floor(point / width);
-    data[point * 4 + 3] = 0;
-    queueIfGrid(x + 1, y); queueIfGrid(x - 1, y); queueIfGrid(x, y + 1); queueIfGrid(x, y - 1);
+  for (let i = 0; i < data.length; i += 4) {
+    const r = data[i], g = data[i + 1], b = data[i + 2];
+    const neutral = Math.abs(r - g) < 28 && Math.abs(g - b) < 28;
+    if ((r > 178 && g > 178 && b > 178) || (neutral && r > 132)) data[i + 3] = 0;
   }
   ctx.putImageData(image, 0, 0);
-
-  function queueIfGrid(x: number, y: number) {
-    if (x < 0 || y < 0 || x >= width || y >= height) return;
-    const point = y * width + x;
-    if (seen[point]) return;
-    seen[point] = 1;
-    const offset = point * 4;
-    const r = data[offset];
-    const g = data[offset + 1];
-    const b = data[offset + 2];
-    const neutral = Math.abs(r - g) < 24 && Math.abs(g - b) < 24;
-    if ((r > 178 && g > 178 && b > 178) || (neutral && r > 126)) queue.push(point);
-  }
 }
 
 function drawFallbackBoss(ctx: CanvasRenderingContext2D, enemy: Enemy) {
-  drawBossWalls(ctx, enemy);
-  ctx.fillStyle = '#101826';
-  ctx.fillRect(enemy.x - 850, enemy.y + 102, 1080, 140);
-  ctx.fillStyle = '#2ee6ff';
-  ctx.fillRect(enemy.x - 820, enemy.y + 146, 1010, 18);
-  ctx.fillStyle = '#b83f35';
-  ctx.fillRect(enemy.x - 1088, enemy.y - 10, 230, 110);
-  ctx.fillRect(enemy.x, enemy.y + 136, 300, 52);
+  ctx.fillStyle = '#1a1515';
+  ctx.fillRect(enemy.x - 20, floorY - 260, 210, 260);
+  drawGauntlet(ctx, enemy.x + 122, floorY - 230, 0.86);
 }

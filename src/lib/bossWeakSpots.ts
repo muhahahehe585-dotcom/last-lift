@@ -3,24 +3,24 @@ import type { Enemy, Rect } from './platformTypes';
 
 export function bossHeadSpot(enemy: Enemy): Rect {
   return {
-    x: enemy.x - 1088,
-    y: enemy.y - 44,
-    width: 248,
-    height: 188,
+    x: enemy.x - 52,
+    y: enemy.y - 116,
+    width: 148,
+    height: 154,
   };
 }
 
 export function bossTailSpot(enemy: Enemy): Rect {
   return {
-    x: enemy.x - 18,
-    y: enemy.y + 124,
-    width: 330,
-    height: 84,
+    x: enemy.x + 70,
+    y: enemy.y - 72,
+    width: 132,
+    height: 112,
   };
 }
 
 export function bossWeakSpots(enemy: Enemy) {
-  return [bossHeadSpot(enemy), bossTailSpot(enemy)];
+  return [{ x: enemy.x, y: enemy.y, width: enemy.width, height: enemy.height }];
 }
 
 export function hitsBossWeakSpot(enemy: Enemy, rect: Rect) {

@@ -241,7 +241,7 @@ export function createLevel(floor: number, hp = 100, carry: LevelCarry = {}): Pl
     bossTimeLeft: bossFloor ? 600 : 0,
     bossClawTimer: bossFloor ? 1.2 : 0,
     bossClawX: 620,
-    bossLightningWarning: bossFloor ? 3 : 0,
+    bossLightningWarning: bossFloor ? 10 : 0,
     bossLightningStrike: 0,
     bossLightningX: 760,
     gauntletSnapTimer: 0,
