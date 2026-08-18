@@ -33,11 +33,16 @@ export async function deleteFeedback(id: string) {
 }
 
 export async function canDeleteFeedback() {
+  const email = await currentUserEmail();
+  return email === 'muhahahehe585@gmail.com';
+}
+
+export async function currentUserEmail() {
   const session = await supabase.auth.getSession();
   const sessionEmail = session.data.session?.user.email?.toLowerCase();
-  if (sessionEmail) return sessionEmail === 'muhahahehe585@gmail.com';
+  if (sessionEmail) return sessionEmail;
   const { data } = await supabase.auth.getUser();
-  return data.user?.email?.toLowerCase() === 'muhahahehe585@gmail.com';
+  return data.user?.email?.toLowerCase() ?? '';
 }
 
 function feedbackErrorMessage(error: string) {
