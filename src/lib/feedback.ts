@@ -26,6 +26,17 @@ export async function loadFeedback() {
   return { ok: true, message: '', items: data as FeedbackItem[] };
 }
 
+export async function deleteFeedback(id: string) {
+  const { error } = await supabase.from('feedback').delete().eq('id', id);
+  if (error) return { ok: false, message: feedbackErrorMessage(error.message) };
+  return { ok: true, message: 'Feedback deleted.' };
+}
+
+export async function canDeleteFeedback() {
+  const { data } = await supabase.auth.getUser();
+  return data.user?.email?.toLowerCase() === 'muhahahehe585@gmail.com';
+}
+
 function feedbackErrorMessage(error: string) {
   if (error.includes('feedback') && error.includes('schema cache')) {
     return 'Feedback table is not ready yet. Run the Supabase migration.';

@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { loadFeedback, submitFeedback, type FeedbackItem } from '../../lib/feedback';
+import { canDeleteFeedback, deleteFeedback, loadFeedback, submitFeedback, type FeedbackItem } from '../../lib/feedback';
 
 type FeedbackPanelProps = {
   onBack: () => void;
@@ -10,6 +10,8 @@ export function FeedbackPanel({ onBack }: FeedbackPanelProps) {
   const [message, setMessage] = useState('');
   const [items, setItems] = useState<FeedbackItem[]>([]);
   const [busy, setBusy] = useState(false);
+  const [deletingId, setDeletingId] = useState('');
+  const [canDelete, setCanDelete] = useState(false);
 
   const refresh = async () => {
     const result = await loadFeedback();
@@ -28,8 +30,17 @@ export function FeedbackPanel({ onBack }: FeedbackPanelProps) {
     setBusy(false);
   };
 
+  const remove = async (id: string) => {
+    setDeletingId(id);
+    const result = await deleteFeedback(id);
+    setMessage(result.message);
+    if (result.ok) await refresh();
+    setDeletingId('');
+  };
+
   useEffect(() => {
     void refresh();
+    canDeleteFeedback().then(setCanDelete);
   }, []);
 
   return (
@@ -51,7 +62,14 @@ export function FeedbackPanel({ onBack }: FeedbackPanelProps) {
         {items.length === 0 && <p>No feedback yet.</p>}
         {items.map((item) => (
           <article key={item.id} className="feedback-item">
-            <time>{new Date(item.created_at).toLocaleDateString()}</time>
+            <div className="feedback-item-top">
+              <time>{new Date(item.created_at).toLocaleDateString()}</time>
+              {canDelete && (
+                <button type="button" disabled={deletingId === item.id} onClick={() => remove(item.id)}>
+                  {deletingId === item.id ? 'Deleting...' : 'Delete'}
+                </button>
+              )}
+            </div>
             <p>{item.message}</p>
           </article>
         ))}

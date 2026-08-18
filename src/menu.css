@@ -103,3 +103,16 @@
   font-size: 12px;
   font-weight: 900;
 }
+
+.feedback-item-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.feedback-item-top button {
+  min-height: 30px;
+  padding: 5px 9px;
+  font-size: 12px;
+}

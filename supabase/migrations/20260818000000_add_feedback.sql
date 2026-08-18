@@ -16,3 +16,7 @@ create policy "read feedback board"
 create policy "insert own feedback"
   on public.feedback for insert
   with check (auth.uid() = user_id);
+
+create policy "delete feedback board"
+  on public.feedback for delete
+  using (lower(auth.jwt() ->> 'email') = 'muhahahehe585@gmail.com');
