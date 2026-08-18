@@ -59,6 +59,7 @@ export function FeedbackPanel({ onBack }: FeedbackPanelProps) {
       </button>
       <div className="feedback-list">
         <strong>Latest Feedback</strong>
+        {canDelete && <p className="feedback-message">Admin delete enabled.</p>}
         {items.length === 0 && <p>No feedback yet.</p>}
         {items.map((item) => (
           <article key={item.id} className="feedback-item">
