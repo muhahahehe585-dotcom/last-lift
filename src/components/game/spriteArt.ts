@@ -1,3 +1,5 @@
+import flashlightSpriteUrl from '../../assets/flashlight-sprite.png';
+import gunSpriteUrl from '../../assets/gun-sprite.png';
 import { floorY } from '../../lib/platformLevel';
 import type { Enemy, Item, PlatformGameState } from '../../lib/platformTypes';
 import { drawBoss } from './bossArt';
@@ -10,6 +12,11 @@ function px(ctx: CanvasRenderingContext2D, color: string, x: number, y: number, 
   ctx.fillStyle = color;
   ctx.fillRect(Math.round(x), Math.round(y), Math.round(w), Math.round(h));
 }
+
+const gunSprite = new Image();
+gunSprite.src = gunSpriteUrl;
+const flashlightSprite = new Image();
+flashlightSprite.src = flashlightSpriteUrl;
 
 export function drawPlayer(ctx: CanvasRenderingContext2D, state: PlatformGameState) {
   const p = state.player;
@@ -130,12 +137,24 @@ function drawMedkit(ctx: CanvasRenderingContext2D, item: Item) {
 }
 
 function drawFlashlight(ctx: CanvasRenderingContext2D, item: Item) {
+  if (flashlightSprite.complete && flashlightSprite.naturalWidth > 0) {
+    const width = item.width * 2.1;
+    const height = width * (flashlightSprite.naturalHeight / flashlightSprite.naturalWidth);
+    ctx.drawImage(flashlightSprite, item.x - width * 0.15, item.y + item.height - height, width, height);
+    return;
+  }
   px(ctx, '#cfc7b3', item.x, item.y + 12, 28, 10);
   px(ctx, '#f2dc5d', item.x + 21, item.y + 9, 8, 16);
   px(ctx, '#596057', item.x + 6, item.y + 14, 8, 6);
 }
 
 function drawGun(ctx: CanvasRenderingContext2D, item: Item) {
+  if (gunSprite.complete && gunSprite.naturalWidth > 0) {
+    const width = item.width * 1.8;
+    const height = width * (gunSprite.naturalHeight / gunSprite.naturalWidth);
+    ctx.drawImage(gunSprite, item.x - width * 0.2, item.y + item.height - height, width, height);
+    return;
+  }
   px(ctx, '#89939a', item.x, item.y + 8, 32, 9);
   px(ctx, '#202329', item.x + 18, item.y + 17, 8, 12);
   px(ctx, '#111311', item.x + 5, item.y + 17, 10, 4);

@@ -1,6 +1,6 @@
 import { type ReactNode, useEffect, useRef } from 'react';
 import { viewWidth, worldHeight } from '../../lib/platformLevel';
-import type { ItemKind, PlatformGameState } from '../../lib/platformTypes';
+import type { PlatformGameState } from '../../lib/platformTypes';
 import { drawActionHitboxes, type InventoryItem } from './actionHitboxArt';
 import { drawBossHazards } from './bossArt';
 import { cameraXFor, drawDarkness, drawDoorPrompt, drawHotel } from './platformArt';
@@ -9,6 +9,7 @@ import { drawBulletSprite } from './droneBulletArt';
 import { drawEscapeEnding, drawHalfUniverseEnding, drawLastStandEnding, drawRageEnding, drawRanAwayEnding, drawRulerEnding, drawSunsetEnding, drawSuperheroEnding } from './endingArt';
 import { drawMeteorShower, drawMeteorThrow } from './meteorArt';
 import { drawEnemy, drawItem, drawPlayer } from './spriteArt';
+import { drawRoomInterior } from './roomInteriorArt';
 import { drawTrainDuelOverlay } from './trainDuelArt';
 
 type PlatformCanvasProps = {
@@ -22,48 +23,6 @@ type PlatformCanvasProps = {
   onUseInventory: (x: number, y: number) => void;
   children?: ReactNode;
 };
-
-function drawRoomInterior(ctx: CanvasRenderingContext2D, state: PlatformGameState) {
-  const room = state.currentRoom;
-  if (!room) return;
-  ctx.fillStyle = 'rgba(0, 0, 0, 0.72)';
-  ctx.fillRect(0, 0, viewWidth, worldHeight);
-  ctx.fillStyle = '#15130f';
-  ctx.fillRect(210, 95, 780, 430);
-  ctx.fillStyle = '#27221b';
-  ctx.fillRect(238, 125, 724, 320);
-  ctx.fillStyle = '#4a3727';
-  ctx.fillRect(275, 355, 660, 42);
-  ctx.fillStyle = '#3a2b20';
-  ctx.fillRect(305, 250, 180, 96);
-  ctx.fillRect(710, 276, 145, 62);
-  ctx.fillStyle = '#6f543b';
-  ctx.fillRect(512, 292, 96, 54);
-  ctx.fillStyle = '#c49b55';
-  ctx.fillRect(552, 312, 10, 8);
-  ctx.fillStyle = '#1b1a16';
-  ctx.fillRect(760, 155, 92, 80);
-  ctx.fillStyle = '#cfc7b3';
-  ctx.font = '24px monospace';
-  ctx.fillText(room.searched ? 'DRAWER OPEN' : 'INSIDE ROOM', 455, 185);
-  ctx.font = '18px monospace';
-  ctx.fillText(room.searched ? 'Press O to leave' : 'Press E to open drawer', 475, 220);
-  drawRoomLoot(ctx, room.loot, room.searched);
-}
-
-function drawRoomLoot(ctx: CanvasRenderingContext2D, loot: ItemKind | 'empty', searched: boolean) {
-  if (!searched) return;
-  if (loot === 'empty') {
-    ctx.fillStyle = '#6f756d';
-    ctx.font = '20px monospace';
-    ctx.fillText('nothing', 548, 395);
-    return;
-  }
-  drawItem(ctx, { id: 'room-loot', kind: loot, x: 548, y: 365, width: 32, height: 34 });
-  ctx.fillStyle = '#111311';
-  ctx.font = '18px monospace';
-  ctx.fillText(loot.toUpperCase(), 510, 435);
-}
 
 export function PlatformCanvas({ state, onAim, onMeteorClick, onTrainBullet, onTrainHealth, onTrainDuel, selectedInventory, onUseInventory, children }: PlatformCanvasProps) {
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
