@@ -35,7 +35,7 @@
 .falling-elevator img {
   position: absolute;
   top: -52vh;
-  left: max(10vw, calc(50vw - 360px));
+  left: var(--elevator-x);
   width: clamp(140px, 22vw, 280px);
   opacity: 0;
   filter: drop-shadow(0 18px 20px rgba(0, 0, 0, 0.5));
@@ -49,12 +49,12 @@
     transform: translate3d(12vw, -20vh, 0) rotate(-4deg);
   }
 
-  3%,
-  17% {
+  2%,
+  10% {
     opacity: 0.58;
   }
 
-  20% {
+  12% {
     opacity: 0;
     transform: translate3d(-10vw, 170vh, 0) rotate(-4deg);
   }
