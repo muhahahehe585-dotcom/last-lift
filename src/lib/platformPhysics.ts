@@ -3,7 +3,7 @@ import { overlaps } from './platformGeometry';
 import { hitPlayer, normalHit, slamEnemies, updateEnemies } from './platformCombat';
 import { updateBossHazards } from './bossHazards';
 import { applyEventDamage } from './platformHazards';
-import { collectItems, enterVentRoute, handleActionInputs, ventBossPlatforms } from './platformInteractions';
+import { collectItems, handleActionInputs, ventBossPlatforms } from './platformInteractions';
 import { startTrainDuel, updateTrainDuel } from './trainDuel';
 import type { InputState, PlatformGameState } from './platformTypes';
 import { awardCoins, awardFloorCoin } from './progress';
@@ -130,21 +130,6 @@ function boxUnderPlayer(state: PlatformGameState, playerX: number, playerBottom:
   return state.boxes.find((box) => feet > box.x && feet < box.x + box.width && playerBottom >= box.y && playerBottom <= box.y + 42);
 }
 
-function trySecretFloorOneHoles(state: PlatformGameState, player: PlatformGameState['player']) {
-  if (state.floor !== 1) return null;
-  const feet = player.x + player.width / 2;
-  const hole = state.holes.find((item) => feet > item.x + 8 && feet < item.x + item.width - 8);
-  if (!hole || player.y < floorY + 46) return null;
-  if (hole === state.holes[0]) {
-    return {
-      ...createLevel(finalFloor, player.hp, { ...getCarry(state), infinityStones: 6 }),
-      message: 'Secret vent found. It throws you straight onto the roof.',
-    };
-  }
-  const ventLevel = createLevel(13, player.hp, { ...getCarry(state), hasGun: true, shots: 0, unlimitedGun: true });
-  return enterVentRoute(ventLevel, 'Second secret vent found. You are inside the vents with an unlimited revolver.');
-}
-
 export function updatePlatformGame(state: PlatformGameState, input: InputState, dt: number): PlatformGameState {
   if (state.status === 'lost') return { ...state, deathTimer: state.deathTimer + dt };
   if (state.status !== 'playing') return state;
@@ -207,8 +192,6 @@ export function updatePlatformGame(state: PlatformGameState, input: InputState, 
   const wasAirSlamming = player.isSlamming;
   const turnedBackEnding = tryTurnedBackDoor(state, player);
   if (turnedBackEnding) return turnedBackEnding;
-  const secretHole = trySecretFloorOneHoles(state, player);
-  if (secretHole) return secretHole;
 
   if (player.y > floorY + 130) {
     return {
