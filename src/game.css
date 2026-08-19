@@ -40,7 +40,7 @@
 
 .platform-canvas {
   width: 100%;
-  height: 100vh;
+  height: 100dvh;
   aspect-ratio: 1400 / 640;
   border: 0;
   border-radius: 0;
@@ -53,7 +53,7 @@
 .platform-stage {
   position: relative;
   width: 100vw;
-  height: 100vh;
+  height: 100dvh;
   overflow: hidden;
 }
 
@@ -435,5 +435,175 @@ h1 {
   .mobile-actions {
     grid-template-columns: repeat(3, minmax(0, 1fr));
     transform: translateY(-38px);
+  }
+}
+
+@media (hover: none) and (orientation: landscape) and (max-height: 560px),
+  (pointer: coarse) and (orientation: landscape) and (max-height: 560px) {
+  .platform-shell,
+  .platform-stage,
+  .platform-canvas {
+    height: 100dvh;
+    min-height: 100dvh;
+  }
+
+  .hud-bars,
+  .hud-items,
+  .hud-power,
+  .hud-menu,
+  .game-message {
+    border-width: 1px;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.38);
+  }
+
+  .hud-bars {
+    left: max(8px, env(safe-area-inset-left));
+    top: 8px;
+    width: min(300px, 38vw);
+    gap: 4px;
+    padding: 8px;
+  }
+
+  .meter-row,
+  .resource-row {
+    gap: 8px;
+    font-size: 12px;
+  }
+
+  .health-shell,
+  .stamina-shell {
+    height: 10px;
+    border-width: 1px;
+    border-radius: 4px;
+  }
+
+  .hud-items {
+    left: max(8px, env(safe-area-inset-left));
+    top: 88px;
+    min-width: 136px;
+    gap: 3px;
+    padding: 7px 8px;
+  }
+
+  .hud-items > strong {
+    font-size: 12px;
+  }
+
+  .hud-items .resource-row {
+    padding-top: 3px;
+  }
+
+  .hud-items .resource-row:nth-of-type(n + 3) {
+    display: none;
+  }
+
+  .hud-power {
+    top: 8px;
+    gap: 5px;
+    padding: 5px 7px;
+  }
+
+  .lightning-icon {
+    width: 28px;
+    height: 28px;
+    border-width: 1px;
+    border-radius: 6px;
+  }
+
+  .hud-menu {
+    top: 8px;
+    right: max(8px, env(safe-area-inset-right));
+    gap: 6px;
+    padding: 5px;
+  }
+
+  .hud-menu button {
+    min-height: 30px;
+    padding: 5px 8px;
+    border-width: 1px;
+    font-size: 12px;
+  }
+
+  .game-message {
+    bottom: calc(82px + env(safe-area-inset-bottom));
+    width: min(390px, 46vw);
+    padding: 7px 10px;
+    font-size: 13px;
+    line-height: 1.2;
+  }
+
+  .mobile-controls {
+    display: block;
+    left: max(8px, env(safe-area-inset-left));
+    right: max(8px, env(safe-area-inset-right));
+    bottom: calc(8px + env(safe-area-inset-bottom));
+    height: 92px;
+  }
+
+  .mobile-pad {
+    position: absolute;
+    left: 0;
+    bottom: 0;
+    width: 132px;
+    gap: 6px;
+  }
+
+  .mobile-actions {
+    position: absolute;
+    right: 62px;
+    bottom: 0;
+    width: min(360px, 42vw);
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 6px;
+    transform: none;
+  }
+
+  .mobile-inventory {
+    position: absolute;
+    right: 62px;
+    bottom: 42px;
+    width: min(300px, 38vw);
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 6px;
+  }
+
+  .mobile-menu-button {
+    display: none;
+  }
+
+  .mobile-controls button {
+    min-height: 34px;
+    padding: 4px 5px;
+    border-width: 1px;
+    border-radius: 7px;
+    font-size: 11px;
+    line-height: 1;
+  }
+
+  .mobile-inventory button {
+    grid-template-columns: minmax(0, 1fr) auto;
+    gap: 4px;
+  }
+
+  .mobile-inventory button span {
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .mobile-controls .arrow-button {
+    min-height: 40px;
+    font-size: 22px;
+  }
+
+  .mobile-pad-spacer {
+    min-height: 40px;
+  }
+
+  .mobile-controls .jump-button {
+    right: 0;
+    bottom: 0;
+    width: 54px;
+    height: 82px;
+    min-height: 82px;
   }
 }
