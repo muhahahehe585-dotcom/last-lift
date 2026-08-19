@@ -1,4 +1,5 @@
 import { FeedbackPanel } from './FeedbackPanel';
+import { FallingElevator } from './FallingElevator';
 import { armorCost, doubleJumpCost, endingLabels, infinityGauntletCost, type SavedEnding } from '../../lib/progress';
 
 type MenuView = 'menu' | 'credits' | 'help' | 'shop' | 'feedback';
@@ -36,6 +37,7 @@ export function GameMenu({
 }: GameMenuProps) {
   return (
     <main className="menu-screen">
+      <FallingElevator />
       <section className="menu-panel">
         <p className="eyebrow">Last Lift</p>
         <h1>Last Lift</h1>
