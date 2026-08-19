@@ -46,7 +46,7 @@
 @keyframes elevator-fall {
   0% {
     opacity: 0;
-    transform: translate3d(12vw, -20vh, 0) rotate(-4deg);
+    transform: translate3d(0, -20vh, 0) rotate(var(--elevator-rotation));
   }
 
   2%,
@@ -56,12 +56,12 @@
 
   12% {
     opacity: 0;
-    transform: translate3d(-10vw, 170vh, 0) rotate(-4deg);
+    transform: translate3d(var(--elevator-drift), 170vh, 0) rotate(var(--elevator-rotation));
   }
 
   100% {
     opacity: 0;
-    transform: translate3d(-10vw, 170vh, 0) rotate(-4deg);
+    transform: translate3d(var(--elevator-drift), 170vh, 0) rotate(var(--elevator-rotation));
   }
 }
 
