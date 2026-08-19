@@ -5,15 +5,16 @@ import { drawItem } from './spriteArt';
 
 const roomInterior = new Image();
 roomInterior.src = roomInteriorUrl;
+const roomFrame = { x: 210, y: 95, width: 780, height: 430 };
 
 export function drawRoomInterior(ctx: CanvasRenderingContext2D, state: PlatformGameState) {
   const room = state.currentRoom;
   if (!room) return;
 
-  ctx.fillStyle = '#080807';
+  ctx.fillStyle = 'rgba(0, 0, 0, 0.72)';
   ctx.fillRect(0, 0, viewWidth, worldHeight);
   if (roomInterior.complete && roomInterior.naturalWidth > 0) {
-    drawCoverImage(ctx, roomInterior);
+    drawCoverImage(ctx, roomInterior, roomFrame);
   } else {
     drawFallbackRoom(ctx);
   }
@@ -22,19 +23,24 @@ export function drawRoomInterior(ctx: CanvasRenderingContext2D, state: PlatformG
   drawRoomLoot(ctx, room.loot, room.searched);
 }
 
-function drawCoverImage(ctx: CanvasRenderingContext2D, image: HTMLImageElement) {
-  const scale = Math.max(viewWidth / image.naturalWidth, worldHeight / image.naturalHeight);
+function drawCoverImage(ctx: CanvasRenderingContext2D, image: HTMLImageElement, frame: typeof roomFrame) {
+  const scale = Math.max(frame.width / image.naturalWidth, frame.height / image.naturalHeight);
   const width = image.naturalWidth * scale;
   const height = image.naturalHeight * scale;
-  ctx.drawImage(image, (viewWidth - width) / 2, (worldHeight - height) / 2, width, height);
+  ctx.save();
+  ctx.beginPath();
+  ctx.rect(frame.x, frame.y, frame.width, frame.height);
+  ctx.clip();
+  ctx.drawImage(image, frame.x + (frame.width - width) / 2, frame.y + (frame.height - height) / 2, width, height);
+  ctx.restore();
 }
 
 function drawFallbackRoom(ctx: CanvasRenderingContext2D) {
   ctx.fillStyle = '#15130f';
-  ctx.fillRect(0, 0, viewWidth, worldHeight);
+  ctx.fillRect(roomFrame.x, roomFrame.y, roomFrame.width, roomFrame.height);
   ctx.fillStyle = '#4a3727';
-  ctx.fillRect(145, 180, 380, 320);
-  ctx.fillRect(545, 330, 410, 150);
+  ctx.fillRect(275, 225, 260, 220);
+  ctx.fillRect(555, 330, 300, 115);
   ctx.fillStyle = '#cfc7b3';
   ctx.font = '38px monospace';
   ctx.fillText('INSIDE ROOM', 435, 142);
